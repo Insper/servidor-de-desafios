@@ -32,7 +32,10 @@ def run_tests(challenge_code, test_code, challenge_name):
 
     # Setup
     if TestCase.CHALLENGE_FUN is None:
-        TestCase.CHALLENGE_FUN = eval(challenge_name)
+        try:
+            TestCase.CHALLENGE_FUN = eval(challenge_name)
+        except NameError:
+            return TestResults(None, ['Função não encontrada. Sua função deveria se chamar {}'.format(challenge_name)], False, [])
 
     stream = StringIO()
 
