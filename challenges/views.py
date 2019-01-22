@@ -14,8 +14,8 @@ def index(request):
     context = create_context()
     context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user)
     for sbc in context['submissions_by_challenge']:
-        sbc.tr_class = 'table-success' if sbc.best_result == Result.OK else 'table-warning'
-        sbc.success = 'Sim' if sbc.best_result == Result.OK else 'Não'
+        sbc.tr_class = 'table-success' if sbc.best_result == str(Result.OK) else 'table-warning'
+        sbc.success = 'Sim' if sbc.best_result == str(Result.OK) else 'Não'
     return render(request, 'challenges/index.html', context=context)
 
 @login_required

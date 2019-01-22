@@ -78,7 +78,7 @@ class ChallengeSubmission(models.Model):
             if sub.challenge in challenge2submissions:
                 sbc = challenge2submissions[sub.challenge]
                 if sub.result == str(Result.OK):
-                    sbc.best_result = Result.OK
+                    sbc.best_result = str(Result.OK)
                 sbc.submissions.append(sub)
             else:
                 challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
