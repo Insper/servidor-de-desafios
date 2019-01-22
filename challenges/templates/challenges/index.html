@@ -2,6 +2,31 @@
 
 {% block pagecontent %}
 
-TO DO :(
+<h1>Dashboard</h1>
+
+{% if submissions_by_challenge %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Desafio</th>
+                <th>Tentativas</th>
+                <th>Resolvido</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sbc in submissions_by_challenge %}
+                <tr class="{{ sbc.tr_class }}">
+                    <td><a href="/challenge/{{ sbc.challenge.id }}">{{ sbc.challenge.full_title }}</a></td>
+                    <td>{{ sbc.attempts }}</td>
+                    <td>{{ sbc.success }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>Você ainda não fez nenhuma submissão... :(</p>
+{% endif %}
 
 {% endblock %}

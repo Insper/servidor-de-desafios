@@ -35,6 +35,18 @@ def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'upload/user_{0}/{1}'.format(instance.author.username, filename)
 
+
+class SubmissionsByChallenge:
+    def __init__(self, challenge, submissions, best_result):
+        self.challenge = challenge
+        self.submissions = submissions
+        self.best_result = best_result
+
+    @property
+    def attempts(self):
+        return len(self.submissions)
+
+
 class ChallengeSubmission(models.Model):
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -57,3 +69,17 @@ class ChallengeSubmission(models.Model):
     @property
     def clean_failure_list(self):
         return list(set(self.failure_list))
+
+    @classmethod
+    def submissions_by_challenge(cls, author):
+        user_submissions = ChallengeSubmission.objects.filter(author=author)
+        challenge2submissions = {}
+        for sub in user_submissions:
+            if sub.challenge in challenge2submissions:
+                sbc = challenge2submissions[sub.challenge]
+                if sub.result == str(Result.OK):
+                    sbc.best_result = Result.OK
+                sbc.submissions.append(sub)
+            else:
+                challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
+        return list(challenge2submissions.values())
