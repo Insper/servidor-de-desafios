@@ -1,0 +1,35 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+      <ul class="nav nav-pills flex-column">
+
+        <!-- menu -->
+        {% for challenge in challenges %}
+        <li class="nav-item">
+          <a class="nav-link" href="/challenge/{{ challenge.id }}">{{ challenge.full_title }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
+
+      <!-- main -->
+      {% if msg != '' %}
+      <div class="alert alert-warning" role="alert">
+        {{ msg }}
+      </div>
+      {% endif %}
+
+    {% block pagecontent %}
+    {%  endblock %}
+
+    </main>
+  </div>
+</div>
+
+{% endblock %}

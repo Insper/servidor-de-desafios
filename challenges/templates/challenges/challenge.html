@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block pagecontent %}
+
+{% if challenge %}
+    <h1>{{ challenge.full_title }}</h1>
+
+    <section class="row placeholders">
+        <div class="col-12 col-sm-12 placeholder">
+            {% if expired %}
+            <div class="alert alert-warning">Prazo encerrado.</div>
+            {% elif challenge.expire is not None %}
+            <div class="text-muted">Prazo: {{ challenge.expire|date:'l d/m/Y H:i' }}</div>
+            {% endif %}
+            <div>{{ challenge.problem }}</div>
+        </div>
+        <div class="col-4 col-md-1 placeholder"></div>
+    </section>
+
+    <div class="row text-left">
+        <div class="col-2 col-md-2 placeholder"></div>
+        <div class="col-10 col-md-10 placeholder">
+        {% if expired %}
+            <p>Infelizmente o prazo já se encerrou...</p>
+        {% else %}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="resposta">Resposta:</label>
+                        <input type="file" class="form-control-file" id="resposta" name="code">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        {% endif %}
+        </div>
+    </div>
+    <br/><br/>
+    <h3>Envios:</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Tentativa</th>
+                <th>Feedback</th>
+                <th>Resultado</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ans in answers %}
+                <tr>
+                    <td>{{ ans.created|date:'d/m/Y H:i' }}</td>
+                    <td>
+                        <ul class="challenge-feedback-list">
+                        {% for failure in ans.clean_failure_list %}
+                            <li>{{ failure }}</li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ ans.result }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>O desafio não existe... :(</p>
+{% endif %}
+
+{% endblock %}

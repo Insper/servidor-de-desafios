@@ -1,0 +1,34 @@
+<h1>Relatório</h1>
+
+          <table class="table table-striped">
+            <col>
+            {% for e in challenges %}
+            <colgroup span="2"></colgroup>
+            {% endfor %}
+            <thead>
+              <tr>
+                <th rowspan="2">Usuário</th>
+                {% for e in challenges %}
+                <th colspan="2" scope="colgroup">Desafio {{ e[1] }}</th>
+                {% endfor %}
+              </tr>
+              <tr>
+                {% for e in challenges %}
+                <th scope="col">Submissões</th>
+                <th scope="col">Status</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for user_data in report_data %}
+              <tr>
+                <td>{{ user_data }}</td>
+                {% for e in challenges %}
+                {% set user_challenge = report_data[user_data][e[1]] %}
+                <td>{{ user_challenge['submissions'] }}</td>
+                <td class="{{ user_challenge['class'] }}">{{ user_challenge['status'] }}</td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
