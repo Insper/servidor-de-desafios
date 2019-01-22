@@ -3,6 +3,7 @@ tmp
 upload
 challenge_tests
 lambda_code.zip
+InsperProgChallenges/production_settings.py
 .idea
 
 # Byte-compiled / optimized / DLL files
