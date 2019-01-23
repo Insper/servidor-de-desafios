@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.core.files.base import ContentFile
 from challenges.code_runner import run_code
 
-from .models import Challenge, ChallengeSubmission, Result
+from .models import Challenge, ChallengeSubmission, Result, user_directory_path
 
 def create_context():
     challenges = Challenge.objects.order_by('id')
@@ -31,14 +32,18 @@ def challenge(request, c_id):
         msg = 'Sorry... Prazo expirado!'
     if request.method == 'POST' and challenge and not expired:
         fp = request.FILES.get('code', None)
+        answer = request.POST.get('codetext', None)
+        if answer and not fp:
+            fp = ContentFile(answer.encode('utf-8'))
         if fp:
             answer = fp.read()
-            submission = ChallengeSubmission(challenge=challenge, author=user, code=fp)
+            submission = ChallengeSubmission(challenge=challenge, author=user)
 
             result = run_code(challenge, answer)
             submission.failure_list = result.failure_msgs
             submission.result = Result.OK if result.success else Result.ERROR
             submission.save()
+            submission.code.save(user_directory_path(submission, ''), fp)
 
     context = create_context()
     context['challenge'] = challenge

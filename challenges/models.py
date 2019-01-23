@@ -31,9 +31,10 @@ class Challenge(models.Model):
     def __str__(self):
         return self.full_title
 
+
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'upload/user_{0}/{1}'.format(instance.author.username, filename)
+    return 'upload/user_{0}/ch{1}_{2}.py'.format(instance.author.username, instance.challenge.id, instance.created.strftime('%Y_%m_%d_%H_%M_%S_%f'))
 
 
 class SubmissionsByChallenge:

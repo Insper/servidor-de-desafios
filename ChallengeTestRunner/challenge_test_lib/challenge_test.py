@@ -61,10 +61,16 @@ def run_tests(challenge_code, test_code, challenge_name):
 @contextmanager
 def timeout(time):
     '''Code from: https://www.jujens.eu/posts/en/2018/Jun/02/python-timeout-function/'''
-    # Register a function to raise a TimeoutError on the signal.
-    signal.signal(signal.SIGALRM, raise_timeout)
-    # Schedule the signal to be sent after ``time``.
-    signal.alarm(time)
+
+    has_signals = True
+    try:
+        # Register a function to raise a TimeoutError on the signal.
+        signal.signal(signal.SIGALRM, raise_timeout)
+        # Schedule the signal to be sent after ``time``.
+        signal.alarm(time)
+    except ValueError:
+        has_signals = False
+        print('Timeout not working :( Signals only work in the main thread...')
 
     try:
         yield
@@ -73,7 +79,8 @@ def timeout(time):
     finally:
         # Unregister the signal so it won't be triggered
         # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
+        if has_signals:
+            signal.signal(signal.SIGALRM, signal.SIG_IGN)
 
 
 def raise_timeout(signum, frame):

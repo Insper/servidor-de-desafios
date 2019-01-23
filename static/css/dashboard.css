@@ -31,6 +31,10 @@ label {
   padding-left: 0;
 }
 
+.CodeMirror {
+  border-top: 1px solid #cccccc; border-bottom: 1px solid #cccccc;
+}
+
 /*
  * Sidebar
  */

@@ -25,5 +25,4 @@ def run_code(challenge, answer):
         response = lamb.invoke(FunctionName="testRunner", InvocationType='RequestResponse', Payload=json.dumps(args))
         feedback = response['Payload'].read().decode('utf-8')
         feedback = json.loads(json.loads(feedback))
-        print(feedback)
         return TestResults(feedback['failure_msgs'], feedback['success'], feedback['stack_traces'])

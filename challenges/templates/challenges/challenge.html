@@ -1,4 +1,24 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra-css %}
+<link href="{%  static 'lib/codemirror.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block extra-js %}
+<script src="{% static 'lib/codemirror.js' %}"></script>
+<script src="{% static 'mode/python/python.js' %}"></script>
+<script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("codeeditor"), {
+        mode: {name: "python",
+            version: 3,
+            singleLineStringErrors: false},
+        lineNumbers: true,
+        indentUnit: 4,
+        matchBrackets: true
+    });
+</script>
+{% endblock %}
 
 {% block pagecontent %}
 
@@ -24,11 +44,18 @@
             <p>Infelizmente o prazo já se encerrou...</p>
         {% else %}
             <form method="POST" enctype="multipart/form-data">
+                <h5>Resposta</h5>
                 {% csrf_token %}
                 <div class="form-row">
                     <div class="form-group col-md-8">
-                        <label for="resposta">Resposta:</label>
+                        <label for="resposta">Selecione um arquivo:</label>
                         <input type="file" class="form-control-file" id="resposta" name="code">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="resposta">Ou escreva seu código aqui:</label>
+                        <textarea name="codetext" id="codeeditor"></textarea>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Enviar</button>
