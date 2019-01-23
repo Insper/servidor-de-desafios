@@ -48,6 +48,17 @@ class SubmissionsByChallenge:
         return len(self.submissions)
 
 
+def escape_js(string):
+    replacements = {
+        '\n': '\\n',
+        '\r': '',
+        '"': '\"',
+    }
+    for k, v in replacements.items():
+        string = string.replace(k, v)
+    return string
+
+
 class ChallengeSubmission(models.Model):
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -84,3 +95,11 @@ class ChallengeSubmission(models.Model):
             else:
                 challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
         return list(challenge2submissions.values())
+
+    @classmethod
+    def latest_submission(cls, challenge, author):
+        latest = ChallengeSubmission.objects.filter(challenge=challenge, author=author).latest('created')
+        source_code = ''
+        if latest:
+            source_code = latest.code.read().decode('utf-8')
+        return escape_js(source_code)

@@ -50,4 +50,5 @@ def challenge(request, c_id):
     context['answers'] = ChallengeSubmission.objects.filter(challenge=context['challenge'], author=request.user)
     context['expired'] = expired
     context['msg'] = msg
+    context['latest_submission'] = ChallengeSubmission.latest_submission(context['challenge'], request.user)
     return render(request, 'challenges/challenge.html', context=context)
