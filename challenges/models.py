@@ -47,6 +47,10 @@ class SubmissionsByChallenge:
     def attempts(self):
         return len(self.submissions)
 
+    @property
+    def latest_submission(self):
+        return sorted(self.submissions, key=lambda s: s.created)[-1]
+
 
 def escape_js(string):
     replacements = {
@@ -94,7 +98,7 @@ class ChallengeSubmission(models.Model):
                 sbc.submissions.append(sub)
             else:
                 challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
-        return list(challenge2submissions.values())
+        return sorted(list(challenge2submissions.values()), key=lambda s: s.latest_submission.created, reverse=True)
 
     @classmethod
     def latest_submission(cls, challenge, author):
