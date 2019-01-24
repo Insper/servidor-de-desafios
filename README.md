@@ -2,6 +2,16 @@
 
 ## Como usar
 
+### Adicionando usuários a partir do arquivo do Blackboard
+
+Para adicionar todos os alunos de uma única vez, faça o download da lista de 
+alunos em formato CSV disponível no Blackboard. Então basta executar o seguinte
+comando no servidor, via SSH:
+
+    $ cd softdes
+    $ source venv/bin/activate
+    $ python manage.py batch_add_users ARQUIVO_BLACKBOARD.csv
+
 ### Criando novos desafios
 
 Entre no Django admin (`/admin/challenges/challenge`) e clique 
