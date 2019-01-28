@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from taggit.managers import TaggableManager
 from enum import Enum
 
 
@@ -20,6 +21,7 @@ class Challenge(models.Model):
     problem = models.TextField(blank=False)
     test_file = models.FileField(upload_to='challenge_tests/')
     function_name = models.CharField(max_length=50, blank=False)
+    tags = TaggableManager()
 
     @property
     def full_title(self):
@@ -89,7 +91,7 @@ class ChallengeSubmission(models.Model):
     @classmethod
     def submissions_by_challenge(cls, author):
         user_submissions = ChallengeSubmission.objects.filter(author=author)
-        challenge2submissions = {}
+        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], Result.ERROR) for ch in Challenge.objects.all()}
         for sub in user_submissions:
             if sub.challenge in challenge2submissions:
                 sbc = challenge2submissions[sub.challenge]
@@ -98,11 +100,14 @@ class ChallengeSubmission(models.Model):
                 sbc.submissions.append(sub)
             else:
                 challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
-        return sorted(list(challenge2submissions.values()), key=lambda s: s.latest_submission.created, reverse=True)
+        return sorted(list(challenge2submissions.values()), key=lambda s: s.challenge.id)
 
     @classmethod
     def latest_submission(cls, challenge, author):
-        latest = ChallengeSubmission.objects.filter(challenge=challenge, author=author).latest('created')
+        all_submissions = ChallengeSubmission.objects.filter(challenge=challenge, author=author)
+        if not all_submissions:
+            return ''
+        latest = all_submissions.latest('created')
         source_code = ''
         if latest:
             source_code = latest.code.read().decode('utf-8')

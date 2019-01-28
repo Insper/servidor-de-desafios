@@ -26,6 +26,12 @@
 {% if challenge %}
     <h1>{{ challenge.full_title }}</h1>
 
+    <section class="placeholders">
+    {% for tag in challenge.tags.all %}
+        <a href="/?tag={{ tag }}" class="badge badge-secondary">{{ tag }}</a>
+    {% endfor %}
+    </section>
+
     <section class="row placeholders">
         <div class="col-12 col-sm-12 placeholder">
             {% if expired %}

@@ -1,8 +1,20 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block extra-js %}
+    <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+
 {% block pagecontent %}
 
-<h1>Dashboard</h1>
+<h1>Desafios</h1>
+
+<div>
+{% for tag in all_tags %}
+    <a href="#" class="filter-challenge-tag challenge-tag badge">{{ tag }}</a>
+{% endfor %}
+</div>
 
 {% if submissions_by_challenge %}
     <div class="table-responsive">
@@ -12,14 +24,20 @@
                 <th>Desafio</th>
                 <th>Tentativas</th>
                 <th>Resolvido</th>
+                <th>Tags</th>
             </tr>
             </thead>
             <tbody>
             {% for sbc in submissions_by_challenge %}
-                <tr class="{{ sbc.tr_class }}">
+                <tr class="challenge-row {{ sbc.tr_class }}">
                     <td><a href="/challenge/{{ sbc.challenge.id }}">{{ sbc.challenge.full_title }}</a></td>
                     <td>{{ sbc.attempts }}</td>
                     <td>{{ sbc.success }}</td>
+                    <td class="challenge-tags">
+                        {% for tag in sbc.challenge.tags.all %}
+                        <a href="/?tag={{ tag }}" class="challenge-tag badge">{{ tag }}</a>
+                        {% endfor %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

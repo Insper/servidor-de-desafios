@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.core.files.base import ContentFile
+from taggit.models import Tag
 from challenges.code_runner import run_code
 
 from .models import Challenge, ChallengeSubmission, Result, user_directory_path
@@ -14,9 +15,17 @@ def create_context():
 def index(request):
     context = create_context()
     context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user)
+    context['all_tags'] = Tag.objects.all()
     for sbc in context['submissions_by_challenge']:
-        sbc.tr_class = 'table-success' if sbc.best_result == str(Result.OK) else 'table-warning'
-        sbc.success = 'Sim' if sbc.best_result == str(Result.OK) else 'Não'
+        if sbc.attempts == 0:
+            sbc.tr_class = 'table-light'
+            sbc.success = '-'
+        elif sbc.best_result == str(Result.OK):
+            sbc.tr_class = 'table-success'
+            sbc.success = 'Sim'
+        else:
+            sbc.tr_class = 'table-warning'
+            sbc.success = 'Não'
     return render(request, 'challenges/index.html', context=context)
 
 @login_required

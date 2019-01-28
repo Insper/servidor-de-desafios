@@ -42,6 +42,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 INSTALLED_APPS = [
     'challenges.apps.ChallengesConfig',
+    'taggit',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -123,6 +124,10 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+# Taggit
+TAGGIT_CASE_INSENSITIVE = True
 
 
 # Static files (CSS, JavaScript, Images)
