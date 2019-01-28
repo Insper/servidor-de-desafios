@@ -39,7 +39,7 @@
             {% elif challenge.expire is not None %}
             <div class="text-muted">Prazo: {{ challenge.expire|date:'l d/m/Y H:i' }}</div>
             {% endif %}
-            <div>{{ challenge.problem }}</div>
+            <div>{{ challenge.problem | safe | linebreaks }}</div>
         </div>
         <div class="col-4 col-md-1 placeholder"></div>
     </section>
