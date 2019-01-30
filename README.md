@@ -48,6 +48,15 @@ aluno passará. Ele deve seguir o seguinte exemplo:
             self.assertAlmostEquals(self.challenge_fun(100, 0, 0.1), 100.0)
 
 
+### Criando novos tutoriais
+
+Entre no Django admin (`/admin/tutorials/tutorial`) e clique 
+em `ADICIONAR TUTORIAL`. A descrição aceita código HTML. 
+
+O campo `Replit url` pode ser usado para adicionar um iframe com 
+o [repl.it](https://repl.it) ao final do tutorial. O valor deste campo
+deve ser uma url, fornecida em `Share Link` ao clicar em `share` no repl.it.   
+
 ## Configuração do servidor
 
 ### Setup
