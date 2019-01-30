@@ -42,6 +42,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 INSTALLED_APPS = [
     'challenges.apps.ChallengesConfig',
+    'tutorials.apps.TutorialsConfig',
     'taggit',
     'django.contrib.admin',
     'django.contrib.auth',

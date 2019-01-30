@@ -6,14 +6,16 @@ from taggit.models import Tag
 from challenges.code_runner import run_code
 
 from .models import Challenge, ChallengeSubmission, Result, user_directory_path
+from tutorials.models import Tutorial
 
 def create_context():
     challenges = Challenge.objects.order_by('id')
-    return {'challenges': challenges}
+    return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges}
 
 @login_required
 def index(request):
     context = create_context()
+    context['tutorials'] = Tutorial.objects.order_by('id')
     context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user)
     context['all_tags'] = Tag.objects.all()
     for sbc in context['submissions_by_challenge']:
@@ -31,7 +33,10 @@ def index(request):
 @login_required
 def challenge(request, c_id):
     user = request.user
-    challenge = Challenge.objects.get(pk=c_id)
+    try:
+        challenge = Challenge.objects.get(pk=c_id)
+    except Challenge.DoesNotExist:
+        challenge = None
     expired = False
     msg = ''
     if challenge is None:

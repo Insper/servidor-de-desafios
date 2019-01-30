@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra-js %}
+    <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+
+{% block pagecontent %}
+
+<h1>Tutoriais</h1>
+
+<div>
+{% for tag in all_tags %}
+    <a href="#" class="filter-challenge-tag challenge-tag badge">{{ tag }}</a>
+{% endfor %}
+</div>
+
+{% if tutorials %}
+    <ul>
+    {% for tutorial in tutorials %}
+        <li><a href="/tutorial/{{ tutorial.id }}">{{ tutorial }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Ainda não criamos nenhum tutorial... :(</p>
+{% endif %}
+
+{% endblock %}

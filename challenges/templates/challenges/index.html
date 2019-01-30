@@ -8,7 +8,7 @@
 
 {% block pagecontent %}
 
-<h1>Desafios</h1>
+<h1>Exercícios</h1>
 
 <div>
 {% for tag in all_tags %}
@@ -45,6 +45,18 @@
     </div>
 {% else %}
     <p>Você ainda não fez nenhuma submissão... :(</p>
+{% endif %}
+
+<h1>Tutoriais</h1>
+
+{% if tutorials %}
+    <ul>
+    {% for tutorial in tutorials %}
+        <li><a href="/tutorial/{{ tutorial.id }}">{{ tutorial }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Ainda não criamos nenhum tutorial... :(</p>
 {% endif %}
 
 {% endblock %}
