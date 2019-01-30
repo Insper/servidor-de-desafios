@@ -5,6 +5,13 @@
 /* Move down content because we have a fixed navbar that is 3.5rem tall */
 body {
   padding-top: 3.5rem;
+  min-height: 100vh;
+  display: flex;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
 }
 
 /*
@@ -79,4 +86,27 @@ label {
 .placeholder img {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
+}
+
+/*
+ * Sizing
+ */
+
+.minh-100 {
+  min-height: 100%;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.with-scroll {
+  overflow-y: auto;
+  width: 100%;
+  height: 0;
+  min-height: 100%;
+}
+
+.is-flex {
+  display: flex;
 }
