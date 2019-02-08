@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra-js %}
+    <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+
+{% block pagecontent %}
+
+<h1>Sandbox</h1>
+
+<p>Utilize este ambiente para rodar seus testes.</p>
+
+<iframe height="100%" width="100%" src="https://repl.it/repls/ElaborateMediumModules?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+
+{% endblock %}
