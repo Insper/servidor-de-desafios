@@ -12,7 +12,7 @@ comando no servidor, via SSH:
     $ source venv/bin/activate
     $ python manage.py batch_add_users ARQUIVO_BLACKBOARD.csv
 
-### Criando novos desafios
+### Criando novos exercícios
 
 Entre no Django admin (`/admin/challenges/challenge`) e clique
 em `ADICIONAR CHALLENGE`. A data limite não é obrigatória. A opção
