@@ -9,4 +9,5 @@ setup(name='ChallengeTestLib',
       author_email='andrewtnk@insper.edu.br',
       url='https://www.github.com/insper/insper-prog-challenges',
       packages=['challenge_test_lib'],
+      scripts=['insper_test.py'],
      )
