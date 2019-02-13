@@ -41,6 +41,10 @@
             {% endif %}
             <div>{{ challenge.problem | safe | linebreaks }}</div>
             <div>O nome da sua função deve ser <code>{{ challenge.function_name }}</code>.</div>
+            {% if challenge.image %}
+            <div><img src="{{ challenge.image.url }}"></div>
+            {% endif %}
+            <div></div>
         </div>
         <div class="col-4 col-md-1 placeholder"></div>
     </section>

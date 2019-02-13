@@ -1,7 +1,6 @@
 # Custom folders
 tmp
-upload
-challenge_tests
+media
 lambda_code.zip
 InsperProgChallenges/production_settings.py
 .idea

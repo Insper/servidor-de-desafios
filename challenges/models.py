@@ -21,6 +21,7 @@ class Challenge(models.Model):
     problem = models.TextField(blank=False)
     test_file = models.FileField(upload_to='challenge_tests/')
     function_name = models.CharField(max_length=50, blank=False)
+    image = models.ImageField(upload_to='challenge/', blank=True)
     tags = TaggableManager()
 
     @property
