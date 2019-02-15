@@ -17,7 +17,7 @@
         indentUnit: 4,
         matchBrackets: true,
     });
-    editor.setValue("{{ latest_submission }}");
+    editor.setValue("{{ latest_submission | safe }}");
 </script>
 {% endblock %}
 

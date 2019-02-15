@@ -59,7 +59,7 @@ def escape_js(string):
     replacements = {
         '\n': '\\n',
         '\r': '',
-        '"': '\"',
+        '"': '\\\"',
     }
     for k, v in replacements.items():
         string = string.replace(k, v)
