@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import markdown
 
 
 class Tutorial(models.Model):
@@ -17,6 +18,10 @@ class Tutorial(models.Model):
 
     def __str__(self):
         return self.full_title
+
+    @property
+    def html_description(self):
+        return markdown.markdown(self.description, extensions=['extra', 'codehilite'])
 
 
 class TutorialAccess(models.Model):

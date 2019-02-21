@@ -2,9 +2,13 @@
 {% load static %}
 
 {% block extra-css %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="{% static 'css/codehilite.css' %}">
+<link rel="stylesheet" href="{% static 'css/tutorial.css' %}">
 {% endblock %}
 
 {% block extra-js %}
+<script src="{% static 'js/tutorial.js' %}"></script>
 {% endblock %}
 
 {% block pagecontent %}
@@ -13,8 +17,13 @@
     <h1>{{ tutorial.full_title }}</h1>
 
     <section class="row placeholders flex-1">
-        <div class="col-md-6 col-sm-12 placeholder is-flex">
-            <div class="with-scroll">{{ tutorial.description | safe | linebreaks }}</div>
+        <div class="col-md-6 col-sm-12 placeholder is-flex slidedeck">
+            <div class="with-scroll">{{ tutorial.html_description | safe }}</div>
+            <div class="slide-ctrl">
+                <a href="#" class="btn back-btn"><span class="fas fa-angle-left"></span></a>
+                <a href="#" id="toggleSlide">Mostrar tudo</a>
+                <a href="#" class="btn forward-btn"><span class="fas fa-angle-right"></span></a>
+            </div>
         </div>
         {% if tutorial.replit_url %}
         <div class="col-md-6 col-sm-12 placeholder">

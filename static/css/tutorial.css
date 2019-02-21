@@ -1,0 +1,36 @@
+.slidedeck {
+    padding-bottom: 4em;
+}
+
+.slide:after {
+    content: '';
+    display:inline-block;
+    border-bottom:1px solid #ccc;
+    width: 98%;
+    margin: 30px 1%;
+}
+
+.slide-ctrl {
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    left: 0;
+    right: 0;
+    padding-left: inherit;
+    padding-right: inherit;
+    align-items: center;
+}
+
+.slide-ctrl a {
+    color: #dc3545;
+}
+
+.slide-ctrl a.btn {
+    font-size: 3rem;
+    line-height: 1em;
+}
+
+.slide-ctrl a.disabled {
+    color: #bbbbbb;
+}
