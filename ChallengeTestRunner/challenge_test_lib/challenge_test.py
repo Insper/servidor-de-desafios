@@ -25,37 +25,40 @@ def get_message(test_case):
 
 
 def run_tests(challenge_code, test_code, challenge_name):
-    exec(challenge_code, locals())
-    # test_code MUST define a class named TestCase
-    # It should be ok to use globals here because this code is provided by the instructors, not students
-    exec(test_code, globals())
+    try:
+        exec(challenge_code, locals())
+        # test_code MUST define a class named TestCase
+        # It should be ok to use globals here because this code is provided by the instructors, not students
+        exec(test_code, globals())
 
-    # Setup
-    if TestCase.CHALLENGE_FUN is None:
-        try:
-            TestCase.CHALLENGE_FUN = eval(challenge_name)
-        except NameError:
-            return TestResults(None, ['Função não encontrada. Sua função deveria se chamar {}'.format(challenge_name)], False, [])
+        # Setup
+        if TestCase.CHALLENGE_FUN is None:
+            try:
+                TestCase.CHALLENGE_FUN = eval(challenge_name)
+            except NameError:
+                return TestResults(None, ['Função não encontrada. Sua função deveria se chamar {}'.format(challenge_name)], False, [])
 
-    stream = StringIO()
+        stream = StringIO()
 
-    runner = unittest.TextTestRunner(stream=stream)
-    result = runner.run(unittest.makeSuite(TestCase))
-    stream.seek(0)
-    failure_msgs = []
-    stack_traces = []
-    success = result.wasSuccessful()
-    for failure in result.failures + result.errors:
-        st = failure[1]
-        fm = get_message(failure[0])
-        stack_traces.append(st)
-        if START_SEP in st and END_SEP in st:
-            fm = st[st.find(START_SEP) + len(START_SEP):st.find(END_SEP)]
-        elif 'TimeoutError' in st:
-            fm = TIME_LIMIT_EXCEEDED
-        failure_msgs.append(fm)
-        success = False
-    return TestResults(result, failure_msgs, success, stack_traces)
+        runner = unittest.TextTestRunner(stream=stream)
+        result = runner.run(unittest.makeSuite(TestCase))
+        stream.seek(0)
+        failure_msgs = []
+        stack_traces = []
+        success = result.wasSuccessful()
+        for failure in result.failures + result.errors:
+            st = failure[1]
+            fm = get_message(failure[0])
+            stack_traces.append(st)
+            if START_SEP in st and END_SEP in st:
+                fm = st[st.find(START_SEP) + len(START_SEP):st.find(END_SEP)]
+            elif 'TimeoutError' in st:
+                fm = TIME_LIMIT_EXCEEDED
+            failure_msgs.append(fm)
+            success = False
+        return TestResults(result, failure_msgs, success, stack_traces)
+    except:
+        return TestResults(None, ['Código com erros de sintaxe'], False, ['Código com erros de sintaxe'])
 
 
 @contextmanager
