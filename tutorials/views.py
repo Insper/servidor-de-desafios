@@ -4,23 +4,29 @@ from django.contrib.auth.decorators import login_required
 from .models import Tutorial, TutorialAccess
 
 
-def create_context():
-    tutorials = Tutorial.objects.order_by('id')
+def create_context(user):
+    if user.is_staff:
+        tutorials = Tutorial.objects.all()
+    else:
+        tutorials = Tutorial.all_published()
+    tutorials = tutorials.order_by('id')
     return {'tutorials': tutorials, 'navtype': 'tutorial', 'navitems': tutorials}
 
 
 @login_required
 def tutorials(request):
-    context = create_context()
+    context = create_context(request.user)
     return render(request, 'tutorials/tutorials.html', context=context)
 
 
 @login_required
 def tutorial(request, t_id):
     user = request.user
-    context = create_context()
+    context = create_context(user)
     try:
         tutorial = Tutorial.objects.get(pk=t_id)
+        if not tutorial.published and not user.is_staff:
+            tutorial = None
     except Tutorial.DoesNotExist:
         tutorial = None
     context['tutorial'] = tutorial

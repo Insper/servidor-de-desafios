@@ -15,7 +15,12 @@ def create_context():
 @login_required
 def index(request):
     context = create_context()
-    context['tutorials'] = Tutorial.objects.order_by('id')
+    if request.user.is_staff:
+        tutorials = Tutorial.objects.all()
+    else:
+        tutorials = Tutorial.all_published()
+    tutorials = tutorials.order_by('id')
+    context['tutorials'] = tutorials
     context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user)
     context['all_tags'] = Tag.objects.all()
     for sbc in context['submissions_by_challenge']:

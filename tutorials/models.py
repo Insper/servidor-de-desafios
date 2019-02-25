@@ -8,6 +8,11 @@ class Tutorial(models.Model):
     title = models.CharField(max_length=1024, blank=True)
     description = models.TextField(blank=False)
     replit_url = models.CharField(max_length=1024, blank=True)
+    published = models.BooleanField(default=True)
+
+    @classmethod
+    def all_published(cls):
+        return Tutorial.objects.filter(published=True)
 
     @property
     def full_title(self):
