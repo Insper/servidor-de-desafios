@@ -57,6 +57,16 @@ class TestCase(challenge_test.TestCaseWrapper):
             self.assertEqual(self.mock_print.printed[i], text) 
 '''
 
+CHALLENGE_CODE_5 = '''
+def code_with_print(a):
+    print(a)
+'''
+
+CHALLENGE_CODE_6 = '''
+def code_with_print(a):
+    pass
+'''
+
 TEST_CODE3 = '''
 from challenge_test_lib import challenge_test
 
@@ -66,22 +76,12 @@ class TestCase(challenge_test.TestCaseWrapper):
         result = self.challenge_fun()
         self.assertEqual(self.mock_input.calls, 4)
         self.assertEqual(result, 8)
-    
+
     def test_no_sum(self):
         self.mock_input.input_list = [0] 
         result = self.challenge_fun()
         self.assertEqual(self.mock_input.calls, 1)
         self.assertEqual(result, 0) 
-'''
-
-CHALLENGE_CODE_5 = '''
-def code_with_print(a):
-    print(a)
-'''
-
-CHALLENGE_CODE_6 = '''
-def code_with_print(a):
-    pass
 '''
 
 CHALLENGE_CODE_7 = '''
@@ -102,6 +102,35 @@ def input_and_sum():
         result += input('Type a number')
         n -= 1
     return result
+'''
+
+TEST_CODE4 = '''
+from challenge_test_lib import challenge_test
+
+class TestCase(challenge_test.TestCaseWrapper):
+    def test_print_called(self):
+        self.mock_input.input_list = ['Inspermon'] 
+        self.challenge_program()
+        self.assertEqual(self.mock_input.calls, 1)
+        self.assertEqual(self.mock_print.calls, 1)
+        self.assertEqual(self.mock_print.printed[0], 'Hello Inspermon!')
+    
+    def test_hello_world(self):
+        self.mock_input.input_list = ['World'] 
+        self.challenge_program()
+        self.assertEqual(self.mock_input.calls, 1)
+        self.assertEqual(self.mock_print.calls, 1)
+        self.assertEqual(self.mock_print.printed[0], 'Hello World!') 
+'''
+
+CHALLENGE_CODE_9 = '''
+name = input('Name? ')
+print('Hello {0}!'.format(name))
+'''
+
+CHALLENGE_CODE_10 = '''
+name = input('Name? ')
+pritn('Hello {0}!'.format(name))
 '''
 
 
@@ -167,6 +196,23 @@ class ChallengeTestTest(unittest.TestCase):
         result = challenge_test.run_tests(CHALLENGE_CODE_8, TEST_CODE3, 'input_and_sum')
         self.assertEqual(2, result.result_obj.testsRun)
         self.assertFalse(result.success)
+
+    def test_run_program_if_no_function(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_9, TEST_CODE4, '')
+        self.assertEqual(2, result.result_obj.testsRun)
+        self.assertTrue(result.success)
+
+    def test_run_program_if_none_function(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_9, TEST_CODE4, None)
+        self.assertEqual(2, result.result_obj.testsRun)
+        self.assertTrue(result.success)
+
+    def test_run_program_with_error(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_10, TEST_CODE4, None)
+        self.assertFalse(result.success)
+        self.assertEqual(2, len(result.failure_msgs))
+        for i in range(2):
+            self.assertEqual('Não funcionou para algum teste', result.failure_msgs[i])
 
 
 if __name__ == '__main__':

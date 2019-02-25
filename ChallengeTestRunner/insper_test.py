@@ -5,9 +5,9 @@ from challenge_test_lib import challenge_test as ch
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('function_name', help='Name of the function to be tested')
 parser.add_argument('target_filename', help='Name of the target file that contains code to be tested')
 parser.add_argument('test_filename', help='Name of the test file')
+parser.add_argument('-f', '--function_name', help='Name of the function to be tested', default=None)
 parser.add_argument("-v", "--verbose", help="Increase output verbosity", action="store_true")
 args = parser.parse_args()
 

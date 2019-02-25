@@ -27,13 +27,16 @@ def get_message(test_case):
 
 def run_tests(challenge_code, test_code, challenge_name):
     try:
-        exec(challenge_code, locals())
+        if challenge_name:
+            exec(challenge_code, locals())
         # test_code MUST define a class named TestCase
         # It should be ok to use globals here because this code is provided by the instructors, not students
         exec(test_code, globals())
 
         # Setup
-        if TestCase.CHALLENGE_FUN is None:
+        if TestCase.CHALLENGE_CODE is None:
+            TestCase.CHALLENGE_CODE = challenge_code
+        if TestCase.CHALLENGE_FUN is None and challenge_name:
             try:
                 TestCase.CHALLENGE_FUN = eval(challenge_name)
             except NameError:
@@ -144,6 +147,7 @@ class MockInput(MockFunction):
 
 
 class TestCaseWrapper(unittest.TestCase):
+    CHALLENGE_CODE = None
     CHALLENGE_FUN = None
     TIMEOUT = 3
 
@@ -173,6 +177,9 @@ class TestCaseWrapper(unittest.TestCase):
 
         # Restore builtin input
         builtins.input = self.python_input
+
+    def challenge_program(self):
+        return exec(self.CHALLENGE_CODE, locals())
 
     def challenge_fun(self, *args, **kwargs):
         # We need the __class__ because in that way it doesn't pass self as argument to the function
