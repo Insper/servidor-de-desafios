@@ -101,7 +101,7 @@ class ChallengeSubmission(models.Model):
             challenges = Challenge.objects.all()
         else:
             challenges = Challenge.all_published()
-        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], Result.ERROR) for ch in challenges}
+        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], str(Result.ERROR)) for ch in challenges}
         for sub in user_submissions:
             if sub.challenge in challenge2submissions:
                 sbc = challenge2submissions[sub.challenge]

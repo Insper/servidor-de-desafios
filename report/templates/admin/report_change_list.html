@@ -1,0 +1,33 @@
+{% extends "admin/change_list.html" %}
+{% load report_extras %}
+
+{% block content_title %}
+    <h1>Report</h1>
+{% endblock %}
+
+{% block result_list %}
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Username</th>
+        {% for challenge in challenges %}
+        <th><a href="/challenge/{{ challenge.id }}">{{ challenge.id }}</a></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for usr in users %}
+      <tr>
+        <td>{{ usr.username }}</td>
+        {% for challenge in challenges %}
+        {% with user_challenge=submissions|get_item:usr|get_item:challenge %}
+        <td class="{{ user_challenge|get_css_class }}">{{ user_challenge.submissions|length }}</td>
+        {% endwith %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block pagination %}{% endblock %}
