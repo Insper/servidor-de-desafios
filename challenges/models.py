@@ -20,7 +20,7 @@ class Challenge(models.Model):
     title = models.CharField(max_length=1024, blank=True)
     problem = models.TextField(blank=False)
     test_file = models.FileField(upload_to='challenge_tests/')
-    function_name = models.CharField(max_length=50, blank=False)
+    function_name = models.CharField(max_length=50, blank=True)
     image = models.ImageField(upload_to='challenge/', blank=True)
     published = models.BooleanField(default=True)
     tags = TaggableManager()
