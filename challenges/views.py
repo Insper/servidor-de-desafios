@@ -9,7 +9,7 @@ from .models import Challenge, ChallengeSubmission, Result, user_directory_path
 from tutorials.models import Tutorial
 
 def create_context():
-    challenges = Challenge.objects.order_by('id')
+    challenges = Challenge.all_published().order_by('id')
     return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges}
 
 @login_required
@@ -35,6 +35,8 @@ def challenge(request, c_id):
     user = request.user
     try:
         challenge = Challenge.objects.get(pk=c_id)
+        if not challenge.published and not user.is_staff:
+            challenge = None
     except Challenge.DoesNotExist:
         challenge = None
     expired = False

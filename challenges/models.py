@@ -22,7 +22,12 @@ class Challenge(models.Model):
     test_file = models.FileField(upload_to='challenge_tests/')
     function_name = models.CharField(max_length=50, blank=False)
     image = models.ImageField(upload_to='challenge/', blank=True)
+    published = models.BooleanField(default=True)
     tags = TaggableManager()
+
+    @classmethod
+    def all_published(cls):
+        return Challenge.objects.filter(published=True)
 
     @property
     def full_title(self):
@@ -92,7 +97,11 @@ class ChallengeSubmission(models.Model):
     @classmethod
     def submissions_by_challenge(cls, author):
         user_submissions = ChallengeSubmission.objects.filter(author=author)
-        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], Result.ERROR) for ch in Challenge.objects.all()}
+        if author.is_staff:
+            challenges = Challenge.objects.all()
+        else:
+            challenges = Challenge.all_published()
+        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], Result.ERROR) for ch in challenges}
         for sub in user_submissions:
             if sub.challenge in challenge2submissions:
                 sbc = challenge2submissions[sub.challenge]
