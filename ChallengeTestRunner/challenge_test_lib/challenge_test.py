@@ -3,6 +3,7 @@ from io import StringIO
 from collections import namedtuple
 import signal
 from contextlib import contextmanager
+import builtins
 
 
 TestResults = namedtuple('TestResults', 'result_obj,failure_msgs,success,stack_traces')
@@ -103,6 +104,45 @@ def timeout_decorator(time):
     return anotate
 
 
+class MockFunction:
+    def __init__(self):
+        self.calls = 0
+        self.args = []
+        self.kwargs = []
+
+    def __call__(self, *args, **kwargs):
+        self.args.append(args)
+        self.kwargs.append(kwargs)
+        self.calls += 1
+
+
+class MockPrint(MockFunction):
+    def __init__(self, python_print):
+        super().__init__()
+        self.printed = []
+        self.python_print = python_print
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        self.printed.append(' '.join(args))  # There is probably a more reliable way to do this...
+        self.python_print(*args, ** kwargs)
+
+
+class MockInput(MockFunction):
+    def __init__(self):
+        super().__init__()
+        self.input_list = []
+        self.cur_input_idx = 0
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        retval = ''
+        if self.cur_input_idx < len(self.input_list):
+            retval = self.input_list[self.cur_input_idx]
+            self.cur_input_idx += 1
+        return str(retval)
+
+
 class TestCaseWrapper(unittest.TestCase):
     CHALLENGE_FUN = None
     TIMEOUT = 3
@@ -115,6 +155,24 @@ class TestCaseWrapper(unittest.TestCase):
                 fun = getattr(cls, attr)
                 fun = timeout_decorator(cls.TIMEOUT)(fun)
                 setattr(cls, attr, fun)
+
+    def setUp(self):
+        # Replace builtin print
+        self.python_print = builtins.print
+        self.mock_print = MockPrint(self.python_print)
+        builtins.print = self.mock_print
+
+        # Replace builtin input
+        self.python_input = builtins.input
+        self.mock_input = MockInput()
+        builtins.input = self.mock_input
+
+    def tearDown(self):
+        # Restore builtin print
+        builtins.print = self.python_print
+
+        # Restore builtin input
+        builtins.input = self.python_input
 
     def challenge_fun(self, *args, **kwargs):
         # We need the __class__ because in that way it doesn't pass self as argument to the function
