@@ -40,7 +40,9 @@
             <div class="text-muted">Prazo: {{ challenge.expire|date:'l d/m/Y H:i' }}</div>
             {% endif %}
             <div>{{ challenge.problem | safe | linebreaks }}</div>
+            {% if challenge.function_name %}
             <div>O nome da sua função deve ser <code>{{ challenge.function_name }}</code>.</div>
+            {% endif %}
             {% if challenge.image %}
             <div><img src="{{ challenge.image.url }}"></div>
             {% endif %}
