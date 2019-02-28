@@ -13,3 +13,10 @@ class EvolutionReport(User):
         proxy = True
         verbose_name = 'Evolution Report'
         verbose_name_plural = 'Evolution Reports'
+
+
+class TutorialsReport(User):
+    class Meta:
+        proxy = True
+        verbose_name = 'Tutorials Report'
+        verbose_name_plural = 'Tutorials Reports'
