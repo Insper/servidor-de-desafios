@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 from enum import Enum
+import markdown
 
 
 FEEDBACK_SEP = '|||'
@@ -35,6 +36,10 @@ class Challenge(models.Model):
         if self.title:
             title += ': {0}'.format(self.title)
         return title
+
+    @property
+    def html_problem(self):
+        return markdown.markdown(self.problem, extensions=['extra', 'codehilite'])
 
     def __str__(self):
         return self.full_title
@@ -120,5 +125,8 @@ class ChallengeSubmission(models.Model):
         latest = all_submissions.latest('created')
         source_code = ''
         if latest:
-            source_code = latest.code.read().decode('utf-8')
+            try:
+                source_code = latest.code.read().decode('utf-8')
+            except:
+                source_code = ''
         return escape_js(source_code)

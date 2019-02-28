@@ -189,4 +189,4 @@ class TestCaseWrapper(unittest.TestCase):
         # Include message separators in all messages and ignore standardMsg
         if not msg:
             return ''
-        return START_SEP + super()._formatMessage(msg, '') + END_SEP
+        return START_SEP + msg + END_SEP
