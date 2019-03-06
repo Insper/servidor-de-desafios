@@ -127,7 +127,7 @@ class MockPrint(MockFunction):
 
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
-        self.printed.append(' '.join(args))  # There is probably a more reliable way to do this...
+        self.printed.append(' '.join([str(arg) for arg in args]))  # There is probably a more reliable way to do this...
         self.python_print(*args, ** kwargs)
 
 
