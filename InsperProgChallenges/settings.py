@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'challenges.apps.ChallengesConfig',
     'tutorials.apps.TutorialsConfig',
     'report.apps.ReportConfig',
+    'course.apps.CourseConfig',
     'taggit',
     'django.contrib.admin',
     'django.contrib.auth',

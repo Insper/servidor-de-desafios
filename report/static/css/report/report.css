@@ -5,3 +5,9 @@
 .error {
     background-color: #cc3311;
 }
+
+#changelist-filter {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2rem;
+}

@@ -1,11 +1,25 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.contrib.admin import SimpleListFilter
 from .models import Report, EvolutionReport, TutorialsReport
 from challenges.models import Challenge, ChallengeSubmission
 from tutorials.models import Tutorial, TutorialAccess
+from course.models import Class
+
+class ClassFilter(SimpleListFilter):
+    title = 'Class'
+    parameter_name = 'class'
+
+    def lookups(self, request, model_admin):
+        return [(c.id, c.name) for c in Class.objects.all()]
+
+    def queryset(self, request, queryset):
+        return queryset.filter(class__id__exact=self.value())
 
 
 class CustomAdmin(admin.ModelAdmin):
+    list_filter = (ClassFilter,)
+
     class Media:
         css = {
             'all': ('css/report/report.css',)
@@ -26,6 +40,10 @@ class CustomAdmin(admin.ModelAdmin):
 
         return True, response
 
+    def get_queryset(self, request):
+        qs = super(CustomAdmin, self).get_queryset(request)
+        return qs.filter(is_staff=False).exclude(username='aluno.teste')
+
 
 @admin.register(Report)
 class ReportAdmin(CustomAdmin):
@@ -36,7 +54,7 @@ class ReportAdmin(CustomAdmin):
         if not ok:
             return response
 
-        users = User.objects.filter(is_staff=False).exclude(username='aluno.teste')
+        users = response.context_data['cl'].queryset
 
         response.context_data['users'] = users
         response.context_data['submissions'] = {user: {s.challenge: s for s in ChallengeSubmission.submissions_by_challenge(user)} for user in users}
@@ -54,7 +72,7 @@ class EvolutionReportAdmin(CustomAdmin):
         if not ok:
             return response
 
-        users = User.objects.filter(is_staff=False).exclude(username='aluno.teste')
+        users = response.context_data['cl'].queryset
 
         has_attempt = {user: sum(1 if len(s.submissions) > 0 else 0 for s in ChallengeSubmission.submissions_by_challenge(user)) for user in users}
         gave_up = {user: sum(1 if len(s.submissions) > 0 and s.best_result != 'OK' else 0 for s in ChallengeSubmission.submissions_by_challenge(user)) for user in users}
@@ -76,7 +94,7 @@ class TutorialsReportAdmin(CustomAdmin):
         if not ok:
             return response
 
-        users = User.objects.filter(is_staff=False).exclude(username='aluno.teste')
+        users = response.context_data['cl'].queryset
         tutorials = Tutorial.all_published()
         accesses = TutorialAccess.objects.filter(user__in=users, tutorial__in=tutorials)
         accesses_by_user = {}
