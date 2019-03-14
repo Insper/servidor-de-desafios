@@ -14,7 +14,9 @@ class ClassFilter(SimpleListFilter):
         return [(c.id, c.name) for c in Class.objects.all()]
 
     def queryset(self, request, queryset):
-        return queryset.filter(class__id__exact=self.value())
+        if self.value() is not None:
+            return queryset.filter(class__id__exact=self.value())
+        return queryset
 
 
 class CustomAdmin(admin.ModelAdmin):
