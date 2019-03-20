@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.admin import SimpleListFilter
@@ -5,6 +6,12 @@ from .models import *
 from challenges.models import Challenge, ChallengeSubmission
 from tutorials.models import Tutorial, TutorialAccess
 from course.models import Class
+
+
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)+1):
+        yield start_date + timedelta(n)
+
 
 class ClassFilter(SimpleListFilter):
     title = 'Class'
@@ -65,8 +72,20 @@ class ReportAdmin(CustomAdmin):
         return response
 
 
+def count_submissions_by_date(submissions_by_challenge, start_date):
+    fmt = '%Y-%m-%d'
+    submissions_by_date = {d.strftime(fmt): 0 for d in daterange(start_date, datetime.today().replace(tzinfo=start_date.tzinfo))}
+    for sub_by_challenge in submissions_by_challenge:
+        for sub in sub_by_challenge.submissions:
+            submissions_by_date[sub.created.strftime(fmt)] += 1
+    return submissions_by_date
+
+
 @admin.register(EvolutionReport)
 class EvolutionReportAdmin(CustomAdmin):
+    class Media:
+        js = ('https://cdn.plot.ly/plotly-latest.min.js', '/static/js/report/evolutionReport.js')
+
     change_list_template = 'admin/evolution_report_change_list.html'
 
     def changelist_view(self, request, extra_context=None):
@@ -76,13 +95,18 @@ class EvolutionReportAdmin(CustomAdmin):
 
         users = response.context_data['cl'].queryset
 
-        has_attempt = {user: sum(1 if len(s.submissions) > 0 else 0 for s in ChallengeSubmission.submissions_by_challenge(user)) for user in users}
-        gave_up = {user: sum(1 if len(s.submissions) > 0 and s.best_result != 'OK' else 0 for s in ChallengeSubmission.submissions_by_challenge(user)) for user in users}
+        submissions_by_user = {user: ChallengeSubmission.submissions_by_challenge(user) for user in users}
+        earlier_submission = min([sub.created for user in users for sub_by_challenge in submissions_by_user[user] for sub in sub_by_challenge.submissions])
+        submissions_by_date_user = {user: count_submissions_by_date(submissions_by_user[user], earlier_submission) for user in users if submissions_by_user[user]}
+        submissions_by_date_user = {user: counts for user, counts in submissions_by_date_user.items() if counts}
+        has_attempt = {user: sum(1 if len(s.submissions) > 0 else 0 for s in submissions_by_user[user]) for user in users}
+        gave_up = {user: sum(1 if len(s.submissions) > 0 and s.best_result != 'OK' else 0 for s in submissions_by_user[user]) for user in users}
         ratio = {user: '-' if has_attempt[user] == 0 else '{0:.2f}%'.format(100 * gave_up[user] / has_attempt[user]) for user in users}
         response.context_data['users'] = users
         response.context_data['has_attempt'] = has_attempt
         response.context_data['gave_up'] = gave_up
         response.context_data['ratio'] = ratio
+        response.context_data['submissions_by_date_user'] = submissions_by_date_user
 
         return response
 
@@ -140,6 +164,6 @@ class ChallengesReportAdmin(CustomAdmin):
                 submissions = sub_by_user.get(submission.challenge.id, [])
                 submissions.append(submission.attempts)
                 sub_by_user[submission.challenge.id] = submissions
-        response.context_data['subByChallenge'] = sub_by_user
+        response.context_data['sub_by_challenge'] = sub_by_user
 
         return response
