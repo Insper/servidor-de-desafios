@@ -1,4 +1,5 @@
 {% load static %}
+{% load utils %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -31,7 +32,7 @@
 		  {% if user.is_authenticated %}
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="/password_change">Olá {{ user.get_username }} [trocar senha]<span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="/password_change">Olá {{ user|smartname }} [trocar senha]<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/sandbox">Sandbox</a>

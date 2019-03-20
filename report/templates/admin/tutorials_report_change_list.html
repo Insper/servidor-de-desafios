@@ -1,5 +1,6 @@
 {% extends "admin/change_list.html" %}
 {% load report_extras %}
+{% load utils %}
 
 {% block content_title %}
     <h1>Tutorials Report</h1>
@@ -18,7 +19,7 @@
     <tbody>
       {% for usr in users %}
       <tr>
-        <td>{{ usr.username }}</td>
+        <td>{{ usr|smartname }} ({{ usr.username }})</td>
         {% for tutorial in tutorials %}
         {% with access_count=accesses_by_user|get_item:usr|get_item:tutorial %}
         <td class="{{ access_count|get_css_count_class }}">{{ access_count }}</td>

@@ -20,3 +20,4 @@ class TutorialsReport(User):
         proxy = True
         verbose_name = 'Tutorials Report'
         verbose_name_plural = 'Tutorials Reports'
+
