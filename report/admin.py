@@ -16,7 +16,7 @@ class ClassFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() is not None:
             return queryset.filter(class__id__exact=self.value())
-        return queryset
+        return queryset.order_by('username')
 
 
 class CustomAdmin(admin.ModelAdmin):
