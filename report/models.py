@@ -21,3 +21,9 @@ class TutorialsReport(User):
         verbose_name = 'Tutorials Report'
         verbose_name_plural = 'Tutorials Reports'
 
+
+class ChallengesReport(User):
+    class Meta:
+        proxy = True
+        verbose_name = 'Challenges Report'
+        verbose_name_plural = 'Challenges Reports'

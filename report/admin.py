@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.admin import SimpleListFilter
-from .models import Report, EvolutionReport, TutorialsReport
+from .models import *
 from challenges.models import Challenge, ChallengeSubmission
 from tutorials.models import Tutorial, TutorialAccess
 from course.models import Class
@@ -114,5 +114,32 @@ class TutorialsReportAdmin(CustomAdmin):
         response.context_data['users'] = users
         response.context_data['tutorials'] = tutorials
         response.context_data['accesses_by_user'] = accesses_by_user
+
+        return response
+
+
+@admin.register(ChallengesReport)
+class ChallengesReportAdmin(CustomAdmin):
+    class Media:
+        js = ('https://cdn.plot.ly/plotly-latest.min.js', '/static/js/report/challengeReport.js')
+
+    change_list_template = 'admin/challenges_report_change_list.html'
+
+    def changelist_view(self, request, extra_context=None):
+        ok, response = super().changelist_view(request, extra_context=extra_context)
+        if not ok:
+            return response
+
+        users = response.context_data['cl'].queryset
+
+        response.context_data['users'] = users
+        sub_by_user = {}
+        for user in users:
+            sub_by_challenge = ChallengeSubmission.submissions_by_challenge(user)
+            for submission in sub_by_challenge:
+                submissions = sub_by_user.get(submission.challenge.id, [])
+                submissions.append(submission.attempts)
+                sub_by_user[submission.challenge.id] = submissions
+        response.context_data['subByChallenge'] = sub_by_user
 
         return response

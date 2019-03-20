@@ -100,8 +100,11 @@ class ChallengeSubmission(models.Model):
         return list(set(self.failure_list))
 
     @classmethod
-    def submissions_by_challenge(cls, author):
-        user_submissions = ChallengeSubmission.objects.filter(author=author)
+    def submissions_by_challenge(cls, author=None):
+        if author is None:
+            user_submissions = ChallengeSubmission.objects.all()
+        else:
+            user_submissions = ChallengeSubmission.objects.filter(author=author)
         if author.is_staff:
             challenges = Challenge.objects.all()
         else:

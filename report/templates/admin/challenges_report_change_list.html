@@ -1,0 +1,23 @@
+{% extends "admin/change_list.html" %}
+{% load report_extras %}
+{% load utils %}
+
+{% block content_title %}
+    <h1>Challenges Report</h1>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        var challengeData = {};
+        {% for challenge in subByChallenge %}
+        challengeData[{{ challenge }}] = [{% for sub in subByChallenge|get_item:challenge %}{{ sub }},{% endfor %}];
+        {% endfor %}
+    </script>
+{% endblock %}
+
+{% block result_list %}
+    <div id="plotHere"></div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}
