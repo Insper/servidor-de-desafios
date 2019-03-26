@@ -1,4 +1,5 @@
-{% extends "admin/change_list.html" %}
+{% extends "admin/base_admin.html" %}
+{% load static %}
 {% load report_extras %}
 {% load utils %}
 
@@ -6,7 +7,7 @@
 <h1>Evolution Report</h1>
 {% endblock %}
 
-{% block extrahead %}
+{% block extra-js %}
 {{ block.super }}
 <script>
     var submissionDates = {};
@@ -16,9 +17,12 @@
     submissionData["{{ u }}"] = [{% for d in submissions_by_date_user|get_item:u %}"{{ submissions_by_date_user|get_item:u|get_item:d }}",{% endfor %}];
     {% endfor %}
 </script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="{% static '/js/report/evolutionReport.js' %}"></script>
 {% endblock %}
 
-{% block result_list %}
+{% block content %}
+{{ block.super }}
 <table class="table table-striped">
     <thead>
       <tr>
@@ -42,5 +46,3 @@
 
 <div id="plotHere"></div>
 {% endblock %}
-
-{% block pagination %}{% endblock %}

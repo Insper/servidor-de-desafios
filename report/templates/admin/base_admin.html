@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/changelists.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/report/report.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% block extra-js %}
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div id="changelist-filter">
+    <h2>Report Type</h2>
+    <ul>
+        <li {% if current_view == '/' %}class="selected"{% endif %}><a href="" title="Overall">Overall</a></li>
+        <li {% if current_view == '/evolution' %}class="selected"{% endif %}><a href="evolution" title="Evolution">Evolution</a></li>
+        <li {% if current_view == '/tutorials' %}class="selected"{% endif %}><a href="tutorials" title="Tutorials">Tutorials</a></li>
+        <li {% if current_view == '/challenges' %}class="selected"{% endif %}><a href="challenges" title="Challenges">Challenges</a></li>
+    </ul>
+
+    <h2>Filter</h2>
+
+    <h3>By Class</h3>
+    <ul>
+
+        <li {% if class_filter == -1 %}class="selected"{% endif %}><a href="?" title="All">All</a></li>
+        {% for c in classes %}
+        <li {% if class_filter == c.id %}class="selected"{% endif %}><a href="?class={{ c.id }}" title="{{ c }}">{{ c }}</a></li>
+        {% endfor %}
+
+    </ul>
+
+</div>
+{% endblock %}
