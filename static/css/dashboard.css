@@ -49,6 +49,7 @@ label {
   grid-column-start: 1;
   grid-column-end: 3;
   color: lightcoral;
+  font-family: monospace;
 }
 
 .CodeMirror {
