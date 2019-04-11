@@ -38,6 +38,19 @@ label {
   padding-left: 0;
 }
 
+.challenge-feedback {
+  display: grid;
+  grid-template-columns: auto fit-content(50px);
+  grid-row-gap: 10px;
+  margin-bottom: 1em;
+}
+
+.challenge-feedback .stacktrace {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  color: lightcoral;
+}
+
 .CodeMirror {
   border-top: 1px solid #cccccc; border-bottom: 1px solid #cccccc;
 }

@@ -3,9 +3,12 @@ from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 from enum import Enum
 import markdown
+from collections import namedtuple
 
 
 FEEDBACK_SEP = '|||'
+STACKTRACE_SEP = '<|>|<|>'
+STACKTRACE_FILE_PATTERN = 'File "<string>", '
 
 
 class Result(Enum):
@@ -76,11 +79,15 @@ def escape_js(string):
     return string
 
 
+ErrorData = namedtuple('ErrorData', 'message, stacktrace')
+
+
 class ChallengeSubmission(models.Model):
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField('date created', auto_now_add=True)
     feedback = models.TextField(blank=True)
+    errors = models.TextField(blank=True)
     code = models.FileField(upload_to=user_directory_path)
     result = models.CharField(max_length=5, choices=[(res, res.value) for res in Result], blank=True)
 
@@ -96,8 +103,38 @@ class ChallengeSubmission(models.Model):
         self.feedback = feedback
 
     @property
-    def clean_failure_list(self):
-        return list(set(self.failure_list))
+    def stack_traces(self):
+        return self.errors.split(STACKTRACE_SEP)
+
+    @stack_traces.setter
+    def stack_traces(self, error_list):
+        errors = STACKTRACE_SEP.join(error_list)
+        if not errors:
+            errors = '-'
+        self.errors = errors
+
+    @property
+    def clean_stack_traces(self):
+        retval = []
+        for st in self.stack_traces:
+            clean = st
+            if 'AssertionError' in clean:
+                clean = 'Resposta diferente da esperada.'
+            else:
+                start = clean.rfind(STACKTRACE_FILE_PATTERN)
+                if start >= 0:
+                    clean = clean[start + len(STACKTRACE_FILE_PATTERN):]
+            clean = clean.replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>').replace(' ', '&nbsp;')
+            retval.append(clean)
+        return retval
+
+    @property
+    def clean_feedback(self):
+        msgs = self.failure_list
+        stacktraces = ['' for _ in msgs]
+        sts = self.clean_stack_traces
+        stacktraces[:len(sts)] = sts
+        return list(set([ErrorData(msg, st) for msg, st in zip(msgs, stacktraces)]))
 
     @classmethod
     def submissions_by_challenge(cls, author=None):

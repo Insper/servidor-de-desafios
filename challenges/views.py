@@ -35,6 +35,17 @@ def index(request):
             sbc.success = 'Não'
     return render(request, 'challenges/index.html', context=context)
 
+class Counter:
+    def __init__(self):
+        self.val = 0
+
+    def next(self):
+        self.val += 1
+        return ''
+
+    def cur(self):
+        return self.val
+
 @login_required
 def challenge(request, c_id):
     user = request.user
@@ -62,6 +73,7 @@ def challenge(request, c_id):
 
             result = run_code(challenge, answer)
             submission.failure_list = result.failure_msgs
+            submission.stack_traces = result.stack_traces
             submission.result = Result.OK if result.success else Result.ERROR
             submission.save()
             submission.code.save(user_directory_path(submission, ''), fp)
@@ -73,6 +85,7 @@ def challenge(request, c_id):
     context['expired'] = expired
     context['msg'] = msg
     context['latest_submission'] = ChallengeSubmission.latest_submission(context['challenge'], request.user)
+    context['error_counter'] = Counter()
     return render(request, 'challenges/challenge.html', context=context)
 
 @login_required

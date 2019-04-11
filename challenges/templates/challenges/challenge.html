@@ -94,8 +94,25 @@
                     <td>{{ ans.created|date:'d/m/Y H:i' }}</td>
                     <td>
                         <ul class="challenge-feedback-list">
-                        {% for failure in ans.clean_failure_list %}
-                            <li>{{ failure }}</li>
+                        {% for feedback in ans.clean_feedback %}
+                            <li>
+                                {% if feedback.stacktrace == '-' %}
+                                {{ feedback.message }}
+                                {% else %}
+                                <div class="challenge-feedback">
+                                    <span>{{ feedback.message }}</span>
+                                    <button class="btn btn-danger" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
+                                        Stack trace
+                                    </button>
+                                    <div class="stacktrace collapse" id="error{{ error_counter.cur }}">
+                                        <div class="card card-body">
+                                            {{ feedback.stacktrace|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {{ error_counter.next }}
+                                {% endif %}
+                            </li>
                         {% endfor %}
                         </ul>
                     </td>

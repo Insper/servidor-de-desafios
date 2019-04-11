@@ -4,6 +4,7 @@ from collections import namedtuple
 import signal
 from contextlib import contextmanager
 import builtins
+import traceback
 
 
 TestResults = namedtuple('TestResults', 'result_obj,failure_msgs,success,stack_traces')
@@ -40,7 +41,7 @@ def run_tests(challenge_code, test_code, challenge_name):
             try:
                 TestCase.CHALLENGE_FUN = eval(challenge_name)
             except NameError:
-                return TestResults(None, ['Função não encontrada. Sua função deveria se chamar {}'.format(challenge_name)], False, [])
+                return TestResults(None, ['Função não encontrada. Sua função deveria se chamar {}'.format(challenge_name)], False, ['Função inexistente ou com o nome errado.'])
 
         stream = StringIO()
 
@@ -62,7 +63,7 @@ def run_tests(challenge_code, test_code, challenge_name):
             success = False
         return TestResults(result, failure_msgs, success, stack_traces)
     except:
-        return TestResults(None, ['Código com erros de sintaxe'], False, ['Código com erros de sintaxe'])
+        return TestResults(None, ['Código com erros de sintaxe'], False, [traceback.format_exc()])
 
 
 @contextmanager
