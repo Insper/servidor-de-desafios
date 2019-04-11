@@ -134,6 +134,7 @@ class ChallengeSubmission(models.Model):
         stacktraces = ['' for _ in msgs]
         sts = self.clean_stack_traces
         stacktraces[:len(sts)] = sts
+        print(stacktraces)
         return list(set([ErrorData(msg, st) for msg, st in zip(msgs, stacktraces)]))
 
     @classmethod

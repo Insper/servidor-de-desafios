@@ -96,7 +96,7 @@
                         <ul class="challenge-feedback-list">
                         {% for feedback in ans.clean_feedback %}
                             <li>
-                                {% if feedback.stacktrace == '-' %}
+                                {% if not feedback.stacktrace or feedback.stacktrace == '-' %}
                                 {{ feedback.message }}
                                 {% else %}
                                 <div class="challenge-feedback">
