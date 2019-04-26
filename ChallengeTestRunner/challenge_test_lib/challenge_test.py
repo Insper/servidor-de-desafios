@@ -1,5 +1,5 @@
 import unittest
-from io import StringIO
+from io import StringIO, UnsupportedOperation, SEEK_END
 from collections import namedtuple
 import signal
 from contextlib import contextmanager
@@ -107,7 +107,8 @@ def timeout_decorator(time):
         return timed_fun
     return anotate
 
-
+# TODO WE SHOULD USE THIS: https://docs.python.org/3/library/unittest.mock.html#mock-open
+# TODO USE PATCH INSTEAD OF REPLACING BY OUR MOCKS BY HAND
 class MockFunction:
     def __init__(self):
         self.calls = 0
@@ -147,6 +148,64 @@ class MockInput(MockFunction):
         return str(retval)
 
 
+class MockOpen(MockFunction):
+    '''
+    Currently supported modes: r, w, a
+    Not supported: x, b, +
+    '''
+    def __init__(self):
+        super().__init__()
+        self.files = {}
+        self._opened = []
+
+    def __call__(self, file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None):
+        args = [file]
+        kwargs = {
+            'mode': mode,
+            'buffering': buffering,
+            'encoding': encoding,
+            'errors': errors,
+            'newline': newline,
+            'closefd': closefd,
+            'opener': opener
+        }
+        super().__call__(*args, **kwargs)
+        if file not in self.files and 'r' in mode:
+            raise FileNotFoundError("[Errno 2] No such file or directory: '{0}'".format(file))
+        outfile = MockFile(file, self.files.get(file, ''), self, **kwargs)
+        self._opened.append(outfile)
+        return outfile
+
+    @property
+    def opened(self):
+        '''List of opened files that have not been closed.'''
+        self._opened = [f for f in self._opened if not f.closed]
+        return self._opened
+
+
+class MockFile(StringIO):
+    def __init__(self, filename, content, mock_open, **kwargs):
+        super().__init__(content, kwargs.get('newline'))
+        self.filename = filename
+        self.mock_open = mock_open
+        self._mode = kwargs.get('mode', 'r')
+        if 'a' in self._mode:
+            self.seek(0, SEEK_END)
+
+    def __getattribute__(self, name):
+        attr = super().__getattribute__(name)
+        if attr:
+            if 'read' in name and 'r' not in self._mode:
+                raise UnsupportedOperation('not readable')
+            elif 'write' in name and 'w' not in self._mode and 'a' not in self._mode:
+                raise UnsupportedOperation('not writable')
+        return attr
+
+    def close(self):
+        self.mock_open.files[self.filename] = self.getvalue()
+        super().close()
+
+
 class TestCaseWrapper(unittest.TestCase):
     CHALLENGE_CODE = None
     CHALLENGE_FUN = None
@@ -172,12 +231,20 @@ class TestCaseWrapper(unittest.TestCase):
         self.mock_input = MockInput()
         builtins.input = self.mock_input
 
+        # Replace builtin open
+        self.python_open = builtins.open
+        self.mock_open = MockOpen()
+        builtins.open = self.mock_open
+
     def tearDown(self):
         # Restore builtin print
         builtins.print = self.python_print
 
         # Restore builtin input
         builtins.input = self.python_input
+
+        # Restore builtin open
+        builtins.open = self.python_open
 
     def challenge_program(self):
         return exec(self.CHALLENGE_CODE, locals())

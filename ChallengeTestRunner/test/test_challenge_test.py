@@ -133,6 +133,109 @@ name = input('Name? ')
 pritn('Hello {0}!'.format(name))
 '''
 
+TEST_CODE5 = '''
+from challenge_test_lib import challenge_test
+import re
+
+class TestCase(challenge_test.TestCaseWrapper):
+    def test_open_called(self):
+        words_str = 'some,words,separated,by,comma\\nwith,some,new,lines\\n\\n'
+        words = [w for w in re.split(',|\\n', words_str) if w]
+        self.mock_open.files['words.csv'] =  words_str
+        self.challenge_program()
+        self.assertEqual(self.mock_open.calls, 1)
+        self.assertEqual(len(self.mock_open.opened), 0)
+        printed = [word.strip() for word in self.mock_print.printed if word.strip()]
+        self.assertEqual(printed, words) 
+'''
+
+CHALLENGE_CODE_11 = '''
+f = open('words.csv', 'r')
+words = []
+for line in f:
+    words += line.split(',')
+words = [word.strip() for word in words if word]
+for word in words:
+    print(word)
+f.close()
+'''
+
+CHALLENGE_CODE_12 = '''
+with open('words.csv', 'r') as f:
+    words = []
+    for line in f:
+        words += [w.strip() for w in line.split(',') if w.strip()]
+    for word in words:
+        print(word)
+'''
+
+CHALLENGE_CODE_13 = '''
+with open('file_that_doesnt_exist.txt', 'r') as f:
+    words = []
+    for line in f:
+        words += line.split(',')
+    for word in words:
+        print(word)
+'''
+
+CHALLENGE_CODE_14 = '''
+with open('words.csv', 'w') as f:
+    words = []
+    for line in f:
+        words += [w.strip() for w in line.split(',') if w.strip()]
+    for word in words:
+        print(word)
+'''
+
+CHALLENGE_CODE_15 = '''
+with open('words.csv', 'a') as f:
+    words = []
+    for line in f:
+        words += [w.strip() for w in line.split(',') if w.strip()]
+    for word in words:
+        print(word)
+'''
+
+CHALLENGE_CODE_16 = '''
+with open('words.csv', 'r') as f:
+    f.write("Shouldn't work")
+'''
+
+TEST_CODE6 = '''
+from challenge_test_lib import challenge_test
+import re
+
+class TestCase(challenge_test.TestCaseWrapper):
+    def test_write(self):
+        self.challenge_program()
+        self.assertEqual(self.mock_open.calls, 1)
+        self.assertEqual(len(self.mock_open.opened), 0)
+        self.assertEqual(self.mock_open.files['newfile.txt'], 'New content') 
+'''
+
+CHALLENGE_CODE_17 = '''
+with open('newfile.txt', 'w') as f:
+    f.write('New content')
+'''
+
+TEST_CODE7 = '''
+from challenge_test_lib import challenge_test
+import re
+
+class TestCase(challenge_test.TestCaseWrapper):
+    def test_write(self):
+        self.mock_open.files['test.txt'] = 'Old content'
+        self.challenge_program()
+        self.assertEqual(self.mock_open.calls, 1)
+        self.assertEqual(len(self.mock_open.opened), 0)
+        self.assertEqual(self.mock_open.files['test.txt'], 'Old content\\nNew content') 
+'''
+
+CHALLENGE_CODE_18 = '''
+with open('test.txt', 'a') as f:
+    f.write('\\nNew content')
+'''
+
 
 class ChallengeTestTest(unittest.TestCase):
     def test_doesnt_break_with_syntax_error(self):
@@ -213,6 +316,45 @@ class ChallengeTestTest(unittest.TestCase):
         self.assertEqual(2, len(result.failure_msgs))
         for i in range(2):
             self.assertEqual('Não funcionou para algum teste', result.failure_msgs[i])
+
+    def test_open(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_11, TEST_CODE5, None)
+        self.assertTrue(result.success)
+
+    def test_with_open(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_12, TEST_CODE5, None)
+        self.assertTrue(result.success)
+
+    def test_open_file_that_doesnt_exist(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_13, TEST_CODE5, None)
+        self.assertFalse(result.success)
+        self.assertTrue('FileNotFoundError' in result.stack_traces[0])
+
+    def test_read_file_opened_for_writing(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_14, TEST_CODE5, None)
+        self.assertFalse(result.success)
+        self.assertTrue('UnsupportedOperation' in result.stack_traces[0])
+        self.assertTrue('not readable' in result.stack_traces[0])
+
+    def test_read_file_opened_for_appending(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_15, TEST_CODE5, None)
+        self.assertFalse(result.success)
+        self.assertTrue('UnsupportedOperation' in result.stack_traces[0])
+        self.assertTrue('not readable' in result.stack_traces[0])
+
+    def test_write_file_opened_for_reading(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_16, TEST_CODE5, None)
+        self.assertFalse(result.success)
+        self.assertTrue('UnsupportedOperation' in result.stack_traces[0])
+        self.assertTrue('not writable' in result.stack_traces[0])
+
+    def test_write(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_17, TEST_CODE6, None)
+        self.assertTrue(result.success)
+
+    def test_append(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_18, TEST_CODE7, None)
+        self.assertTrue(result.success)
 
 
 if __name__ == '__main__':
