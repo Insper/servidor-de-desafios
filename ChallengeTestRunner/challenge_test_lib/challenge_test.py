@@ -7,6 +7,9 @@ import builtins
 import traceback
 
 
+# This might be useful someday: https://docs.python.org/3/library/unittest.mock.html#mock-open
+
+
 TestResults = namedtuple('TestResults', 'result_obj,failure_msgs,success,stack_traces')
 START_SEP = '<|><'
 END_SEP = '><|>'
@@ -107,8 +110,6 @@ def timeout_decorator(time):
         return timed_fun
     return anotate
 
-# TODO WE SHOULD USE THIS: https://docs.python.org/3/library/unittest.mock.html#mock-open
-# TODO USE PATCH INSTEAD OF REPLACING BY OUR MOCKS BY HAND
 class MockFunction:
     def __init__(self):
         self.calls = 0
