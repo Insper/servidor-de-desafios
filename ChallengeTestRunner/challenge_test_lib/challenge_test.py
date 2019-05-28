@@ -5,6 +5,7 @@ import signal
 from contextlib import contextmanager
 import builtins
 import traceback
+import imp
 
 
 # This might be useful someday: https://docs.python.org/3/library/unittest.mock.html#mock-open
@@ -246,6 +247,13 @@ class TestCaseWrapper(unittest.TestCase):
 
         # Restore builtin open
         builtins.open = self.python_open
+
+    @property
+    def module(self):
+        if not hasattr(self, '_module'):
+            self._module = imp.new_module(name)
+            exec self.CHALLENGE_CODE in self._module.__dict__
+        return self._module
 
     def challenge_program(self):
         return exec(self.CHALLENGE_CODE, locals())
