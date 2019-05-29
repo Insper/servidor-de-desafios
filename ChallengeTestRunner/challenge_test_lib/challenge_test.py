@@ -251,8 +251,8 @@ class TestCaseWrapper(unittest.TestCase):
     @property
     def module(self):
         if not hasattr(self, '_module'):
-            self._module = imp.new_module(name)
-            exec self.CHALLENGE_CODE in self._module.__dict__
+            self._module = imp.new_module('user_module')
+            exec(self.CHALLENGE_CODE, self._module.__dict__)
         return self._module
 
     def challenge_program(self):
