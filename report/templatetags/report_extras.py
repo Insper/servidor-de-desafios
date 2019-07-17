@@ -6,7 +6,7 @@ register = template.Library()
 def get_css_class(submissions_by_challenge):
     if submissions_by_challenge.best_result == 'OK':
         return 'success'
-    elif submissions_by_challenge.best_result == 'Erro' and len(submissions_by_challenge.submissions) > 0:
+    elif submissions_by_challenge.best_result == 'Erro' and submissions_by_challenge.attempts > 0:
         return 'error'
     return 'noattempt'
 

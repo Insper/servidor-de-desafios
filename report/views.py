@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from challenges.models import Challenge, ChallengeSubmission
 from tutorials.models import Tutorial, TutorialAccess
 from course.models import Class
+from .models import *
 
 
 CSV_DELIMITER = ','
@@ -38,8 +39,13 @@ def make_context(request):
 def index(request):
     context = make_context(request)
     users = context['users']
-    context['submissions'] = {user: {s.challenge: s for s in ChallengeSubmission.submissions_by_challenge(user)} for user in users}
     context['challenges'] = Challenge.objects.all()
+    challenge_reports = UserChallengeReport.objects.all()
+    user_challenges = {u.id: {} for u in users}
+    for challenge_report in challenge_reports:
+        if challenge_report.user_id in user_challenges:
+            user_challenges[challenge_report.user_id][challenge_report.challenge_id] = challenge_report
+    context['user_challenges'] = user_challenges
     return render(request, 'report/index.html', context)
 
 
