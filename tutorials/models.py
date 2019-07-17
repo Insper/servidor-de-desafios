@@ -50,7 +50,10 @@ class Tutorial(models.Model):
 
 class TutorialAccess(models.Model):
     first_access = models.DateTimeField('first accessed', auto_now_add=True)
-    last_access = models.DateTimeField('first accessed', auto_now=True)
+    last_access = models.DateTimeField('last accessed', auto_now=True)
     access_count = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tutorial = models.ForeignKey(Tutorial, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user.username}: Tutorial {self.tutorial.id} First Access[{self.first_access}] Last Access[{self.last_access}] Access Count[{self.access_count}]'

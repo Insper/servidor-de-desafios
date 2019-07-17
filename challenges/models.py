@@ -91,6 +91,9 @@ class ChallengeSubmission(models.Model):
     code = models.FileField(upload_to=user_directory_path)
     result = models.CharField(max_length=5, choices=[(res, res.value) for res in Result], blank=True)
 
+    def __str__(self):
+        return f'{self.author.username}: Challenge {self.challenge.id} - date[{self.created}] result[{self.result}]'
+
     @property
     def failure_list(self):
         return self.feedback.split(FEEDBACK_SEP)
