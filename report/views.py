@@ -2,6 +2,7 @@ import io
 import csv
 import zipfile
 from datetime import timedelta, datetime
+from collections import defaultdict
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
@@ -41,11 +42,7 @@ def index(request):
     users = context['users']
     context['challenges'] = Challenge.objects.all()
     challenge_reports = UserChallengeReport.objects.all()
-    user_challenges = {u.id: {} for u in users}
-    for challenge_report in challenge_reports:
-        if challenge_report.user_id in user_challenges:
-            user_challenges[challenge_report.user_id][challenge_report.challenge_id] = challenge_report
-    context['user_challenges'] = user_challenges
+    context['user_challenges'] = UserChallengeReport.submissions_by_user(users)
     return render(request, 'report/index.html', context)
 
 
@@ -54,26 +51,37 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 
-def count_submissions_by_date(submissions_by_challenge, start_date):
+def count_submissions_by_date(submissions_by_challenge):
     fmt = '%Y-%m-%d'
-    submissions_by_date = {d.strftime(fmt): 0 for d in daterange(start_date, datetime.today().replace(tzinfo=start_date.tzinfo))}
-    for sub_by_challenge in submissions_by_challenge:
-        for sub in sub_by_challenge.submissions:
-            submissions_by_date[sub.created.strftime(fmt)] += 1
+    submissions_by_date = defaultdict(lambda: 0)
+    for submission_report in submissions_by_challenge.values():
+        submissions_by_date[sub.created.strftime(fmt)] += 1
     return submissions_by_date
+
+
+def count_submissions_by_user_and_date(submissions):
+    fmt = '%Y-%m-%d'
+    sub_dates = [sub.created for sub in submissions]
+    earlier_submission = min(sub_dates)
+    latest_submission = max(sub_dates)
+    submissions_by_date_user = defaultdict(lambda: {d.strftime(fmt): 0 for d in daterange(earlier_submission, latest_submission)})
+    for submission in submissions:
+        submissions_by_date_user[submission.author_id][submission.created.strftime(fmt)] += 1
+    return submissions_by_date_user
 
 
 @staff_member_required
 def evolution(request):
     context = make_context(request)
     users = context['users']
+    submissions = ChallengeSubmission.objects.all()
 
-    submissions_by_user = {user: ChallengeSubmission.submissions_by_challenge(user) for user in users}
-    earlier_submission = min([sub.created for user in users for sub_by_challenge in submissions_by_user[user] for sub in sub_by_challenge.submissions])
-    submissions_by_date_user = {user: count_submissions_by_date(submissions_by_user[user], earlier_submission) for user in users if submissions_by_user[user]}
-    submissions_by_date_user = {user: counts for user, counts in submissions_by_date_user.items() if counts}
-    has_attempt = {user: sum(1 if len(s.submissions) > 0 else 0 for s in submissions_by_user[user]) for user in users}
-    gave_up = {user: sum(1 if len(s.submissions) > 0 and s.best_result != 'OK' else 0 for s in submissions_by_user[user]) for user in users}
+    submissions_by_user = UserChallengeReport.submissions_by_user(users)
+    submissions_by_date_user = count_submissions_by_user_and_date(submissions)
+    #submissions_by_date_user = {user: count_submissions_by_date(submissions_by_user[user]) for user in users if submissions_by_user[user]}
+    #submissions_by_date_user = {user: counts for user, counts in submissions_by_date_user.items() if counts}
+    has_attempt = {user: sum(1 if s.attempts > 0 else 0 for s in submissions_by_user[user.id].values()) for user in users}
+    gave_up = {user: sum(1 if s.attempts > 0 and s.best_result != 'OK' else 0 for s in submissions_by_user[user.id].values()) for user in users}
     ratio = {user: '-' if has_attempt[user] == 0 else '{0:.2f}%'.format(100 * gave_up[user] / has_attempt[user]) for user in users}
     context['users'] = users
     context['has_attempt'] = has_attempt

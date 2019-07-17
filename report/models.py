@@ -11,3 +11,11 @@ class UserChallengeReport(models.Model):
 
     class Meta:
         unique_together = ('user', 'challenge',)
+
+    @classmethod
+    def submissions_by_user(cls, users):
+        user_challenges = {u.id: {} for u in users}
+        for challenge_report in cls.objects.all():
+            if challenge_report.user_id in user_challenges:
+                user_challenges[challenge_report.user_id][challenge_report.challenge_id] = challenge_report
+        return user_challenges
