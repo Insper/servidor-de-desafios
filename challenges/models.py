@@ -92,7 +92,7 @@ class ChallengeSubmission(models.Model):
     result = models.CharField(max_length=5, choices=[(res, res.value) for res in Result], blank=True)
 
     def __str__(self):
-        return f'{self.author.username}: Challenge {self.challenge.id} - date[{self.created}] result[{self.result}]'
+        return '{0}: Challenge {1} - date[{2}] result[{3}]'.format(self.author.username, self.challenge.id, self.created, self.result)
 
     @property
     def failure_list(self):

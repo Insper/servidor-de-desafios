@@ -56,4 +56,4 @@ class TutorialAccess(models.Model):
     tutorial = models.ForeignKey(Tutorial, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.user.username}: Tutorial {self.tutorial.id} First Access[{self.first_access}] Last Access[{self.last_access}] Access Count[{self.access_count}]'
+        return '{0}: Tutorial {1} First Access[{2}] Last Access[{3}] Access Count[{4}]'.format(self.user.username, self.tutorial.id, self.first_access, self.last_access, self.access_count)
