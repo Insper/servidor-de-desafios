@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
+import json
+from pathlib import Path
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -18,10 +21,8 @@ DEBUG = True
 try:
     from InsperProgChallenges.production_settings import *
     DEV_SERVER = False
-    print('PRODUCTION SERVER')
 except:
     DEV_SERVER = True
-    print('DEVELOPMENT SERVER')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -88,12 +89,27 @@ WSGI_APPLICATION = 'InsperProgChallenges.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+try:
+    with open('.db_credentials') as f:
+        db_credentials = json.load(f)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': db_credentials['db'],
+            'USER': db_credentials['user'],
+            'PASSWORD': db_credentials['password'],
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
     }
-}
+except:
+    print('Something went wrong with .db_credentials. Giving up on PostgreSQL, using sqlite3 instead. If you want to use PostgreSQL make sure that .db_credentials exist in this project\'s root folder and the keys are correct.', file=sys.stderr)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 
 # Password validation

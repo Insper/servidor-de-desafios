@@ -4,6 +4,7 @@ media
 lambda_code.zip
 InsperProgChallenges/production_settings.py
 .idea
+.db_credentials
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
