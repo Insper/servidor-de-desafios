@@ -37,9 +37,6 @@ def update():
 
 
 def start():
-    # Run once, then schedule
-    five_seconds_from_now = datetime.now() + timedelta(0, 5)
     scheduler = BackgroundScheduler()
-    scheduler.add_job(update, 'date', run_date=five_seconds_from_now)
     scheduler.add_job(update, 'cron', hour=3, minute=7)
     scheduler.start()
