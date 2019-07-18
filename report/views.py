@@ -123,14 +123,12 @@ def challenges(request):
     context = make_context(request)
     users = context['users']
 
-    sub_by_user = {}
-    for user in users:
-        sub_by_challenge = ChallengeSubmission.submissions_by_challenge(user)
-        for submission in sub_by_challenge:
-            submissions = sub_by_user.get(submission.challenge.id, [])
-            submissions.append(submission.attempts)
-            sub_by_user[submission.challenge.id] = submissions
-    context['sub_by_challenge'] = sub_by_user
+    sub_by_challenge = defaultdict(lambda: [])
+    submissions_by_user = UserChallengeReport.submissions_by_user(users)
+    for user_report in submissions_by_user.values():
+        for user_challenge_report in user_report.values():
+            sub_by_challenge[user_challenge_report.challenge_id].append(user_challenge_report.attempts)
+    context['sub_by_challenge'] = sub_by_challenge
 
     return render(request, 'report/challenges.html', context)
 
