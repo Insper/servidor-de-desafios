@@ -102,8 +102,9 @@ try:
             'PORT': '5432',
         }
     }
-except:
+except Exception as e:
     print('Something went wrong with .db_credentials. Giving up on PostgreSQL, using sqlite3 instead. If you want to use PostgreSQL make sure that .db_credentials exist in this project\'s root folder and the keys are correct.', file=sys.stderr)
+    print(e, file=sys.stderr)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
