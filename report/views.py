@@ -148,6 +148,7 @@ def csv_str(header, values):
 def download(request):
     # Load data
     users = User.objects.filter(is_staff=False).exclude(username='aluno.teste')
+    user_ids = [user.id for user in users]
     submissions = ChallengeSubmission.objects.all()
     challenges = Challenge.all_published()
 
@@ -160,7 +161,7 @@ def download(request):
 
         submission_header = ['author_id', 'challenge_id', 'created', 'result']
         date_fmt = '%Y-%m-%d:%H:%M:%S'
-        submission_values = [[s.author.id, s.challenge.id, s.created.strftime(date_fmt), s.result] for s in submissions if not s.author.is_staff and s.author.username != 'aluno.teste']
+        submission_values = [[s.author_id, s.challenge_id, s.created.strftime(date_fmt), s.result] for s in submissions if not s.author_id in user_ids]
         zipped.writestr('submissions.csv', csv_str(submission_header, submission_values))
 
         challenge_header = ['id', 'title', 'problem', 'tags']
