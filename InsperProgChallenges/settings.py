@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'InsperProgChallenges.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 try:
-    with open('.db_credentials') as f:
+    with open(Path(BASE_DIR) / '.db_credentials') as f:
         db_credentials = json.load(f)
     DATABASES = {
         'default': {
