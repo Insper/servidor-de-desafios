@@ -141,7 +141,7 @@ class ChallengeSubmission(models.Model):
         return list(set([ErrorData(msg, st) for msg, st in zip(msgs, stacktraces)]))
 
     @classmethod
-    def submissions_by_challenge(cls, author=None):
+    def submissions_by_challenge(cls, author=None, challenge_ids=None):
         if author is None:
             user_submissions = ChallengeSubmission.objects.all()
         else:
@@ -150,15 +150,16 @@ class ChallengeSubmission(models.Model):
             challenges = Challenge.objects.all()
         else:
             challenges = Challenge.all_published()
-        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], str(Result.ERROR)) for ch in challenges}
+        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], str(Result.ERROR)) for ch in challenges if challenge_ids is None or ch.id in challenge_ids}
         for sub in user_submissions:
-            if sub.challenge in challenge2submissions:
-                sbc = challenge2submissions[sub.challenge]
-                if sub.result == str(Result.OK):
-                    sbc.best_result = str(Result.OK)
-                sbc.submissions.append(sub)
-            else:
-                challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
+            if challenge_ids is None or sub.challenge.id in challenge_ids:
+                if sub.challenge in challenge2submissions:
+                    sbc = challenge2submissions[sub.challenge]
+                    if sub.result == str(Result.OK):
+                        sbc.best_result = str(Result.OK)
+                    sbc.submissions.append(sub)
+                else:
+                    challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
         return sorted(list(challenge2submissions.values()), key=lambda s: s.challenge.id)
 
     @classmethod

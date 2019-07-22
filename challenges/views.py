@@ -2,26 +2,38 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.core.files.base import ContentFile
+from django.db.models import Q
+from datetime import datetime
 from taggit.models import Tag
 from challenges.code_runner import run_code
 
 from .models import Challenge, ChallengeSubmission, Result, user_directory_path
 from tutorials.models import Tutorial
+from course.models import ChallengeBlock
 
-def create_context():
+def create_context(user):
     challenges = Challenge.all_published().order_by('id')
-    return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges}
+    if user.is_staff:
+        visible_challenges_ids = [c.id for c in challenges]
+    else:
+        classes_ids = user.class_set.values_list('id', flat=True)
+        today = datetime.now().date()
+        released_blocks = ChallengeBlock.objects.filter(Q(release_date__isnull=True) | Q(release_date__lte=today), block_class__id__in=classes_ids)
+        visible_challenges_ids = set(released_blocks.values_list('challenges__id', flat=True))
+        visible_challenges = [c for c in challenges if c.id in visible_challenges_ids]
+        challenges = visible_challenges
+    return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges, 'visible_challenges_ids': visible_challenges_ids}
 
 @login_required
 def index(request):
-    context = create_context()
+    context = create_context(request.user)
     if request.user.is_staff:
         tutorials = Tutorial.objects.all()
     else:
         tutorials = Tutorial.all_published()
     tutorials = tutorials.order_by('id')
     context['tutorials'] = tutorials
-    context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user)
+    context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user, context['visible_challenges_ids'])
     context['all_tags'] = Tag.objects.all()
     for sbc in context['submissions_by_challenge']:
         if sbc.attempts == 0:
@@ -49,12 +61,16 @@ class Counter:
 @login_required
 def challenge(request, c_id):
     user = request.user
-    try:
-        challenge = Challenge.objects.get(pk=c_id)
-        if not challenge.published and not user.is_staff:
+    context = create_context(user)
+
+    challenge = None
+    if c_id in context['visible_challenges_ids']:
+        try:
+            challenge = Challenge.objects.get(pk=c_id)
+            if not challenge.published and not user.is_staff:
+                challenge = None
+        except Challenge.DoesNotExist:
             challenge = None
-    except Challenge.DoesNotExist:
-        challenge = None
     expired = False
     msg = ''
     if challenge is None:
@@ -79,7 +95,6 @@ def challenge(request, c_id):
             submission.code.save(user_directory_path(submission, ''), fp)
             return redirect('challenge', c_id=c_id)
 
-    context = create_context()
     context['challenge'] = challenge
     context['answers'] = ChallengeSubmission.objects.filter(challenge=context['challenge'], author=request.user).order_by('-created')
     context['expired'] = expired
@@ -90,4 +105,4 @@ def challenge(request, c_id):
 
 @login_required
 def sandbox(request):
-    return render(request, 'challenges/sandbox.html', context=create_context())
+    return render(request, 'challenges/sandbox.html', context=create_context(request.user))
