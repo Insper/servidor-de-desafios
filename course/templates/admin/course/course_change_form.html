@@ -9,6 +9,7 @@
 {% block extrastyle %}{{ block.super }}<link href="{% static 'admin/css/course_change_form.css' %}" rel="stylesheet">{% endblock %}
 
 {% block after_related_objects %}
+
 <template id="block-template">
     {% include "admin/course/challenge_block_template.html" %}
 </template>
@@ -18,8 +19,8 @@
     <div class="two-columns">
         <div id="block-container">
             <h3>Challenge Blocks</h3>
-            {% for block in blocks %}
-            {% include "admin/course/challenge_block_template.html" with block=block %}
+            {% for challenge_block in blocks %}
+            {% include "admin/course/challenge_block_template.html" with challenge_block=challenge_block %}
             {% endfor %}
             <input type="button" value="Add Block" id="add-block">
             <input type="hidden" value="[]" name="blocks">

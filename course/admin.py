@@ -51,7 +51,7 @@ class ClassAdmin(admin.ModelAdmin):
         ChallengeBlock.objects.filter(block_class__id=obj.id).delete()
         blocks = json.loads(request.POST['blocks'])
         for block in blocks:
-            new_block = ChallengeBlock(name=block['name'], release_date=block['release_date'], block_class=obj)
+            new_block = ChallengeBlock(name=block['name'], release_date=block['release_date'] or None, block_class=obj)
             new_block.save()
             for challenge_id in block['challenges']:
                 new_block.challenges.add(challenge_id)

@@ -26,12 +26,6 @@ function initSortable(blocks) {
     var list = sortable('.sortable-list', {
         acceptFrom: '.sortable-list'
     });
-    for (var i = 0; i < list.length; i++) {
-        list[i].addEventListener('sortupdate', function(e) {
-            // Documentation: https://github.com/lukasoppermann/html5sortable#sortupdate
-            blocks.value = serializeBlockList();
-        });
-    }
 }
 
 window.onload = function(){
@@ -56,4 +50,9 @@ window.onload = function(){
         var insertedBlock = allCards[allCards.length - 1];
         DateTimeShortcuts.addCalendar(insertedBlock.querySelector(".vDateField"));
     }
+
+    django.jQuery('#class_form').submit(function() {
+        blocks.value = serializeBlockList();
+        return true;
+    });
 }
