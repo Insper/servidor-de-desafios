@@ -1,0 +1,38 @@
+{% extends 'admin/change_form.html' %}
+{% load static %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% static '/js/html5sortable.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/course_change_form.js' %}"></script>
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link href="{% static 'admin/css/course_change_form.css' %}" rel="stylesheet">{% endblock %}
+
+{% block after_related_objects %}
+<template id="block-template">
+    {% include "admin/course/challenge_block_template.html" %}
+</template>
+
+<fieldset class="module collapse">
+    <h2>Exercícios</h2>
+    <div class="two-columns">
+        <div id="block-container">
+            <h3>Challenge Blocks</h3>
+            {% for block in blocks %}
+            {% include "admin/course/challenge_block_template.html" with block=block %}
+            {% endfor %}
+            <input type="button" value="Add Block" id="add-block">
+            <input type="hidden" value="[]" name="blocks">
+        </div>
+        <div class="scroll-col">
+            <h3>Disabled Challenges</h3>
+            <p>The challenges that remain in this list will not be visible to the students.</p>
+            <ul class="sortable-list">
+                {% for challenge in available_challenges %}
+                <li class="challenge" value="{{ challenge.id }}">{{ challenge.full_title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</fieldset>
+{% endblock %}
