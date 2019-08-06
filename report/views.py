@@ -161,7 +161,7 @@ def download(request):
 
         submission_header = ['author_id', 'challenge_id', 'created', 'result']
         date_fmt = '%Y-%m-%d:%H:%M:%S'
-        submission_values = [[s.author_id, s.challenge_id, s.created.strftime(date_fmt), s.result] for s in submissions if not s.author_id in user_ids]
+        submission_values = [[s.author_id, s.challenge_id, s.created.strftime(date_fmt), s.result] for s in submissions if s.author_id in user_ids]
         zipped.writestr('submissions.csv', csv_str(submission_header, submission_values))
 
         challenge_header = ['id', 'title', 'problem', 'tags']
