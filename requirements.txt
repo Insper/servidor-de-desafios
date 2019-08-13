@@ -5,6 +5,7 @@ boto3==1.9.82
 botocore==1.12.82
 ChallengeTestLib==0.1
 Django==2.1.7
+django-extensions==2.2.1
 django-taggit==0.23.0
 docutils==0.14
 jmespath==0.9.3
@@ -15,6 +16,8 @@ numpy==1.16.0
 pandas==0.23.4
 Pillow==5.4.1
 pluggy==0.8.0
+psycopg2==2.7.4
+psycopg2-binary==2.7.4
 py==1.7.0
 Pygments==2.3.1
 pytest==4.0.1
@@ -24,7 +27,6 @@ pytz==2018.7
 s3transfer==0.1.13
 six==1.12.0
 timeout-decorator==0.4.1
+tzlocal==1.5.1
 urllib3==1.24.1
 xlrd==1.2.0
-psycopg2==2.7.4
-psycopg2-binary==2.7.4

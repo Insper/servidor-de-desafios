@@ -82,6 +82,11 @@ def escape_js(string):
 ErrorData = namedtuple('ErrorData', 'message, stacktrace')
 
 
+class ChallengeSubmissionManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
+
 class ChallengeSubmission(models.Model):
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -90,6 +95,10 @@ class ChallengeSubmission(models.Model):
     errors = models.TextField(blank=True)
     code = models.FileField(upload_to=user_directory_path)
     result = models.CharField(max_length=5, choices=[(res, res.value) for res in Result], blank=True)
+    deleted = models.BooleanField(default=False)
+
+    objects_with_deleted = models.Manager() # Include all objects, even the ones marked with soft delete.
+    objects = ChallengeSubmissionManager() # Only objects that were not soft deleted.
 
     def __str__(self):
         return '{0}: Challenge {1} - date[{2}] result[{3}]'.format(self.author.username, self.challenge.id, self.created, self.result)
