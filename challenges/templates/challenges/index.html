@@ -1,12 +1,55 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load utils %}
 
 {% block extra-js %}
     <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/plotly-latest.min.js' %}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+    var data = [{
+        x: [
+            {% for d in days %}
+            '{{ d|date:"Y-m-d" }}',
+            {% endfor %}
+        ],
+        y: [
+            {% for d in days %}
+            {{ submissions_per_day|get_item:d }},
+            {% endfor %}
+        ],
+        type: 'bar'
+    }];
+    var layout = {
+        xaxis: {
+            title: {
+                text: 'Data',
+            }
+        },
+        yaxis: {
+            title: {
+                text: '# Submissões',
+            }
+        },
+    }
+
+    Plotly.newPlot('plotDias', data, layout);
+});
+    </script>
 {% endblock %}
 
 {% block pagecontent %}
+
+<h1>Acompanhamento</h1>
+
+<h2>Submissões por dia</h2>
+
+<p>
+A seguir você pode acompanhar o número de submissões realizadas por você, separadas por dia, desde o início do semestre.
+</p>
+
+<div id="plotDias"></div>
 
 <h1>Tutoriais</h1>
 

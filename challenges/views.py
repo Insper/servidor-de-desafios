@@ -9,7 +9,8 @@ from challenges.code_runner import run_code
 
 from .models import Challenge, ChallengeSubmission, Result, user_directory_path
 from tutorials.models import Tutorial
-from course.models import ChallengeBlock
+from course.models import ChallengeBlock, get_daterange
+
 
 def create_context(user):
     challenges = Challenge.all_published().order_by('id')
@@ -24,6 +25,7 @@ def create_context(user):
         challenges = visible_challenges
     return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges, 'visible_challenges_ids': visible_challenges_ids}
 
+
 @login_required
 def index(request):
     context = create_context(request.user)
@@ -35,6 +37,8 @@ def index(request):
     context['tutorials'] = tutorials
     context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user, context['visible_challenges_ids'])
     context['all_tags'] = Tag.objects.all()
+    context['submissions_per_day'] = ChallengeSubmission.objects.by(request.user).count_challenges_per_day()
+    context['days'] = get_daterange(request.user)
     for sbc in context['submissions_by_challenge']:
         if sbc.attempts == 0:
             sbc.tr_class = 'table-light'

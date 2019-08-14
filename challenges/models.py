@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 from enum import Enum
 import markdown
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 
 FEEDBACK_SEP = '|||'
@@ -83,8 +83,30 @@ ErrorData = namedtuple('ErrorData', 'message, stacktrace')
 
 
 class ChallengeSubmissionManager(models.Manager):
+    def __init__(self, *args, **kwargs):
+        self.author = None
+        return super().__init__(*args, **kwargs)
+
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=False)
+        queryset = super().get_queryset().filter(deleted=False)
+        if self.author is not None:
+            queryset = queryset.filter(author=self.author)
+        return queryset
+
+    def by(self, author):
+        self.author = author
+        return self
+
+    def count_challenges_per_day(self, start=None, end=None):
+        all_submissions = self.get_queryset()
+        challenges_per_day = defaultdict(lambda: set())
+        for submission in all_submissions:
+            if (start and submission.created.date() < start) or (end and submission.created.date() > end):
+                continue
+            challenges_per_day[submission.created.date()].add(submission.challenge_id)
+        per_day = defaultdict(lambda: 0)
+        per_day.update({d: len(c) for d, c in challenges_per_day.items()})
+        return per_day
 
 
 class ChallengeSubmission(models.Model):

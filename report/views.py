@@ -1,7 +1,6 @@
 import io
 import csv
 import zipfile
-from datetime import timedelta, datetime
 from collections import defaultdict
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
@@ -44,11 +43,6 @@ def index(request):
     challenge_reports = UserChallengeReport.objects.all()
     context['user_challenges'] = UserChallengeReport.submissions_by_user(users)
     return render(request, 'report/index.html', context)
-
-
-def daterange(start_date, end_date):
-    for n in range(int((end_date - start_date).days)+1):
-        yield start_date + timedelta(n)
 
 
 def count_submissions_by_date(submissions_by_challenge):
@@ -172,3 +166,26 @@ def download(request):
     response = HttpResponse(zipped_file, content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename=report_data.zip'
     return response
+
+
+@staff_member_required
+def status(request):
+    selected_course = request.GET.get('turma')
+    selected_student = request.GET.get('aluno')
+
+    student_data = None
+    if selected_student is not None and selected_student != 'Todos':
+        student_data = [User.objects.get(username=selected_student)]
+    if student_data is None and selected_course:
+        student_data = Class.objects.get(name=selected_course).students.all()
+
+    user_submissions_per_day = {u: ChallengeSubmission.objects.by(u).count_challenges_per_day() for u in student_data}
+    context = {
+        'selectedClass': selected_course,
+        'selectedStudent': selected_student,
+        'student_data': student_data,
+        'user_submissions_per_day': user_submissions_per_day,
+        'classes': Class.objects.all(),
+        'students': User.objects.filter(is_staff=False).exclude(username='aluno.teste'),
+    }
+    return render(request, 'report/status.html', context)
