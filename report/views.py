@@ -173,7 +173,7 @@ def status(request):
     selected_course = request.GET.get('turma')
     selected_student = request.GET.get('aluno')
 
-    student_data = None
+    student_data = []
     if selected_student is not None and selected_student != 'Todos':
         student_data = [User.objects.get(username=selected_student)]
     if student_data is None and selected_course:

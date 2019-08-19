@@ -4,10 +4,13 @@ register = template.Library()
 
 @register.filter
 def get_css_class(submissions_by_challenge):
-    if submissions_by_challenge.best_result == 'OK':
-        return 'success'
-    elif submissions_by_challenge.best_result == 'Erro' and submissions_by_challenge.attempts > 0:
-        return 'error'
+    try:
+        if submissions_by_challenge.best_result == 'OK':
+            return 'success'
+        elif submissions_by_challenge.best_result == 'Erro' and submissions_by_challenge.attempts > 0:
+            return 'error'
+    except:
+        pass
     return 'noattempt'
 
 @register.filter
