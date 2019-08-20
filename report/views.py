@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from challenges.models import Challenge, ChallengeSubmission
 from tutorials.models import Tutorial, TutorialAccess
-from course.models import Class
+from course.models import Class, get_daterange
 from .models import *
 
 
@@ -177,7 +177,11 @@ def status(request):
     if selected_student is not None and selected_student != 'Todos':
         student_data = [User.objects.get(username=selected_student)]
     if student_data is None and selected_course:
-        student_data = Class.objects.get(name=selected_course).students.all()
+        student_data = [u for u in Class.objects.get(name=selected_course).students.all()]
+
+    days = []
+    if student_data:
+        days = get_daterange(student_data[0])
 
     user_submissions_per_day = {u: ChallengeSubmission.objects.by(u).count_challenges_per_day() for u in student_data}
     context = {
@@ -187,5 +191,6 @@ def status(request):
         'user_submissions_per_day': user_submissions_per_day,
         'classes': Class.objects.all(),
         'students': User.objects.filter(is_staff=False).exclude(username='aluno.teste'),
+        'days': days,
     }
     return render(request, 'report/status.html', context)
