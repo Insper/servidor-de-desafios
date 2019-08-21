@@ -35,7 +35,7 @@ def index(request):
         tutorials = Tutorial.all_published()
     tutorials = tutorials.order_by('id')
     context['tutorials'] = tutorials
-    context['submissions_by_challenge'] = ChallengeSubmission.submissions_by_challenge(request.user, context['visible_challenges_ids'])
+    context['submissions_by_challenge'] = ChallengeSubmission.objects.by(request.user).submissions_by_challenge(context['visible_challenges_ids'])
     context['all_tags'] = Tag.objects.all()
     context['submissions_per_day'] = ChallengeSubmission.objects.by(request.user).count_challenges_per_day()
     context['days'] = get_daterange(request.user)
@@ -100,10 +100,10 @@ def challenge(request, c_id):
             return redirect('challenge', c_id=c_id)
 
     context['challenge'] = challenge
-    context['answers'] = ChallengeSubmission.objects.filter(challenge=context['challenge'], author=request.user).order_by('-created')
+    context['answers'] = ChallengeSubmission.objects.by(request.user).filter(challenge=context['challenge']).order_by('-created')
     context['expired'] = expired
     context['msg'] = msg
-    context['latest_submission'] = ChallengeSubmission.latest_submission(context['challenge'], request.user)
+    context['latest_submission'] = ChallengeSubmission.objects.by(request.user).latest_submission(context['challenge'])
     context['error_counter'] = Counter()
     return render(request, 'challenges/challenge.html', context=context)
 

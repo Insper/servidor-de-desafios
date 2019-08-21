@@ -108,6 +108,37 @@ class ChallengeSubmissionManager(models.Manager):
         per_day.update({d: len(c) for d, c in challenges_per_day.items()})
         return per_day
 
+    def latest_submission(self, challenge):
+        all_submissions = self.get_queryset().filter(challenge=challenge)
+        if not all_submissions:
+            return ''
+        latest = all_submissions.latest('created')
+        source_code = ''
+        if latest:
+            try:
+                source_code = latest.code.read().decode('utf-8')
+            except:
+                source_code = ''
+        return escape_js(source_code)
+
+    def submissions_by_challenge(self, challenge_ids=None):
+        user_submissions = self.get_queryset().all()
+        if self.author and self.author.is_staff:
+            challenges = Challenge.objects.all()
+        else:
+            challenges = Challenge.all_published()
+        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], str(Result.ERROR)) for ch in challenges if challenge_ids is None or ch.id in challenge_ids}
+        for sub in user_submissions:
+            if challenge_ids is None or sub.challenge.id in challenge_ids:
+                if sub.challenge in challenge2submissions:
+                    sbc = challenge2submissions[sub.challenge]
+                    if sub.result == str(Result.OK):
+                        sbc.best_result = str(Result.OK)
+                    sbc.submissions.append(sub)
+                else:
+                    challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
+        return sorted(list(challenge2submissions.values()), key=lambda s: s.challenge.id)
+
 
 class ChallengeSubmission(models.Model):
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
@@ -168,41 +199,5 @@ class ChallengeSubmission(models.Model):
         stacktraces = ['' for _ in msgs]
         sts = self.clean_stack_traces
         stacktraces[:len(sts)] = sts
-        print(stacktraces)
         return list(set([ErrorData(msg, st) for msg, st in zip(msgs, stacktraces)]))
 
-    @classmethod
-    def submissions_by_challenge(cls, author=None, challenge_ids=None):
-        if author is None:
-            user_submissions = ChallengeSubmission.objects.all()
-        else:
-            user_submissions = ChallengeSubmission.objects.filter(author=author)
-        if author.is_staff:
-            challenges = Challenge.objects.all()
-        else:
-            challenges = Challenge.all_published()
-        challenge2submissions = {ch: SubmissionsByChallenge(ch, [], str(Result.ERROR)) for ch in challenges if challenge_ids is None or ch.id in challenge_ids}
-        for sub in user_submissions:
-            if challenge_ids is None or sub.challenge.id in challenge_ids:
-                if sub.challenge in challenge2submissions:
-                    sbc = challenge2submissions[sub.challenge]
-                    if sub.result == str(Result.OK):
-                        sbc.best_result = str(Result.OK)
-                    sbc.submissions.append(sub)
-                else:
-                    challenge2submissions[sub.challenge] = SubmissionsByChallenge(sub.challenge, [sub], sub.result)
-        return sorted(list(challenge2submissions.values()), key=lambda s: s.challenge.id)
-
-    @classmethod
-    def latest_submission(cls, challenge, author):
-        all_submissions = ChallengeSubmission.objects.filter(challenge=challenge, author=author)
-        if not all_submissions:
-            return ''
-        latest = all_submissions.latest('created')
-        source_code = ''
-        if latest:
-            try:
-                source_code = latest.code.read().decode('utf-8')
-            except:
-                source_code = ''
-        return escape_js(source_code)
