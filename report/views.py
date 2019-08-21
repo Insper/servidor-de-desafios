@@ -176,9 +176,8 @@ def status(request):
     student_data = []
     if selected_student is not None and selected_student != 'Todos':
         student_data = [User.objects.get(username=selected_student)]
-    if not student_data and selected_course != 'Todas':
-        student_data = [u for u in Class.objects.get(name=selected_course).students.all()]
-        print(Class.objects.get(name=selected_course))
+    if not student_data and selected_course is not None and selected_course != 'Todas':
+        student_data = [u for u in Class.objects.get(name=selected_course).students.order_by('username')]
 
     days = []
     if student_data:
@@ -191,7 +190,7 @@ def status(request):
         'student_data': student_data,
         'user_submissions_per_day': user_submissions_per_day,
         'classes': Class.objects.all(),
-        'students': User.objects.filter(is_staff=False).exclude(username='aluno.teste'),
+        'students': User.objects.filter(is_staff=False).exclude(username='aluno.teste').order_by('username'),
         'days': days,
     }
     return render(request, 'report/status.html', context)
