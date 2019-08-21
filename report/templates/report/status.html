@@ -24,7 +24,7 @@ var data = [{
     ],
     y: [
         {% for d in days %}
-        {{ submissions_per_day|get_item:d }},
+        {{ user_submissions_per_day|get_item:student|get_item:d }},
         {% endfor %}
     ],
     type: 'bar'
