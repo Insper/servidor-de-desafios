@@ -176,8 +176,9 @@ def status(request):
     student_data = []
     if selected_student is not None and selected_student != 'Todos':
         student_data = [User.objects.get(username=selected_student)]
-    if student_data is None and selected_course:
+    if not student_data and selected_course != 'Todas':
         student_data = [u for u in Class.objects.get(name=selected_course).students.all()]
+        print(Class.objects.get(name=selected_course))
 
     days = []
     if student_data:
