@@ -157,6 +157,12 @@ class ChallengeSubmission(models.Model):
         return '{0}: Challenge {1} - date[{2}] result[{3}]'.format(self.author.username, self.challenge.id, self.created, self.result)
 
     @property
+    def success(self):
+        if(self.result == "OK"):
+            return True
+        return False
+
+    @property
     def failure_list(self):
         return self.feedback.split(FEEDBACK_SEP)
 
