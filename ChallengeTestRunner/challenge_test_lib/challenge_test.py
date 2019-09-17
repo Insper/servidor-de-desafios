@@ -262,6 +262,10 @@ class TestCaseWrapper(unittest.TestCase):
         # We need the __class__ because in that way it doesn't pass self as argument to the function
         return self.__class__.CHALLENGE_FUN(*args, **kwargs)
 
+    def assert_printed(self, value):
+        str_value = str(value)
+        return str_value in self.mock_print.printed
+
     def _formatMessage(self, msg, standardMsg):
         # Include message separators in all messages and ignore standardMsg
         if not msg:

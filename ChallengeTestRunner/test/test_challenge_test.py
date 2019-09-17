@@ -237,7 +237,7 @@ with open('test.txt', 'a') as f:
 '''
 
 
-class ChallengeTestTest(unittest.TestCase):
+class ChallengeTestTest(challenge_test.TestCaseWrapper):
     def test_doesnt_break_with_syntax_error(self):
         result = challenge_test.run_tests(CHALLENGE_CODE_0, TEST_CODE1, 'ex1')
         self.assertFalse(result.success)
@@ -355,6 +355,16 @@ class ChallengeTestTest(unittest.TestCase):
     def test_append(self):
         result = challenge_test.run_tests(CHALLENGE_CODE_18, TEST_CODE7, None)
         self.assertTrue(result.success)
+
+    def test_assert_printed_string(self):
+        expected_print = 'Who watches Bleach in 2019?'
+        print(expected_print)
+        assert self.assert_printed(expected_print)
+
+    def test_assert_printed_number(self):
+        expected_print = 42
+        print(expected_print)
+        assert self.assert_printed(expected_print)
 
 
 if __name__ == '__main__':
