@@ -37,7 +37,7 @@ class Challenge(models.Model):
     def full_title(self):
         title = '{0}'.format(self.id)
         if self.title:
-            title += ': {0}'.format(self.title)
+            title += '- {0}'.format(self.title)
         return title
 
     @property
