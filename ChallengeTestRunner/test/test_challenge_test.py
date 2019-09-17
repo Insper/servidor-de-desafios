@@ -366,6 +366,16 @@ class ChallengeTestTest(challenge_test.TestCaseWrapper):
         print(expected_print)
         assert self.assert_printed(expected_print)
 
+    def test_assert_printed_substring(self):
+        print('Bleach was fine until Aizen')
+        assert self.assert_printed('Aizen')
+
+    def test_assert_printed_index(self):
+        print('First string')
+        print('Second string')
+        assert self.assert_printed('First', 0)
+        assert not self.assert_printed('First', 1)
+
 
 if __name__ == '__main__':
     unittest.main()
