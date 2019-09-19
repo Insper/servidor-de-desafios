@@ -265,11 +265,15 @@ class TestCaseWrapper(unittest.TestCase):
     def assert_printed(self, value, index=None):
         str_value = str(value)
         if index is not None:
-            return str_value in self.mock_print.printed[index]
+            self.assertTrue(str_value in self.mock_print.printed[index],
+                            msg=f'Value not found in print of index {index}')
+            return
 
         filtered = [printed for printed in self.mock_print.printed
                     if str_value in printed]
-        return len(filtered) > 0
+
+        self.assertTrue(len(filtered) > 0,
+                        msg='Value not found in printed strings')
 
     def _formatMessage(self, msg, standardMsg):
         # Include message separators in all messages and ignore standardMsg

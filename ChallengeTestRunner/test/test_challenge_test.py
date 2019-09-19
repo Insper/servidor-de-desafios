@@ -237,7 +237,7 @@ with open('test.txt', 'a') as f:
 '''
 
 
-class ChallengeTestTest(challenge_test.TestCaseWrapper):
+class ChallengeTestTest(unittest.TestCase):
     def test_doesnt_break_with_syntax_error(self):
         result = challenge_test.run_tests(CHALLENGE_CODE_0, TEST_CODE1, 'ex1')
         self.assertFalse(result.success)
@@ -356,25 +356,60 @@ class ChallengeTestTest(challenge_test.TestCaseWrapper):
         result = challenge_test.run_tests(CHALLENGE_CODE_18, TEST_CODE7, None)
         self.assertTrue(result.success)
 
+
+class TestCaseWrapperTest(unittest.TestCase):
+    def setUp(self):
+        self.test_case_wrapper = challenge_test.TestCaseWrapper()
+        self.test_case_wrapper.setUp()
+
     def test_assert_printed_string(self):
         expected_print = 'Who watches Bleach in 2019?'
         print(expected_print)
-        assert self.assert_printed(expected_print)
+        self.test_case_wrapper.assert_printed(expected_print)
 
     def test_assert_printed_number(self):
         expected_print = 42
         print(expected_print)
-        assert self.assert_printed(expected_print)
+        self.test_case_wrapper.assert_printed(expected_print)
+        self.test_case_wrapper.assert_printed(str(expected_print))
 
     def test_assert_printed_substring(self):
-        print('Bleach was fine until Aizen')
-        assert self.assert_printed('Aizen')
+        complete_print = 'Bleach was fine until Aizen'
+        print(complete_print)
+        self.test_case_wrapper.assert_printed(complete_print[2:8])
 
     def test_assert_printed_index(self):
         print('First string')
         print('Second string')
-        assert self.assert_printed('First', 0)
-        assert not self.assert_printed('First', 1)
+        self.test_case_wrapper.assert_printed('First', 0)
+        self.test_case_wrapper.assert_printed('Second', 1)
+
+    def test_assert_printed_fails_string(self):
+        print('Ora ora ora')
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Yare yare daze')
+
+    def test_assert_printed_fails_number(self):
+        print(42)
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed(666)
+
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('666')
+
+    def test_assert_printed_fails_substring(self):
+        print('Ora ora ora')
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Yare')
+
+    def test_assert_printed_fails_index(self):
+        print('Ora ora ora')
+        print('Yare yare daze')
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Yare', 0)
+
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Ora', 1)
 
 
 if __name__ == '__main__':
