@@ -4,6 +4,7 @@
 
 <div class="container-fluid">
   <div class="row minh-100">
+    {% if show_nav %}
     <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
       <ul class="nav nav-pills flex-column">
         <!-- menu -->
@@ -14,6 +15,7 @@
         {% endfor %}
       </ul>
     </nav>
+    {% endif %}
 
     <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
 
