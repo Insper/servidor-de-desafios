@@ -70,6 +70,7 @@ class SubmissionsByChallenge:
 
 def escape_js(string):
     replacements = {
+        '\\': '\\\\',
         '\n': '\\n',
         '\r': '',
         '"': '\\\"',
@@ -206,4 +207,3 @@ class ChallengeSubmission(models.Model):
         sts = self.clean_stack_traces
         stacktraces[:len(sts)] = sts
         return list(set([ErrorData(msg, st) for msg, st in zip(msgs, stacktraces)]))
-
