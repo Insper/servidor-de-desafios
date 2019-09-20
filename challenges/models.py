@@ -21,17 +21,18 @@ class Result(Enum):
 def create_default_test_file():
     from django.core.files.base import ContentFile
     from django.core.files.storage import default_storage
+    from django.utils import timezone
     TEST_CODE = '''
 from challenge_test_lib import challenge_test
 
 class TestCase(challenge_test.TestCaseWrapper):
     TIMEOUT = 1
     
-    #@challenge_test.error_message('Não funcionou para caso com zero.')
+    @challenge_test.error_message('Erro no servidor')
     def test_1(self):
         self.assertTrue(True)
 '''
-    path = default_storage.save('.', ContentFile(TEST_CODE))
+    path = default_storage.save('challenge_tests/test_{0}'.format(timezone.now().strftime('%Y_%m_%d_%H_%M_%S_%f')), ContentFile(TEST_CODE))
     return path
 
 import os
