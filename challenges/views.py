@@ -14,6 +14,7 @@ from course.models import ChallengeBlock, get_daterange
 
 def create_context(user):
     challenges = Challenge.all_published().order_by('id')
+    show_nav = True
     if user.is_staff:
         visible_challenges_ids = [c.id for c in challenges]
     else:
@@ -23,7 +24,8 @@ def create_context(user):
         visible_challenges_ids = set(released_blocks.values_list('challenges__id', flat=True))
         visible_challenges = [c for c in challenges if c.id in visible_challenges_ids]
         challenges = visible_challenges
-    return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges, 'visible_challenges_ids': visible_challenges_ids}
+        
+    return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges, 'visible_challenges_ids': visible_challenges_ids, 'show_nav': show_nav}
 
 
 @login_required
@@ -39,6 +41,7 @@ def index(request):
     context['all_tags'] = Tag.objects.all()
     context['submissions_per_day'] = ChallengeSubmission.objects.by(request.user).count_challenges_per_day()
     context['days'] = get_daterange(request.user)
+    context['show_nav'] = False
     for sbc in context['submissions_by_challenge']:
         if sbc.attempts == 0:
             sbc.tr_class = 'table-light'
