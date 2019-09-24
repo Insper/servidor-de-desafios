@@ -357,5 +357,60 @@ class ChallengeTestTest(unittest.TestCase):
         self.assertTrue(result.success)
 
 
+class TestCaseWrapperTest(unittest.TestCase):
+    def setUp(self):
+        self.test_case_wrapper = challenge_test.TestCaseWrapper()
+        self.test_case_wrapper.setUp()
+
+    def test_assert_printed_string(self):
+        expected_print = 'Who watches Bleach in 2019?'
+        print(expected_print)
+        self.test_case_wrapper.assert_printed(expected_print)
+
+    def test_assert_printed_number(self):
+        expected_print = 42
+        print(expected_print)
+        self.test_case_wrapper.assert_printed(expected_print)
+        self.test_case_wrapper.assert_printed(str(expected_print))
+
+    def test_assert_printed_substring(self):
+        complete_print = 'Bleach was fine until Aizen'
+        print(complete_print)
+        self.test_case_wrapper.assert_printed(complete_print[2:8])
+
+    def test_assert_printed_index(self):
+        print('First string')
+        print('Second string')
+        self.test_case_wrapper.assert_printed('First', 0)
+        self.test_case_wrapper.assert_printed('Second', 1)
+
+    def test_assert_printed_fails_string(self):
+        print('Ora ora ora')
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Yare yare daze')
+
+    def test_assert_printed_fails_number(self):
+        print(42)
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed(666)
+
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('666')
+
+    def test_assert_printed_fails_substring(self):
+        print('Ora ora ora')
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Yare')
+
+    def test_assert_printed_fails_index(self):
+        print('Ora ora ora')
+        print('Yare yare daze')
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Yare', 0)
+
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_printed('Ora', 1)
+
+
 if __name__ == '__main__':
     unittest.main()

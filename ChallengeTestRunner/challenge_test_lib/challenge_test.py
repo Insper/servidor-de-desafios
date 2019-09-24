@@ -262,6 +262,19 @@ class TestCaseWrapper(unittest.TestCase):
         # We need the __class__ because in that way it doesn't pass self as argument to the function
         return self.__class__.CHALLENGE_FUN(*args, **kwargs)
 
+    def assert_printed(self, value, index=None, msg=None):
+        str_value = str(value)
+        if index is not None and str_value not in self.mock_print.printed[index]:
+            raise AssertionError('Value not found in print of index {index}'
+                                 .format(index=index) if msg is None else msg)
+
+        contains_str = any(str_value in printed for printed
+                           in self.mock_print.printed)
+
+        if not contains_str:
+            raise AssertionError('Value not found in printed strings'
+                                 if msg is None else msg)
+
     def _formatMessage(self, msg, standardMsg):
         # Include message separators in all messages and ignore standardMsg
         if not msg:
