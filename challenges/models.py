@@ -32,7 +32,7 @@ class TestCase(challenge_test.TestCaseWrapper):
     def test_1(self):
         self.assertTrue(True)
 '''
-    path = default_storage.save('challenge_tests/test_{0}'.format(timezone.now().strftime('%Y_%m_%d_%H_%M_%S_%f')), ContentFile(TEST_CODE))
+    path = default_storage.save('challenge_tests/test_{0}.py'.format(timezone.now().strftime('%Y_%m_%d_%H_%M_%S_%f')), ContentFile(TEST_CODE))
     return path
 
 import os
