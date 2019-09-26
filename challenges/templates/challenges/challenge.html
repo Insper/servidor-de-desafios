@@ -25,7 +25,9 @@
 
 {% if challenge %}
     <h1>{{ challenge.full_title }}</h1>
-
+    {% if status %}
+        <p>Submission status: {{ status }}</p>
+    {% endif %}
     <section class="placeholders">
     {% for tag in challenge.tags.all %}
         <a href="/?tag={{ tag }}" class="badge badge-primary">{{ tag }}</a>
