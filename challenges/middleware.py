@@ -23,7 +23,7 @@ class LogIPMiddleware:
         filename = os.path.join(LOG_DIR, 'ip-log-{0}.txt'.format(now.strftime(DATE_FORMAT)))
         ip = self.visitor_ip_address(request)
         with open(filename, 'a') as logfile:
-            logfile.write('{0},{1}\n'.format(request.user.username, ip))
+            logfile.write('{0},{1},{2}\n'.format(now, request.user.username, ip))
         response = self.get_response(request)
         return response
 
