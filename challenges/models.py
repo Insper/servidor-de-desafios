@@ -19,12 +19,31 @@ class Result(Enum):
     ERROR = "Erro"
     OK = "OK"
 
+def create_default_test_file():
+    from django.core.files.base import ContentFile
+    from django.core.files.storage import default_storage
+    from django.utils import timezone
+    TEST_CODE = '''
+from challenge_test_lib import challenge_test
+
+class TestCase(challenge_test.TestCaseWrapper):
+    TIMEOUT = 1
+    
+    @challenge_test.error_message('Erro no servidor')
+    def test_1(self):
+        self.assertTrue(True)
+'''
+    path = default_storage.save('challenge_tests/test_{0}.py'.format(timezone.now().strftime('%Y_%m_%d_%H_%M_%S_%f')), ContentFile(TEST_CODE))
+    return path
+
+import os
+
 class Challenge(models.Model):
     release = models.DateTimeField('date released', auto_now=True)
     expire = models.DateTimeField('date expired', blank=True, null=True)
     title = models.CharField(max_length=1024, blank=True)
     problem = models.TextField(blank=False)
-    test_file = models.FileField(upload_to='challenge_tests/')
+    test_file = models.FileField(upload_to='challenge_tests/', default=create_default_test_file)
     function_name = models.CharField(max_length=50, blank=True)
     image = models.ImageField(upload_to='challenge/', blank=True)
     published = models.BooleanField(default=True)
