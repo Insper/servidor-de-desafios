@@ -12,10 +12,9 @@ class LogIPMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-
+        now = timezone.now()
         for fname in os.listdir(LOG_DIR):
             filename = os.path.join(LOG_DIR, fname)
-            now = timezone.now()
             log_date_str = '-'.join(fname.split('-')[-3:]).replace('.txt', '')
             log_date = timezone.datetime.strptime(log_date_str, DATE_FORMAT).date()
             time_delta = now.date() - log_date
