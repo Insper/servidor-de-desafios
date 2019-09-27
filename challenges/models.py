@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from taggit.managers import TaggableManager
 from enum import Enum
 import markdown
@@ -207,3 +208,28 @@ class ChallengeSubmission(models.Model):
         sts = self.clean_stack_traces
         stacktraces[:len(sts)] = sts
         return list(set([ErrorData(msg, st) for msg, st in zip(msgs, stacktraces)]))
+
+
+class ProvaQuerySet(models.QuerySet):
+    def disponiveis_para(self, usuario):
+        turmas_ids = usuario.class_set.values_list('id', flat=True)
+        now = timezone.now()
+        return self.filter(models.Q(inicio__lte=now) & models.Q(fim__gte=now), turma__id__in=turmas_ids)
+
+
+class Prova(models.Model):
+    inicio = models.DateTimeField('data inicial')
+    fim = models.DateTimeField('data final')
+    titulo = models.CharField(max_length=1024, blank=True)
+    descricao = models.TextField(blank=True)
+    exercicios = models.ManyToManyField(Challenge)
+    turma = models.ForeignKey('course.Class', on_delete=models.CASCADE)
+    slug = models.SlugField()
+    
+    objects = ProvaQuerySet.as_manager()
+
+    def __str__(self):
+        return self.titulo
+
+    def disponivel_para(self, usuario):
+        return self.turma.students_set.filter(id=usuario.id).count() > 0

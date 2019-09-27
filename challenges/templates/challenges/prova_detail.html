@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block pagecontent %}
+<h1>{{ object.titulo }}</h1>
+
+<p>{{ object.descricao }}</p>
+
+<h3>Exercícios</h3>
+
+{% for exercicio in object.exercicios.all %}
+<a href="{% url 'challenge' c_id=exercicio.id %}">{{ exercicio.title }}</a>
+{% endfor %}
+
+
+{% endblock %}

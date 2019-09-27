@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.core.files.base import ContentFile
 from django.db.models import Q
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from datetime import datetime
 from taggit.models import Tag
 from challenges.code_runner import run_code
 
-from .models import Challenge, ChallengeSubmission, Result, user_directory_path
+from .models import Challenge, ChallengeSubmission, Result, user_directory_path, Prova
 from tutorials.models import Tutorial
 from course.models import ChallengeBlock, get_daterange
 
@@ -19,9 +22,11 @@ def create_context(user):
         visible_challenges_ids = [c.id for c in challenges]
     else:
         classes_ids = user.class_set.values_list('id', flat=True)
-        today = datetime.now().date()
+        now = datetime.now()
+        today = now.date()
         released_blocks = ChallengeBlock.objects.filter(Q(release_date__isnull=True) | Q(release_date__lte=today), block_class__id__in=classes_ids)
-        visible_challenges_ids = set(released_blocks.values_list('challenges__id', flat=True))
+        current_tests = Prova.objects.disponiveis_para(user)
+        visible_challenges_ids = set(released_blocks.values_list('challenges__id', flat=True)) | set(current_tests.values_list('exercicios__id', flat=True))
         visible_challenges = [c for c in challenges if c.id in visible_challenges_ids]
         challenges = visible_challenges
         
@@ -109,6 +114,30 @@ def challenge(request, c_id):
     context['latest_submission'] = ChallengeSubmission.objects.by(request.user).latest_submission(context['challenge'])
     context['error_counter'] = Counter()
     return render(request, 'challenges/challenge.html', context=context)
+
+
+class ProvasListView(ListView):
+    model = Prova
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        return Prova.objects.disponiveis_para(self.request.user)
+
+
+class ProvaDetailView(DetailView):
+    model = Prova
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        return Prova.objects.disponiveis_para(self.request.user)
+
+
 
 @login_required
 def sandbox(request):
