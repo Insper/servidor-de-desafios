@@ -31,7 +31,7 @@ class LogIPMiddleware:
         '''Source: https://www.science-emergence.com/Articles/How-to-get-visitor-ip-address-with-django-/'''
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
+            ip = x_forwarded_for.split
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
