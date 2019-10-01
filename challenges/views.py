@@ -29,7 +29,7 @@ def create_context(user):
         visible_challenges_ids = set(released_blocks.values_list('challenges__id', flat=True)) | set(current_tests.values_list('exercicios__id', flat=True))
         visible_challenges = [c for c in challenges if c.id in visible_challenges_ids]
         challenges = visible_challenges
-        
+
     return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges, 'visible_challenges_ids': visible_challenges_ids, 'show_nav': show_nav}
 
 @login_required
@@ -42,18 +42,20 @@ def index(request):
     tutorials = tutorials.order_by('id')
     context['tutorials'] = tutorials
     context['submissions_by_challenge'] = ChallengeSubmission.objects.by(request.user).submissions_by_challenge(context['visible_challenges_ids'])
-    context['all_tags'] = Tag.objects.all()
+    context['all_tags'] = [tag for tag in Tag.objects.all() if 'prova' not in str(tag)]
     context['submissions_per_day'] = ChallengeSubmission.objects.by(request.user).count_challenges_per_day()
     context['days'] = get_daterange(request.user)
     context['show_nav'] = False
     context['prog_tags'] = {}
-    
+
     for c in context['challenges']:
         for tag in c.tags.names():
+            if 'prova' in tag:
+                continue
             if tag not in context['prog_tags']:
                 context['prog_tags'][tag] = { "total":1,"feitos":0,"pct":0}
             else:
-                context['prog_tags'][tag]['total'] +=1
+                context['prog_tags'][tag]['total'] += 1
 
     for sbc in context['submissions_by_challenge']:
         if sbc.attempts == 0:
@@ -63,8 +65,9 @@ def index(request):
             sbc.tr_class = 'table-success'
             sbc.success = 'Sim'
             for tag in sbc.challenge.tags.names():
-                context['prog_tags'][tag]['feitos'] +=1
-                context['prog_tags'][tag]['pct'] = int((context['prog_tags'][tag]['feitos'] / context['prog_tags'][tag]['total'])*100)
+                if tag in context['prog_tags']:
+                    context['prog_tags'][tag]['feitos'] += 1
+                    context['prog_tags'][tag]['pct'] = int((context['prog_tags'][tag]['feitos'] / context['prog_tags'][tag]['total'])*100)
         else:
             sbc.tr_class = 'table-warning'
             sbc.success = 'Não'
