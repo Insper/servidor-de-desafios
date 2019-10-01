@@ -252,3 +252,7 @@ class Prova(models.Model):
 
     def disponivel_para(self, usuario):
         return self.turma.students_set.filter(id=usuario.id).count() > 0
+
+    @property
+    def exercicios_por_nome(self):
+        return self.exercicios.order_by('title')

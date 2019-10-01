@@ -7,7 +7,7 @@
 
 <h3>Exercícios</h3>
 
-{% for exercicio in object.exercicios.all %}
+{% for exercicio in object.exercicios_por_nome %}
 <a href="{% url 'challenge' c_id=exercicio.id %}">{{ exercicio.title }}</a>
 {% endfor %}
 
