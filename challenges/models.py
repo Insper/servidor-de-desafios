@@ -28,7 +28,7 @@ from challenge_test_lib import challenge_test
 
 class TestCase(challenge_test.TestCaseWrapper):
     TIMEOUT = 1
-    
+
     @challenge_test.error_message('Erro no servidor')
     def test_1(self):
         self.assertTrue(True)
@@ -90,7 +90,7 @@ class SubmissionsByChallenge:
 
 def escape_js(string):
     replacements = {
-        '\\': '\\\\',
+        #'\\': '\\\\',  # TODO this line makes everything become a single line (escapes all \n)
         '\n': '\\n',
         '\r': '',
         '"': '\\\"',
@@ -244,7 +244,7 @@ class Prova(models.Model):
     exercicios = models.ManyToManyField(Challenge)
     turma = models.ForeignKey('course.Class', on_delete=models.CASCADE)
     slug = models.SlugField()
-    
+
     objects = ProvaQuerySet.as_manager()
 
     def __str__(self):
