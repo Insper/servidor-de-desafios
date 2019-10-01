@@ -2,46 +2,71 @@
 
 {% load static %}
 {% load utils %}
-
 {% block extra-js %}
     <script src="{% static 'js/index.js' %}"></script>
     <script src="{% static 'js/plotly-latest.min.js' %}"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function(){
-    var data = [{
-        x: [
-            {% for d in days %}
-            '{{ d|date:"Y-m-d" }}',
-            {% endfor %}
-        ],
-        y: [
-            {% for d in days %}
-            {{ submissions_per_day|get_item:d }},
-            {% endfor %}
-        ],
-        type: 'bar'
-    }];
-    var layout = {
-        xaxis: {
-            title: {
-                text: 'Data',
-            }
-        },
-        yaxis: {
-            title: {
-                text: '# Submissões',
-            }
-        },
-    }
-
-    Plotly.newPlot('plotDias', data, layout);
-});
-    </script>
+     document.addEventListener('DOMContentLoaded', function(){
+     var data = [{
+         x: [
+             {% for d in days %}
+             '{{ d|date:"Y-m-d" }}',
+             {% endfor %}
+         ],
+         y: [
+             {% for d in days %}
+             {{ submissions_per_day|get_item:d }},
+             {% endfor %}
+         ],
+         type: 'bar'
+     }];
+     var layout = {
+         xaxis: {
+             title: {
+                 text: 'Data',
+             }
+         },
+         yaxis: {
+             title: {
+                 text: '# Submissões',
+             }
+         },
+     }
+     Plotly.newPlot('plotDias', data, layout);
+     });
+</script>
 {% endblock %}
 
 {% block pagecontent %}
 
 <h1>Acompanhamento</h1>
+
+<h2>Progresso</h2>
+
+<p>
+A seguir você pode acompanhar o seu progresso nos desafios por tags.
+</p>
+
+<div >
+    <div>    
+        <link rel="stylesheet" type="text/css" href="./static/css/loading-bar.css"/>
+        <script type="text/javascript" src="/static/js/loading-bar.js"></script>
+        <div style="width: 100%; display: table;"><div style="display: table-row"></div>
+        {%for t in prog_tags %}
+        {%with tag=prog_tags|get_item:t pct=tag|get_item:'pct' feitos=tag|get_item:'feitos' total=tag|get_item:'total' %}
+        {%if forloop.counter0|divisibleby:"4" %}
+            </div>
+            <div style="display: table-row">
+            <div style="display: table-cell;">
+            <div class="ldBar label-center" style="width:40%;height:40%;margin:auto"; align=left; data-value={{pct}} data-preset="circle"></div><div style=" text-align: center;">{{t}}: {{feitos}}/{{total}}</div></div>
+        {% else %}
+            <div style="display: table-cell;">
+            <div class="ldBar label-center" style="width:40%;height:40%;margin:auto"; align=left; data-value={{pct}} data-preset="circle"></div><div style=" text-align: center;">{{t}}: {{feitos}}/{{total}}</div></div>
+        {% endif %}
+        {% endwith %}
+        {% endfor %}
+    </div>
+</div>
 
 <h2>Submissões por dia</h2>
 
