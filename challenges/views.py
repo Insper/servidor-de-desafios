@@ -9,6 +9,7 @@ from django.views.generic.detail import DetailView
 from datetime import datetime
 from taggit.models import Tag
 from challenges.code_runner import run_code
+from collections import defaultdict
 
 from .models import Challenge, ChallengeSubmission, Result, user_directory_path, Prova
 from tutorials.models import Tutorial
@@ -148,6 +149,20 @@ class ProvaDetailView(DetailView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        results = defaultdict(lambda: defaultdict(lambda: {}))
+        if self.request.user.is_staff:
+            for exercicio in self.object.exercicios.all():
+                for submission in exercicio.challengesubmission_set.all():
+                    sub_dict = {
+                        'created': str(submission.created),
+                        'code': str(submission.code.url),
+                    }
+                    results[exercicio.title][submission.author.username] = sub_dict
+            ctx['results'] = results
+        return ctx
 
     def get_queryset(self):
         return Prova.objects.disponiveis_para(self.request.user)
