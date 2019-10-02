@@ -231,6 +231,8 @@ class ChallengeSubmission(models.Model):
 
 class ProvaQuerySet(models.QuerySet):
     def disponiveis_para(self, usuario):
+        if usuario.is_staff:
+            return self
         turmas_ids = usuario.class_set.values_list('id', flat=True)
         now = timezone.now()
         return self.filter(models.Q(inicio__lte=now) & models.Q(fim__gte=now), turma__id__in=turmas_ids)

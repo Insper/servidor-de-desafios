@@ -13,6 +13,8 @@ class LogIPMiddleware:
 
     def __call__(self, request):
         now = timezone.now()
+        if not os.path.isdir(LOG_DIR):
+            os.mkdir(LOG_DIR)
         for fname in os.listdir(LOG_DIR):
             filename = os.path.join(LOG_DIR, fname)
             log_date_str = '-'.join(fname.split('-')[-3:]).replace('.txt', '')
