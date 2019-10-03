@@ -236,6 +236,22 @@ with open('test.txt', 'a') as f:
     f.write('\\nNew content')
 '''
 
+TEST_CODE8 = '''
+from challenge_test_lib import challenge_test
+
+class TestCase(challenge_test.TestCaseWrapper):
+    def test_do_nothing(self):
+        pass
+'''
+
+CHALLENGE_CODE_19 = '''
+def do_nothing(arg):
+    return arg
+
+arg = input('Should not use input in function questions: ')
+print(do_nothing(arg))
+'''
+
 
 class ChallengeTestTest(unittest.TestCase):
     def test_doesnt_break_with_syntax_error(self):
@@ -355,6 +371,11 @@ class ChallengeTestTest(unittest.TestCase):
     def test_append(self):
         result = challenge_test.run_tests(CHALLENGE_CODE_18, TEST_CODE7, None)
         self.assertTrue(result.success)
+    
+    def test_doesnt_allow_input_in_function_challenge(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_19, TEST_CODE8, 'do_nothing')
+        self.assertFalse(result.success)
+        self.assertTrue('input' in result.failure_msgs[0])
 
 
 class TestCaseWrapperTest(unittest.TestCase):
