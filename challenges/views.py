@@ -157,7 +157,7 @@ class ProvaDetailView(DetailView):
             for exercicio in self.object.exercicios.all():
                 for submission in exercicio.challengesubmission_set.all():
                     sub_dict = {
-                        'created': str(submission.created),
+                        'created': submission.created,
                         'code': str(submission.code.url),
                     }
                     results[exercicio.title][submission.author.username] = sub_dict

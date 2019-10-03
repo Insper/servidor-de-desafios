@@ -25,7 +25,7 @@
 <tr>
     <td>{{ exercicio.title }}</td>
     <td>{{ autor }}</td>
-    <td>{{ horario }}</td>
+    <td>{{ horario|date:'Y-m-d H:i:s' }}</td>
     <td>{{ code }}</td>
 </tr>
 {% endwith %}
