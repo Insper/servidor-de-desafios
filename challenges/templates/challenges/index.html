@@ -94,8 +94,9 @@ A seguir você pode acompanhar o número de submissões realizadas por você, se
 
 <div>
 {% for tag in all_tags %}
-    <a href="#" class="filter-challenge-tag challenge-tag badge">{{ tag }}</a>
+    <a href="/?tag={{ tag }}" class="challenge-tag badge">{{ tag }}</a>
 {% endfor %}
+    <a href="/" class="challenge-tag badge">all</a>
 </div>
 
 {% if submissions_by_challenge %}
