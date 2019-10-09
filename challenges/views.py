@@ -155,7 +155,7 @@ class ProvaDetailView(DetailView):
         results = defaultdict(lambda: defaultdict(lambda: {}))
         if self.request.user.is_staff:
             for exercicio in self.object.exercicios.all():
-                for submission in exercicio.challengesubmission_set.all():
+                for submission in exercicio.challengesubmission_set.order_by('created'):
                     sub_dict = {
                         'created': submission.created,
                         'code': str(submission.code.url),
