@@ -1,0 +1,10 @@
+{% load static %}
+<div class="author">
+    <div class="foto" style="background-image: url( {% static foto %} ) ;"></div>
+    <span class="author-name">{{nome}}
+    {% if student %}
+    <span class="author-class"> - {{ turma }} </span> <br>
+    {% endif %} 
+    </span> 
+    <span class="author-contributions"> {{ contribuicoes }} </span>
+</div>

@@ -1,0 +1,31 @@
+.authors {
+    display: flex;
+    flex-flow: row wrap;
+    border-spacing: 5px;
+}
+
+.author {
+    border: 1px #dddddd solid;
+    padding: 3px;
+    margin: 7px;
+    width: 210px;
+}
+
+.author .foto {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    
+    background-size: cover;
+    background-position:  50% 50%;
+}
+
+.author-name {
+    font-weight: bold;
+    display: block;
+}
+
+.author-class {
+    font-weight: normal;
+    font-size: small;
+}
