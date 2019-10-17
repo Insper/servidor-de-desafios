@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load authors %}
+{% load static %}
+
+{% block pagecontent %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/authors.css' %}">
+
+<h1>Agradecimentos</h1>
+
+Esta página lista todas as pessoas que contribuíram para que este software. 
+
+<h2> Professores </h2>
+
+<div class="authors">
+
+{% professor_author "Raul Ikeda" "raul.jpeg" "Versão inicial em Flask com código testado usando AWS Lambda." %}
+
+{% professor_author "Andrew (Toshi) Kurauchi" "andrew.jpg" "Versão atual escrita em Django e relatórios de acompanhamento." %}
+
+{% professor_author "Igor Montagner" "igor.png" "Página de agradecimentos." %}
+
+</div>
+
+<h2> Alunos </h2>
+
+<div class="authors">
+
+{% student_author "Guilherme Leite" "Turma 3" "Barras de progresso circulares para cada tag." "guilherme_leite.jpeg" %}
+
+{% student_author "Hugo Carl" "Turma 3" "Barras de progresso circulares para cada tag." "hugo_carl.jpeg" %}
+
+{% student_author "Gabriel Monteiro" "Turma 3" "Barras de progresso circulares para cada tag." "gabriel_monteiro.jpeg" %}
+
+{% student_author "Vitor Hase Liu" "Turma 3" "Testes padrão para cada desafio." "vitor_liu.jpeg" %}
+
+{% student_author "Elisa Malzoni" "Turma 2" "Tratamento de caracteres especiais na edição de código." "elisa_malzoni.jpeg" %}
+
+{% student_author "Alessandra Blücher" "Turma 3" "Menu só é visível nas páginas de desafios." "alessandra_blucher.jpeg" %}
+
+{% student_author "Samuel Granato" "Turma 3" "Correções na instalação do servidor e implementação do menu dropdown no nome." "samuel_granato.jpeg" %}
+
+{% student_author "Leonardo Pereira" "Turma 2" "Linhas da tabela de submissões são coloridas conforme seu status." "leonardo_pereira.jpeg" %}
+
+{% student_author "Pedro Cunial" "Turma 1" "Método extra para verificação da corretude de soluções dos desafios." "pedro_cunial.jpeg" %}
+
+{% student_author "Alexandre Edington" "Turma 3" "Mudanças na exibição do nome de cada exercício." "alexandre_edington.jpeg" %}
+
+{% student_author "Giulia Braga Passarelli" "Turma 3" "Melhorias na seleção de exercícios usando tags." "giulia_passarelli.png" %}
+
+</div>
+
+
+{% endblock %}
