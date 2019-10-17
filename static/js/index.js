@@ -15,11 +15,14 @@ function updateVisible() {
     });
     $('.challenge-row').each(function(index, element) {
         var tags = $(element).find('.challenge-tags').children();
-        var visible = false;
-        for (var i = 0; i < tags.length; i++) {
-            if (visibleTags.indexOf(tags[i].innerHTML) >= 0) {
-                visible = true;
-                break;
+        var visible = true;
+        if(visibleTags[0] != ["all"]){
+            visible = false;
+            for (var i = 0; i < tags.length; i++) {
+                if (visibleTags.indexOf(tags[i].innerHTML) >= 0) {
+                    visible = true;
+                    break;
+                }
             }
         }
         if (visible) $(element).show();
@@ -46,6 +49,7 @@ $(document).ready(function() {
     visibleTags = [];
     if (tag != null) visibleTags = [tag];
     else {
+        visibleTags = ["all"];
         $('.filter-challenge-tag').each(function(index, element) {
             visibleTags.push(element.innerHTML);
         });
