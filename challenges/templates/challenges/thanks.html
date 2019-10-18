@@ -2,20 +2,24 @@
 {% load authors %}
 {% load static %}
 
-{% block pagecontent %}
+{% block extra-css %}
+{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'css/authors.css' %}">
+{% endblock %}
+
+{% block pagecontent %}
 
 <h1>Agradecimentos</h1>
 
-Esta página lista todas as pessoas que contribuíram para que este software. 
+Esta página lista todas as pessoas que contribuíram para este software. 
 
 <h2> Professores </h2>
 
 <div class="authors">
 
-{% professor_author "Raul Ikeda" "raul.jpeg" "Versão inicial em Flask com código testado usando AWS Lambda." %}
+{% professor_author "Raul Ikeda" "raul.jpeg" "Versão inicial em Flask com código testado automaticamente usando AWS Lambda." %}
 
-{% professor_author "Andrew (Toshi) Kurauchi" "andrew.jpg" "Versão atual escrita em Django e relatórios de acompanhamento." %}
+{% professor_author "Andrew (Toshi) Kurauchi" "andrew.jpg" "Versão atual escrita em Django, módulo de testes automatizados e relatórios de acompanhamento." %}
 
 {% professor_author "Igor Montagner" "igor.png" "Página de agradecimentos." %}
 

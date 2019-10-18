@@ -1,10 +1,9 @@
 {% load static %}
-<div class="author">
-    <div class="foto" style="background-image: url( {% static foto %} ) ;"></div>
-    <span class="author-name">{{nome}}
-    {% if student %}
-    <span class="author-class"> - {{ turma }} </span> <br>
-    {% endif %} 
-    </span> 
-    <span class="author-contributions"> {{ contribuicoes }} </span>
+<div class="card author">
+    <img src="{% static foto %}" class="card-img-top foto" alt="{{nome}} (foto)">
+    <div class="card-body">
+        <h5 class="card-title">{{nome}}</h5>
+        <span class="turma">{{ turma }}</span>
+        <p class="card-text">{{ contribuicoes }}</p>
+    </div>
 </div>
