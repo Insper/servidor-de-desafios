@@ -1,0 +1,16 @@
+{% load i18n %}
+<script type="text/javascript">
+    function execute_filter(opt) {
+        var loc = window.location.pathname + opt.value;
+        window.location.href = loc;
+    }
+</script>
+<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<ul>
+    <select onchange="execute_filter(this.options[this.selectedIndex]);">
+    {% for choice in choices %}
+        <option{% if choice.selected %} selected="selected"{% endif %}
+            value="{{ choice.query_string|iriencode }}">{{ choice.display }}</option>
+    {% endfor %}
+    </select>
+</ul>
