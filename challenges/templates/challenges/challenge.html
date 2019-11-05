@@ -23,11 +23,53 @@
 
 {% block pagecontent %}
 
+{% if word == 'post' %}
+    <h3>Ultimo envio:</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Tentativa</th>
+                    <th>Feedback</th>
+                    <th>Resultado</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ answers.first.created|date:'d/m/Y H:i' }}</td>
+                        <td>
+                            <ul class="challenge-feedback-list">
+                            {% for feedback in answers.first.clean_feedback %}
+                                <li>
+                                    {% if not feedback.stacktrace or feedback.stacktrace == '-' %}
+                                    {{ feedback.message }}
+                                    {% else %}
+                                    <div class="challenge-feedback">
+                                        <span>{{ feedback.message }}</span>
+                                        <button class="btn btn-danger" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
+                                            Stack trace
+                                        </button>
+                                        <div class="stacktrace collapse" id="error{{ error_counter.cur }}">
+                                            <div class="card card-body">
+                                                {{ feedback.stacktrace|safe }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{ error_counter.next }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ answers.first.result }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+{% endif %}
+
 {% if challenge %}
     <h1>{{ challenge.full_title }}</h1>
-    {% if status %}
-        <p>Submission status: {{ status }}</p>
-    {% endif %}
     <section class="placeholders">
     {% for tag in challenge.tags.all %}
         <a href="/?tag={{ tag }}" class="badge badge-primary">{{ tag }}</a>
@@ -92,40 +134,42 @@
             </thead>
             <tbody>
             {% for ans in answers %}
-                <tr>
-                    <td>{{ ans.created|date:'d/m/Y H:i' }}</td>
-                    <td>
-                        <ul class="challenge-feedback-list">
-                        {% for feedback in ans.clean_feedback %}
-                            <li>
-                                {% if not feedback.stacktrace or feedback.stacktrace == '-' %}
-                                {{ feedback.message }}
-                                {% else %}
-                                <div class="challenge-feedback">
-                                    <span>{{ feedback.message }}</span>
-                                    <button class="btn btn-danger" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
-                                        Stack trace
-                                    </button>
-                                    <div class="stacktrace collapse" id="error{{ error_counter.cur }}">
-                                        <div class="card card-body">
-                                            {{ feedback.stacktrace|safe }}
+                {% if ans != answers.first %}
+                    <tr>
+                        <td>{{ ans.created|date:'d/m/Y H:i' }}</td>
+                        <td>
+                            <ul class="challenge-feedback-list">
+                            {% for feedback in ans.clean_feedback %}
+                                <li>
+                                    {% if not feedback.stacktrace or feedback.stacktrace == '-' %}
+                                    {{ feedback.message }}
+                                    {% else %}
+                                    <div class="challenge-feedback">
+                                        <span>{{ feedback.message }}</span>
+                                        <button class="btn btn-danger" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
+                                            Stack trace
+                                        </button>
+                                        <div class="stacktrace collapse" id="error{{ error_counter.cur }}">
+                                            <div class="card card-body">
+                                                {{ feedback.stacktrace|safe }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                {{ error_counter.next }}
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    </td>
-                    <td>{{ ans.result }}</td>
-                </tr>
+                                    {{ error_counter.next }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ ans.result }}</td>
+                    </tr>
+                {% endif %}
             {% endfor %}
             </tbody>
         </table>
     </div>
+    
 {% else %}
     <p>O exercício não existe... :(</p>
 {% endif %}
-
 {% endblock %}

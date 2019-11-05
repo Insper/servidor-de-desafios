@@ -63,7 +63,7 @@ class Counter:
         return self.val
 
 @login_required
-def challenge(request, c_id, status=None):
+def challenge(request, c_id, word):
     user = request.user
     context = create_context(user)
 
@@ -93,11 +93,14 @@ def challenge(request, c_id, status=None):
 
             result = run_code(challenge, answer)
             submission.failure_list = result.failure_msgs
-            submission.stack_traces = result.stack_traces
+            #submission.stack_traces = result.stack_traces
             submission.result = Result.OK if result.success else Result.ERROR
             submission.save()
             submission.code.save(user_directory_path(submission, ''), fp)
-            return redirect('challenge', c_id=c_id, status=200)
+
+
+            return redirect('challenge', c_id=c_id, word='post')
+
 
     context['challenge'] = challenge
     context['answers'] = ChallengeSubmission.objects.by(request.user).filter(challenge=context['challenge']).order_by('-created')
@@ -105,8 +108,8 @@ def challenge(request, c_id, status=None):
     context['msg'] = msg
     context['latest_submission'] = ChallengeSubmission.objects.by(request.user).latest_submission(context['challenge'])
     context['error_counter'] = Counter()
-    if status != None:
-        context['status'] = status
+    context['word'] = word
+
     return render(request, 'challenges/challenge.html', context=context)
 
 @login_required
