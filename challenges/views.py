@@ -6,6 +6,7 @@ from django.db.models import Q
 from datetime import datetime
 from taggit.models import Tag
 from challenges.code_runner import run_code
+from django.contrib import messages
 
 from .models import Challenge, ChallengeSubmission, Result, user_directory_path
 from tutorials.models import Tutorial
@@ -97,6 +98,11 @@ def challenge(request, c_id):
             submission.result = Result.OK if result.success else Result.ERROR
             submission.save()
             submission.code.save(user_directory_path(submission, ''), fp)
+            
+            messages.success(request,submission.created.strftime("%d/%m/%Y %H:%M"))
+            messages.success(request,submission.feedback)
+            messages.success(request,submission.result)
+
             return redirect('challenge', c_id=c_id)
 
     context['challenge'] = challenge
