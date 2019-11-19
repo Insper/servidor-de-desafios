@@ -31,6 +31,31 @@
         <a href="/?tag={{ tag }}" class="badge badge-primary">{{ tag }}</a>
     {% endfor %}
     </section>
+    
+    {% if messages %}
+    <h3>Ultimo envio:</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Tentativa</th>
+                <th>Feedback</th>
+                <th>Resultado</th>
+            </tr>
+            </thead>
+            <tbody>
+        <tr>
+            {% for message in messages %}
+                <td>
+                    {{message}}
+                </td>
+            {% endfor %}
+        </tr>
+            </tbody>
+        </table>
+        </div>
+    {% endif %}
+
 
     <section class="row placeholders">
         <div class="col-12 col-sm-12 placeholder">
