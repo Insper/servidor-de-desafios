@@ -1,6 +1,7 @@
 # Custom folders
 tmp
 media
+logs
 lambda_code.zip
 InsperProgChallenges/production_settings.py
 .idea

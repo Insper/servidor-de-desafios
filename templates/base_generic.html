@@ -31,16 +31,22 @@
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
 		  {% if user.is_authenticated %}
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/password_change">Olá {{ user|smartname }} [trocar senha]<span class="sr-only">(current)</span></a>
-            </li>
             <li class="nav-item">
               <a class="nav-link" href="/sandbox">Sandbox</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/agradecimentos">Agradecimentos</a>
+            </li>
           </ul>
-          <form class="form-inline mt-2 mt-md-0" action="/logout">
-            <button class="btn btn-light my-2 my-sm-0" type="submit">Logout</button>
-          </form>
+          <div class="dropdown" >
+            <button class="btn btn-danger dropdown-toggle"   type="button" data-toggle="dropdown">{{ user|smartname }}
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu text-center" >
+              <li><a href="/password_change" style="color:black;">Mudar Senha</a></li>
+              <li><a href="/logout" style="color:black">Logout</a></li>
+            </ul>
+          </div> 
+          
 		  {% endif %}
         </div>
       </nav>

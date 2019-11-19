@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from taggit.managers import TaggableManager
 from enum import Enum
 import markdown
@@ -18,12 +19,31 @@ class Result(Enum):
     ERROR = "Erro"
     OK = "OK"
 
+def create_default_test_file():
+    from django.core.files.base import ContentFile
+    from django.core.files.storage import default_storage
+    from django.utils import timezone
+    TEST_CODE = '''
+from challenge_test_lib import challenge_test
+
+class TestCase(challenge_test.TestCaseWrapper):
+    TIMEOUT = 1
+
+    @challenge_test.error_message('Erro no servidor')
+    def test_1(self):
+        self.assertTrue(True)
+'''
+    path = default_storage.save('challenge_tests/test_{0}.py'.format(timezone.now().strftime('%Y_%m_%d_%H_%M_%S_%f')), ContentFile(TEST_CODE))
+    return path
+
+import os
+
 class Challenge(models.Model):
     release = models.DateTimeField('date released', auto_now=True)
     expire = models.DateTimeField('date expired', blank=True, null=True)
     title = models.CharField(max_length=1024, blank=True)
     problem = models.TextField(blank=False)
-    test_file = models.FileField(upload_to='challenge_tests/')
+    test_file = models.FileField(upload_to='challenge_tests/', default=create_default_test_file)
     function_name = models.CharField(max_length=50, blank=True)
     image = models.ImageField(upload_to='challenge/', blank=True)
     published = models.BooleanField(default=True)
@@ -35,9 +55,9 @@ class Challenge(models.Model):
 
     @property
     def full_title(self):
-        title = 'Exercício {0}'.format(self.id)
+        title = '{0}'.format(self.id)
         if self.title:
-            title += ': {0}'.format(self.title)
+            title += '. {0}'.format(self.title)
         return title
 
     @property
@@ -70,6 +90,7 @@ class SubmissionsByChallenge:
 
 def escape_js(string):
     replacements = {
+        #'\\': '\\\\',  # TODO this line makes everything become a single line (escapes all \n)
         '\n': '\\n',
         '\r': '',
         '"': '\\\"',
@@ -157,6 +178,12 @@ class ChallengeSubmission(models.Model):
         return '{0}: Challenge {1} - date[{2}] result[{3}]'.format(self.author.username, self.challenge.id, self.created, self.result)
 
     @property
+    def success(self):
+        if(self.result == "OK"):
+            return True
+        return False
+
+    @property
     def failure_list(self):
         return self.feedback.split(FEEDBACK_SEP)
 
@@ -201,3 +228,33 @@ class ChallengeSubmission(models.Model):
         stacktraces[:len(sts)] = sts
         return list(set([ErrorData(msg, st) for msg, st in zip(msgs, stacktraces)]))
 
+
+class ProvaQuerySet(models.QuerySet):
+    def disponiveis_para(self, usuario):
+        if usuario.is_staff:
+            return self
+        turmas_ids = usuario.class_set.values_list('id', flat=True)
+        now = timezone.now()
+        return self.filter(models.Q(inicio__lte=now) & models.Q(fim__gte=now), turma__id__in=turmas_ids)
+
+
+class Prova(models.Model):
+    inicio = models.DateTimeField('data inicial')
+    fim = models.DateTimeField('data final')
+    titulo = models.CharField(max_length=1024, blank=True)
+    descricao = models.TextField(blank=True)
+    exercicios = models.ManyToManyField(Challenge)
+    turma = models.ForeignKey('course.Class', on_delete=models.CASCADE)
+    slug = models.SlugField()
+
+    objects = ProvaQuerySet.as_manager()
+
+    def __str__(self):
+        return self.titulo
+
+    def disponivel_para(self, usuario):
+        return self.turma.students_set.filter(id=usuario.id).count() > 0
+
+    @property
+    def exercicios_por_nome(self):
+        return self.exercicios.order_by('title')

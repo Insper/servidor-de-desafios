@@ -1,0 +1,9 @@
+{% load static %}
+<div class="card author">
+    <img src="{% static foto %}" class="card-img-top foto" alt="{{nome}} (foto)">
+    <div class="card-body">
+        <h5 class="card-title">{{nome}}</h5>
+        <span class="turma">{{ turma }}</span>
+        <p class="card-text">{{ contribuicoes }}</p>
+    </div>
+</div>

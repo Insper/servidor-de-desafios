@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block pagecontent %}
+<h1>Provas</h1>
+
+{% for prova in object_list %}
+<a href="{% url 'prova' slug=prova.slug %}">{{ prova }}</a>
+{% endfor %}
+
+{% endblock %}

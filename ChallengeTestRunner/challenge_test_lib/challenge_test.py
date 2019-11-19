@@ -33,7 +33,14 @@ def get_message(test_case):
 def run_tests(challenge_code, test_code, challenge_name):
     try:
         if challenge_name:
-            exec(challenge_code, locals())
+            python_input = builtins.input
+            try:
+                builtins.input = ForbiddenInput()
+                exec(challenge_code, locals())
+            except ForbiddenInputError:
+                return TestResults(None, ['Não deveria usar input neste código.'], False, ['Esse desafio não espera nenhuma chamada da função input. Você pode utilizá-la em seu código para testes, mas envie o código sem o input para o servidor.'])
+            finally:
+                builtins.input = python_input
         # test_code MUST define a class named TestCase
         # It should be ok to use globals here because this code is provided by the instructors, not students
         exec(test_code, globals())
@@ -133,6 +140,16 @@ class MockPrint(MockFunction):
         super().__call__(*args, **kwargs)
         self.printed.append(' '.join([str(arg) for arg in args]))  # There is probably a more reliable way to do this...
         self.python_print(*args, ** kwargs)
+
+
+class ForbiddenInputError(AssertionError):
+    def __init__(self, msg):
+        super().__init__(msg)
+
+
+class ForbiddenInput:
+    def __call__(self, *args, **kwargs):
+        raise ForbiddenInputError('Should not call input in this challenge')
 
 
 class MockInput(MockFunction):
@@ -261,6 +278,20 @@ class TestCaseWrapper(unittest.TestCase):
     def challenge_fun(self, *args, **kwargs):
         # We need the __class__ because in that way it doesn't pass self as argument to the function
         return self.__class__.CHALLENGE_FUN(*args, **kwargs)
+
+    def assert_printed(self, value, index=None, msg=None):
+        str_value = str(value)
+        if index is not None and str_value not in self.mock_print.printed[index]:
+            standard_msg = 'Value not found in print of index {index}'.format(index=index)
+            msg = self._formatMessage(msg, standard_msg)
+            self.fail(msg)
+
+        contains_str = any(str_value in printed for printed
+                           in self.mock_print.printed)
+
+        if not contains_str:
+            msg = self._formatMessage(msg, 'Value not found in printed strings')
+            self.fail(msg)
 
     def _formatMessage(self, msg, standardMsg):
         # Include message separators in all messages and ignore standardMsg

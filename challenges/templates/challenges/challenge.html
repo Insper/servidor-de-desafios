@@ -115,7 +115,11 @@
             </thead>
             <tbody>
             {% for ans in answers %}
-                <tr>
+                {% if ans.success%}
+                <tr class = "bg-success text-white">
+                {% else %}
+                <tr class = "bg-danger text-white">
+                {% endif %}
                     <td>{{ ans.created|date:'d/m/Y H:i' }}</td>
                     <td>
                         <ul class="challenge-feedback-list">
@@ -126,7 +130,7 @@
                                 {% else %}
                                 <div class="challenge-feedback">
                                     <span>{{ feedback.message }}</span>
-                                    <button class="btn btn-danger" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
+                                    <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
                                         Stack trace
                                     </button>
                                     <div class="stacktrace collapse" id="error{{ error_counter.cur }}">
