@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -6,19 +7,21 @@ from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.contrib import messages
 from datetime import datetime
 from taggit.models import Tag
 from challenges.code_runner import run_code
-from django.contrib import messages
 from collections import defaultdict
+from itertools import zip_longest
 
-from .models import Challenge, ChallengeSubmission, Result, user_directory_path, Prova
+from .models import TesteDeMesa, Challenge, ChallengeSubmission, Result, user_directory_path, Prova
 from tutorials.models import Tutorial
 from course.models import ChallengeBlock, get_daterange
 
 
 def create_context(user):
     challenges = Challenge.all_published().order_by('id')
+    testes_mesa = TesteDeMesa.objects.order_by('id')
     show_nav = True
     if user.is_staff:
         visible_challenges_ids = [c.id for c in challenges]
@@ -32,7 +35,7 @@ def create_context(user):
         visible_challenges = [c for c in challenges if c.id in visible_challenges_ids]
         challenges = visible_challenges
 
-    return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges, 'visible_challenges_ids': visible_challenges_ids, 'show_nav': show_nav}
+    return {'challenges': challenges, 'navtype': 'challenge', 'navitems': challenges, 'visible_challenges_ids': visible_challenges_ids, 'show_nav': show_nav, 'testes_mesa': testes_mesa}
 
 @login_required
 def index(request):
@@ -122,10 +125,10 @@ def challenge(request, c_id):
             submission.result = Result.OK if result.success else Result.ERROR
             submission.save()
             submission.code.save(user_directory_path(submission, ''), fp)
-            
-            messages.success(request,submission.created.strftime("%d/%m/%Y %H:%M"))
-            messages.success(request,submission.feedback)
-            messages.success(request,submission.result)
+
+            messages.success(request, submission.created.strftime("%d/%m/%Y %H:%M"))
+            messages.success(request, submission.feedback)
+            messages.success(request, submission.result)
 
             return redirect('challenge', c_id=c_id)
 
@@ -136,6 +139,150 @@ def challenge(request, c_id):
     context['latest_submission'] = ChallengeSubmission.objects.by(request.user).latest_submission(context['challenge'])
     context['error_counter'] = Counter()
     return render(request, 'challenges/challenge.html', context=context)
+
+
+def name_dict2list(passo, limpa_valores=False):
+    memoria = []
+    if passo is None:
+        return memoria
+    nd = passo.name_dicts
+    for contexto in sorted(nd.keys()):
+        vars = nd[contexto]
+        if limpa_valores:
+            vars = {k: None for k in vars}
+        nome_atual = contexto.split(',')[-1]
+        if '<module>' in nome_atual:
+            nome_atual = 'PROGRAMA'
+        memoria.append((nome_atual, contexto, vars))
+    return memoria
+
+
+def monta_memoria(passo1, passo2):
+    memoria = []
+    mem1 = name_dict2list(passo1)
+    mem2 = name_dict2list(passo2, True)
+    for ctx1, ctx2 in zip_longest(mem1, mem2):
+        if ctx1 and ctx2:
+            nome_atual, contexto, vars = ctx2
+            vars.update(ctx1[2])
+        elif ctx1:
+            nome_atual, contexto, vars = ctx1
+        else:
+            nome_atual, contexto, vars = ctx2
+        memoria.append((nome_atual, contexto, vars))
+    return memoria
+
+
+def get_teste_de_mesa(request, teste_mesa, passo_atual_i):
+    user = request.user
+    context = create_context(user)
+
+    # TODO Validar se o usuário tem acesso
+
+    context['teste_mesa'] = teste_mesa
+    gabarito = teste_mesa.gabarito_list
+    if passo_atual_i < len(gabarito):
+        # TODO TELA DE FIM: https://codepen.io/cvan/pen/LYYXzWZ
+        pass
+    passo_atual = gabarito[passo_atual_i]
+    passo_anterior = gabarito[passo_atual_i-1] if passo_atual_i > 0 else None
+    stdout = []
+    if passo_anterior:
+        stdout = passo_anterior.stdout
+    stdout += [i for i in passo_atual.stdout[len(stdout):] if i[1] is not None]
+    context['passo_atual'] = passo_atual
+    context['passo_anterior'] = passo_anterior
+    context['memoria'] = monta_memoria(passo_anterior, passo_atual)
+    context['linhas'] = range(1, len(teste_mesa.codigo.split('\n'))+1)
+    context['proxima_linha'] = passo_atual.line_i + 2
+    context['stdout'] = stdout
+
+    # TODO PEGAR DIFF E VER SE O NOVO OUTPUT É DE UM INPUT (ter os dois argumentos no par e ter um comando input)
+    return render(request, 'challenges/teste_de_mesa.html', context=context)
+
+
+def extrai_memoria(post_data):
+    ativos = set()
+    memoria = defaultdict(lambda: dict())
+    for k, v in post_data.items():
+        name_data = k.split('::')
+        if len(name_data) == 3:
+            d_type, d_ctx, d_name = name_data
+            if d_type != 'mem':
+                continue
+            memoria[d_ctx][d_name] = v
+    return memoria
+
+
+def memorias_iguais(recebido, esperado):
+    # TODO Jogar essa função para o lambda (por causa do eval)
+    mensagens = []
+    for k, v in esperado.items():
+        if not v:
+            if recebido.get(k):
+                mensagens.append('A memória desativada ainda está ativa.')
+            else:
+                recebido[k] = {}
+        try:
+            val_recebidos = {r_k: eval(r_v) if r_v else None for r_k, r_v in recebido.get(k, {}).items()}
+            if v != val_recebidos:
+                mensagens.append('Ao menos um valor na memória está incorreto.')
+        except NameError:
+            mensagens.append('Não consegui entender algum dos valores da memória. Você não esqueceu as aspas em alguma string?')
+    return len(mensagens) == 0, mensagens
+
+
+def verifica_proxima_linha(request, gabarito, passo_atual_i):
+    eh_ultimo_passo = passo_atual_i == len(gabarito) - 1
+    if eh_ultimo_passo:
+        return True
+    prox_linha = int(request.POST.get('ctr::prox_linha', '-1'))
+    return prox_linha == gabarito[passo_atual_i + 1].line_i + 1
+
+
+def verifica_memoria(request, gabarito, passo_atual_i):
+    passo_atual = gabarito[passo_atual_i]
+    resposta = extrai_memoria(request.POST)
+    esperado = passo_atual.name_dicts
+    return memorias_iguais(resposta, esperado)
+
+
+def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
+    gabarito = teste_mesa.gabarito_list
+    assert passo_atual_i < len(gabarito)
+
+    # TODO CORES PARA MSGS
+    # TODO VALIDAR TERMINAL
+    tag = 'teste-mesa'
+    linha_ok = verifica_proxima_linha(request, gabarito, passo_atual_i)
+    memoria_ok, mensagens = verifica_memoria(request, gabarito, passo_atual_i)
+    if linha_ok and memoria_ok:
+        messages.success(request, 'Sem erros', extra_tags=tag)
+        proximo_passo = passo_atual_i + 1
+    else:
+        if not linha_ok:
+            messages.error(request, 'Valor incorreto para próxima linha', extra_tags=tag)
+        for msg in mensagens:
+            messages.error(request, msg, extra_tags=tag)
+        proximo_passo = passo_atual_i
+    return HttpResponseRedirect('{0}?passo={1}'.format(request.path_info, proximo_passo))
+
+
+@login_required
+def teste_de_mesa(request, pk):
+    try:
+        passo_atual_i = int(request.GET.get('passo', 0))
+    except ValueError:
+        passo_atual_i = 0
+    try:
+        teste_mesa = TesteDeMesa.objects.get(pk=pk)
+    except TesteDeMesa.DoesNotExist:
+        teste_mesa = None
+
+    if request.method == 'POST':
+        return post_teste_de_mesa(request, teste_mesa, passo_atual_i)
+    else:
+        return get_teste_de_mesa(request, teste_mesa, passo_atual_i)
 
 
 class ProvasListView(ListView):

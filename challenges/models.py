@@ -4,7 +4,9 @@ from django.utils import timezone
 from taggit.managers import TaggableManager
 from enum import Enum
 import markdown
+import json
 from collections import namedtuple, defaultdict
+from .validators import json_validator
 
 
 FEEDBACK_SEP = '|||'
@@ -36,7 +38,43 @@ class TestCase(challenge_test.TestCaseWrapper):
     path = default_storage.save('challenge_tests/test_{0}.py'.format(timezone.now().strftime('%Y_%m_%d_%H_%M_%S_%f')), ContentFile(TEST_CODE))
     return path
 
-import os
+
+class NonStrippingTextField(models.TextField):
+    """
+    A TextField that does not strip whitespace at the beginning/end of
+    it's value.  Might be important for markup/code.
+    Source: https://stackoverflow.com/a/40709539
+    """
+    def formfield(self, **kwargs):
+        kwargs['strip'] = False
+        return super(NonStrippingTextField, self).formfield(**kwargs)
+
+
+TraceData = namedtuple('TraceData', 'line_i,line,name_dicts,call_line_i,retval,stdout')
+
+class TesteDeMesa(models.Model):
+    titulo = models.CharField(max_length=1024, blank=True)
+    descricao = models.TextField(blank=False)
+    codigo = NonStrippingTextField(blank=False)
+    gabarito = models.TextField(blank=False, validators=(json_validator,))
+
+    class Meta:
+        verbose_name_plural = 'testes de mesa'
+
+    @property
+    def titulo_completo(self):
+        titulo = '{0}'.format(self.id)
+        if self.titulo:
+            titulo += '. {0}'.format(self.titulo)
+        return titulo
+
+    @property
+    def gabarito_list(self):
+        return [TraceData(*i) for i in json.loads(self.gabarito)]
+
+    def __str__(self):
+        return self.titulo_completo
+
 
 class Challenge(models.Model):
     release = models.DateTimeField('date released', auto_now=True)

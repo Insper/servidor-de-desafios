@@ -78,6 +78,18 @@ A seguir você pode acompanhar o número de submissões realizadas por você, se
 
 <div id="plotDias"></div>
 
+<h1>Testes de Mesa</h1>
+
+{% if testes_mesa %}
+    <ul>
+    {% for teste_mesa in testes_mesa %}
+        <li><a href="{% url 'teste_de_mesa' pk=teste_mesa.id %}">{{ teste_mesa }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Ainda não criamos nenhum teste de mesa... :(</p>
+{% endif %}
+
 <h1>Tutoriais</h1>
 
 {% if tutorials %}

@@ -1,0 +1,68 @@
+.box {
+    margin: 1em;
+    padding-right: 5px;
+}
+
+.box.outer-box {
+    margin: 0 0 10px;
+}
+
+.box-memoria {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border: 1px solid black;
+}
+
+.memoria-titulo {
+    font-weight: bold;
+}
+
+.box-inativo {
+    background-color: #dfdfda;
+}
+
+.terminal,.terminal textarea {
+    background-color: black;
+    border: none;
+    color: white;
+    font-family: Consolas, Lucida Console, monospace;
+}
+
+.terminal textarea {
+    padding: 0;
+    width: 100%;
+}
+
+.terminal textarea:focus {
+    outline: 0;
+}
+
+.terminal .term-input {
+    color: #27e427;
+}
+
+/* highlightjs line numbers */
+/* for block of numbers */
+.hljs-ln-numbers {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    text-align: center;
+    color: #ccc;
+    border-right: 1px solid #CCC;
+    vertical-align: top;
+    padding-right: 5px;
+
+    /* your custom style here */
+}
+
+/* for block of code */
+.hljs-ln-code {
+    padding-left: 10px !important;
+}

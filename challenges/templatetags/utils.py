@@ -19,3 +19,7 @@ def smartname(user):
     if not name:
         name = user.username
     return name.strip()
+
+@register.filter
+def get_repr(obj):
+    return repr(obj)
