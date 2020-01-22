@@ -217,18 +217,19 @@ def extrai_memoria(post_data):
 def memorias_iguais(recebido, esperado):
     # TODO Jogar essa função para o lambda (por causa do eval)
     mensagens = []
-    for k, v in esperado.items():
-        if not v:
-            if recebido.get(k):
-                mensagens.append('A memória desativada ainda está ativa.')
-            else:
-                recebido[k] = {}
-        try:
-            val_recebidos = {r_k: eval(r_v) if r_v else None for r_k, r_v in recebido.get(k, {}).items()}
-            if v != val_recebidos:
-                mensagens.append('Ao menos um valor na memória está incorreto.')
-        except NameError:
-            mensagens.append('Não consegui entender algum dos valores da memória. Você não esqueceu as aspas em alguma string?')
+    keys = esperado.keys() | recebido.keys()
+    for k in keys:
+        v_esperado = esperado.get(k, {})
+        v_recebido = recebido.get(k, {})
+        if (not v_esperado) and v_recebido:
+            mensagens.append('A memória desativada ainda está ativa.')
+        else:
+            try:
+                v_recebido = {r_k: eval(r_v) if r_v else None for r_k, r_v in v_recebido.items()}
+                if v_esperado != v_recebido:
+                    mensagens.append('Pelo menos um valor na memória está incorreto.')
+            except NameError:
+                mensagens.append('Não consegui entender algum dos valores da memória. Você não esqueceu as aspas em alguma string?')
     return len(mensagens) == 0, mensagens
 
 
@@ -257,13 +258,13 @@ def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
     linha_ok = verifica_proxima_linha(request, gabarito, passo_atual_i)
     memoria_ok, mensagens = verifica_memoria(request, gabarito, passo_atual_i)
     if linha_ok and memoria_ok:
-        messages.success(request, 'Sem erros', extra_tags=tag)
+        messages.success(request, 'Sem erros', extra_tags=' '.join([tag, 'text-success']))
         proximo_passo = passo_atual_i + 1
     else:
         if not linha_ok:
-            messages.error(request, 'Valor incorreto para próxima linha', extra_tags=tag)
+            messages.error(request, 'Valor incorreto para próxima linha', extra_tags=' '.join([tag, 'text-danger']))
         for msg in mensagens:
-            messages.error(request, msg, extra_tags=tag)
+            messages.error(request, msg, extra_tags=' '.join([tag, 'text-danger']))
         proximo_passo = passo_atual_i
     return HttpResponseRedirect('{0}?passo={1}'.format(request.path_info, proximo_passo))
 

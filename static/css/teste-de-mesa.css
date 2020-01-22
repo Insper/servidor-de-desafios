@@ -13,6 +13,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     border: 1px solid black;
+    font-family: Consolas, Lucida Console, monospace;
 }
 
 .memoria-titulo {
