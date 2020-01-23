@@ -222,6 +222,8 @@ def memorias_iguais(recebido, esperado):
         v_esperado = esperado.get(k, {})
         v_recebido = recebido.get(k, {})
         if (not v_esperado) and v_recebido:
+            mensagens.append('Alguma parte da memória não deveria estar mais ativa.')
+        elif v_esperado and (not v_recebido):
             mensagens.append('A memória desativada ainda está ativa.')
         else:
             try:
