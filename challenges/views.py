@@ -198,6 +198,7 @@ def get_teste_de_mesa(request, teste_mesa, passo_atual_i):
     context['stdout'] = stdout
     context['n_prev_out_lines'] = len(stdout)
     context['tem_input'] = any(out_in[1] for out_in in stdout)
+    context['eh_ultimo_passo'] = passo_atual_i + 1 == len(gabarito)
     # TODO Testar com exemplo com vários prints
 
     return render(request, 'challenges/teste_de_mesa.html', context=context)
@@ -259,7 +260,7 @@ def verifica_terminal(request, gabarito, passo_atual_i):
     passo_atual = gabarito[passo_atual_i]
     resposta = request.POST.get('out::terminal', '')
     prev_out_lines = int(request.POST.get('out::prev_terminal_lines', '0'))
-    esperado = passo_atual.stdout_str[prev_out_lines:]
+    esperado = stdout_list2str(passo_atual.stdout[prev_out_lines:])
     return esperado == resposta
 
 

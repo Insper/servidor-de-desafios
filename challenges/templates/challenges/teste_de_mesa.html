@@ -106,6 +106,7 @@ hljs.initHighlightLinesOnLoad([
                     <span>Entrada digitada pelo usuário <span class="term-input">em verde</span></span>
                     {% endif %}
                 </div>
+                {% if not eh_ultimo_passo %}
                 <div class="form-group">
                     <label for="proximaLinha">Próxima linha</label>
                     <select class="form-control" id="proximaLinha" name="ctr::prox_linha">
@@ -114,6 +115,7 @@ hljs.initHighlightLinesOnLoad([
                     {% endfor %}
                     </select>
                 </div>
+                {% endif %}
                 <button type="submit" class="btn btn-primary btn-block">Próximo passo</button>
             </form>
         </div>
