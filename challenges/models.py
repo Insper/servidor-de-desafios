@@ -50,7 +50,15 @@ class NonStrippingTextField(models.TextField):
         return super(NonStrippingTextField, self).formfield(**kwargs)
 
 
-TraceData = namedtuple('TraceData', 'line_i,line,name_dicts,call_line_i,retval,stdout')
+def stdout_list2str(stdout_list):
+    return '\n'.join((''.join((i for i in out_in if i)) for out_in in stdout_list))
+
+_TraceData = namedtuple('TraceData', 'line_i,line,name_dicts,call_line_i,retval,stdout')
+class TraceData(_TraceData):
+    @property
+    def stdout_str(self):
+        return stdout_list2str(self.stdout)
+
 
 class TesteDeMesa(models.Model):
     titulo = models.CharField(max_length=1024, blank=True)

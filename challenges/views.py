@@ -14,7 +14,7 @@ from challenges.code_runner import run_code
 from collections import defaultdict
 from itertools import zip_longest
 
-from .models import TesteDeMesa, Challenge, ChallengeSubmission, Result, user_directory_path, Prova
+from .models import TesteDeMesa, Challenge, ChallengeSubmission, Result, user_directory_path, Prova, stdout_list2str
 from tutorials.models import Tutorial
 from course.models import ChallengeBlock, get_daterange
 
@@ -196,8 +196,10 @@ def get_teste_de_mesa(request, teste_mesa, passo_atual_i):
     context['linhas'] = range(1, len(teste_mesa.codigo.split('\n'))+1)
     context['proxima_linha'] = passo_atual.line_i + 2
     context['stdout'] = stdout
+    context['n_prev_out_lines'] = len(stdout)
+    context['tem_input'] = any(out_in[1] for out_in in stdout)
+    # TODO Testar com exemplo com vários prints
 
-    # TODO PEGAR DIFF E VER SE O NOVO OUTPUT É DE UM INPUT (ter os dois argumentos no par e ter um comando input)
     return render(request, 'challenges/teste_de_mesa.html', context=context)
 
 
@@ -250,16 +252,27 @@ def verifica_memoria(request, gabarito, passo_atual_i):
     return memorias_iguais(resposta, esperado)
 
 
+def verifica_terminal(request, gabarito, passo_atual_i):
+    passo_anterior = None
+    if passo_atual_i:
+        passo_anterior = gabarito[passo_atual_i-1]
+    passo_atual = gabarito[passo_atual_i]
+    resposta = request.POST.get('out::terminal', '')
+    prev_out_lines = int(request.POST.get('out::prev_terminal_lines', '0'))
+    esperado = passo_atual.stdout_str[prev_out_lines:]
+    return esperado == resposta
+
+
 def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
     gabarito = teste_mesa.gabarito_list
     assert passo_atual_i < len(gabarito)
 
-    # TODO CORES PARA MSGS
     # TODO VALIDAR TERMINAL
     tag = 'teste-mesa'
     linha_ok = verifica_proxima_linha(request, gabarito, passo_atual_i)
     memoria_ok, mensagens = verifica_memoria(request, gabarito, passo_atual_i)
-    if linha_ok and memoria_ok:
+    terminal_ok = verifica_terminal(request, gabarito, passo_atual_i)
+    if linha_ok and memoria_ok and terminal_ok:
         messages.success(request, 'Sem erros', extra_tags=' '.join([tag, 'text-success']))
         proximo_passo = passo_atual_i + 1
     else:
@@ -267,6 +280,8 @@ def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
             messages.error(request, 'Valor incorreto para próxima linha', extra_tags=' '.join([tag, 'text-danger']))
         for msg in mensagens:
             messages.error(request, msg, extra_tags=' '.join([tag, 'text-danger']))
+        if not terminal_ok:
+            messages.error(request, 'Saída incorreta no terminal', extra_tags=' '.join([tag, 'text-danger']))
         proximo_passo = passo_atual_i
     return HttpResponseRedirect('{0}?passo={1}'.format(request.path_info, proximo_passo))
 

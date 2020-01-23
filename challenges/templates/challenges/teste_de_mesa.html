@@ -94,11 +94,17 @@ hljs.initHighlightLinesOnLoad([
                         {% for term_out, term_in in stdout %}
                         <div class="term-linha">
                             <span>{{ term_out }}</span>
+                            {% if term_in %}
                             <span class="term-input">{{ term_in }}</span>
+                            {% endif %}
                         </div>
                         {% endfor %}
-                        <textarea id="terminal" rows="3"></textarea>
+                        <input type="hidden" name="out::prev_terminal_lines" value="{{ n_prev_out_lines }}">
+                        <textarea id="terminal" name="out::terminal" rows="3"></textarea>
                     </div>
+                    {% if tem_input %}
+                    <span>Entrada digitada pelo usuário <span class="term-input">em verde</span></span>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="proximaLinha">Próxima linha</label>
