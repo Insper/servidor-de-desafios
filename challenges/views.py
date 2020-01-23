@@ -181,25 +181,27 @@ def get_teste_de_mesa(request, teste_mesa, passo_atual_i):
 
     context['teste_mesa'] = teste_mesa
     gabarito = teste_mesa.gabarito_list
-    if passo_atual_i < len(gabarito):
+    if passo_atual_i >= len(gabarito):
         # TODO TELA DE FIM: https://codepen.io/cvan/pen/LYYXzWZ
-        pass
-    passo_atual = gabarito[passo_atual_i]
-    passo_anterior = gabarito[passo_atual_i-1] if passo_atual_i > 0 else None
-    stdout = []
-    if passo_anterior:
-        stdout = passo_anterior.stdout
-    stdout += [i for i in passo_atual.stdout[len(stdout):] if i[1] is not None]
-    context['passo_atual'] = passo_atual
-    context['passo_anterior'] = passo_anterior
-    context['memoria'] = monta_memoria(passo_anterior, passo_atual)
-    context['linhas'] = range(1, len(teste_mesa.codigo.split('\n'))+1)
-    context['proxima_linha'] = passo_atual.line_i + 2
-    context['stdout'] = stdout
-    context['n_prev_out_lines'] = len(stdout)
-    context['tem_input'] = any(out_in[1] for out_in in stdout)
-    context['eh_ultimo_passo'] = passo_atual_i + 1 == len(gabarito)
-    # TODO Testar com exemplo com vários prints
+        context['teste_concluido'] = True
+    else:
+        passo_atual = gabarito[passo_atual_i]
+        passo_anterior = gabarito[passo_atual_i-1] if passo_atual_i > 0 else None
+        stdout = []
+        if passo_anterior:
+            stdout = passo_anterior.stdout
+        stdout += [i for i in passo_atual.stdout[len(stdout):] if i[1] is not None]
+        context['passo_atual'] = passo_atual
+        context['passo_anterior'] = passo_anterior
+        context['memoria'] = monta_memoria(passo_anterior, passo_atual)
+        context['linhas'] = range(1, len(teste_mesa.codigo.split('\n'))+1)
+        context['proxima_linha'] = passo_atual.line_i + 2
+        context['stdout'] = stdout
+        context['n_prev_out_lines'] = len(stdout)
+        context['tem_input'] = any(out_in[1] for out_in in stdout)
+        context['eh_ultimo_passo'] = passo_atual_i + 1 == len(gabarito)
+        context['teste_concluido'] = False
+        # TODO Testar com exemplo com vários prints
 
     return render(request, 'challenges/teste_de_mesa.html', context=context)
 
@@ -268,7 +270,6 @@ def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
     gabarito = teste_mesa.gabarito_list
     assert passo_atual_i < len(gabarito)
 
-    # TODO VALIDAR TERMINAL
     tag = 'teste-mesa'
     linha_ok = verifica_proxima_linha(request, gabarito, passo_atual_i)
     memoria_ok, mensagens = verifica_memoria(request, gabarito, passo_atual_i)

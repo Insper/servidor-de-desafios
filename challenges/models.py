@@ -62,7 +62,7 @@ class TraceData(_TraceData):
 
 class TesteDeMesa(models.Model):
     titulo = models.CharField(max_length=1024, blank=True)
-    descricao = models.TextField(blank=False)
+    descricao = models.TextField(blank=True)
     codigo = NonStrippingTextField(blank=False)
     gabarito = models.TextField(blank=False, validators=(json_validator,))
 

@@ -16,6 +16,7 @@
 <script>
 hljs.initHighlightingOnLoad();
 hljs.initLineNumbersOnLoad();
+{% if passo_atual %}
 hljs.initHighlightLinesOnLoad([
     [{start: {{ passo_atual.line_i }}, end: {{ passo_atual.line_i }}, color: '#fdd'},
     {% if passo_atual.call_line_i is not None %}
@@ -23,6 +24,7 @@ hljs.initHighlightLinesOnLoad([
     {% endif %}
     ],
 ]);
+{% endif %}
 </script>
 {% endblock %}
 
@@ -30,14 +32,20 @@ hljs.initHighlightLinesOnLoad([
 {% if teste_mesa %}
     <h1>{{ teste_mesa.titulo_completo }}</h1>
 
-    <p>{{ teste_mesa.descricao }}</p>
+    <p>
+    {% if teste_mesa.descricao %}
+        {{ teste_mesa.descricao }}
+    {% else %}
+    Atualize as variáveis na memória e a saída do terminal de acordo com a linha atual.
+    {% endif %}
+    </p>
     <section class="row">
         <div class="col-md-6 col-sm-12">
             <h3>Código</h3>
             <pre><code class="python">{{ teste_mesa.codigo }}</code></pre>
         </div>
         <div class="col-md-6 col-sm-12">
-            <h3>Teste de Mesa (atualize com os novos valores)</h3>
+            <h3>Teste de Mesa{% if not teste_concluido %} (atualize com os novos valores){% endif %}</h3>
             {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
@@ -47,6 +55,17 @@ hljs.initHighlightLinesOnLoad([
                 {% endfor %}
             </ul>
             {% endif %}
+            {% if teste_concluido %}
+            {% comment %} Fonte: https://codepen.io/cvan/pen/LYYXzWZ {% endcomment %}
+            <div class="success-checkmark">
+                <div class="check-icon">
+                    <span class="icon-line line-tip"></span>
+                    <span class="icon-line line-long"></span>
+                    <div class="icon-circle"></div>
+                    <div class="icon-fix"></div>
+                </div>
+            </div>
+            {% else %}
             <form method="POST">
                 <h5>Memória</h5>
                 {% if passo_anterior.retval is not None %}
@@ -118,6 +137,7 @@ hljs.initHighlightLinesOnLoad([
                 {% endif %}
                 <button type="submit" class="btn btn-primary btn-block">Próximo passo</button>
             </form>
+            {% endif %}
         </div>
     </section>
 {% else %}
