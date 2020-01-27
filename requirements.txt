@@ -9,7 +9,7 @@ ChallengeTestLib==0.1
 chardet==3.0.4
 Django==3.0.2
 django-extensions==2.2.1
-django-taggit==0.23.0
+django-taggit==1.2.0
 docutils==0.14
 idna==2.8
 Jinja2==2.10.3
