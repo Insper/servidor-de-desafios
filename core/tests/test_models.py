@@ -1,86 +1,76 @@
 import os
-from unittest import mock
-from django.core.files import File
 from django.test import TestCase
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from core.models import Usuario, Turma, Matricula, RespostaExProgramacao, ExercicioDeProgramacao, Prova
 from core.choices import Resultado
-from core.date_utils import DateRange, tz_delta, tz_agora, tz_amanha, tz_ontem, inc_dia, dec_dia
+from core.date_utils import *
+from .factories import *
 
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-def cria_aluno(i):
-    return Usuario.objects.create_user(username='aluno{0}'.format(i),
-                                       email='aluno{0}@email.com'.format(i),
-                                       password='top_secret{0}'.format(i))
-
-
-def cria_arquivo_teste():
-    arquivo = mock.MagicMock(spec=File)
-    arquivo.name = 'c1.py'
-    return arquivo
-
-
-def cria_exercicio(titulo='Hello World',
-                   descricao='Escreva um programa que imprime "Olá, Mundo!"',
-                   publicado=True):
-    return ExercicioDeProgramacao.objects.create(titulo=titulo,
-                                                 descricao=descricao,
-                                                 publicado=publicado,
-                                                 testes=cria_arquivo_teste())
-
-
-def cria_resposta(autor,
-                  exercicio,
-                  resultado=Resultado.OK,
-                  deletado=False,
-                  data_submissao=None):
-    if data_submissao is None:
-        data_submissao = tz_agora()
-    with mock.patch('django.utils.timezone.now',
-                    mock.Mock(return_value=data_submissao)):
-        resposta = RespostaExProgramacao.objects.create(autor=autor,
-                                                        exercicio=exercicio,
-                                                        resultado=resultado,
-                                                        deletado=deletado)
-    return resposta
-
-
 class TurmaTestCase(TestCase):
-    def setUp(self):
+    def test_alunos_matriculados(self):
         anos = sorted(list(range(-1, 2)) * 2)
         inicios = [tz_delta(months=-2, years=y) for y in anos]
         fins = [tz_delta(months=+2, years=y) for y in anos]
-        self.turmas = [
-            Turma.objects.create(nome='turma{0}'.format(i),
-                                 inicio=inicio,
-                                 fim=fim)
+        turmas = [
+            cria_turma(nome='turma{0}'.format(i), inicio=inicio, fim=fim)
             for i, (inicio, fim) in enumerate(zip(inicios, fins))
         ]
         # Metade dos alunos vem da turma anterior
-        self.turma2aluno = {}
+        turma2aluno = {}
         alunos_por_turma = 2
         metade_turma = alunos_por_turma // 2
-        self.alunos = [cria_aluno(i) for i in range(metade_turma)]
-        for turma in self.turmas:
-            n = len(self.alunos)
+        alunos = [cria_aluno(i) for i in range(metade_turma)]
+        for turma in turmas:
+            n = len(alunos)
             for i in range(n, n + metade_turma):
-                self.alunos.append(cria_aluno(i))
-            for aluno in self.alunos[-alunos_por_turma:]:
-                Matricula.objects.create(aluno=aluno, turma=turma)
-                self.turma2aluno.setdefault(turma, []).append(aluno)
+                alunos.append(cria_aluno(i))
+            for aluno in alunos[-alunos_por_turma:]:
+                cria_matricula(aluno=aluno, turma=turma)
+                turma2aluno.setdefault(turma, []).append(aluno)
 
-    def test_alunos_matriculados(self):
-        todos_alunos = set(self.alunos)
-        for turma in self.turmas:
-            matriculados = set(self.turma2aluno[turma])
+        todos_alunos = set(alunos)
+        for turma in turmas:
+            matriculados = set(turma2aluno[turma])
             nao_matriculados = todos_alunos - matriculados
             for aluno in matriculados:
                 self.assertTrue(turma.esta_matriculado(aluno))
             for aluno in nao_matriculados:
                 self.assertFalse(turma.esta_matriculado(aluno))
+
+    def test_date_range(self):
+        # Datas
+        ano_passado = tz_delta(years=-1)
+        dois_meses_atras = tz_delta(months=-2)
+        mes_passado = tz_delta(months=-1)
+        ontem = tz_ontem()
+        hoje = tz_agora()
+        amanha = tz_amanha()
+        ano_que_vem = tz_delta(years=1)
+        # Alunos
+        aluno1 = cria_aluno(1)
+        aluno2 = cria_aluno(2)
+        # Turmas
+        turma1 = cria_turma(inicio=dois_meses_atras, fim=ontem)
+        turma2 = cria_turma(inicio=ano_passado, fim=ano_que_vem)
+        turma3 = cria_turma(inicio=mes_passado, fim=amanha)
+        turma4 = cria_turma()
+        # Matricula
+        cria_matricula(aluno1, turma1)
+        cria_matricula(aluno1, turma3)
+        cria_matricula(aluno1, turma4)
+        cria_matricula(aluno2, turma1)
+        cria_matricula(aluno2, turma2)
+        # Asserts
+        date_range1 = Turma.objects.get_date_range(aluno1)
+        date_range2 = Turma.objects.get_date_range(aluno2)
+        self.assertEqual(mes_passado.date(), date_range1.start_date)
+        self.assertEqual(ano_passado.date(), date_range2.start_date)
+        self.assertEqual(hoje.date(), date_range1.end_date)
+        self.assertEqual(hoje.date(), date_range2.end_date)
 
 
 class ExercicioDeProgramacaoTestCase(TestCase):
@@ -196,10 +186,8 @@ class ProvaTestCase(TestCase):
         inicio_prova_passada = tz_delta(hours=-1, months=-1)
         fim_prova_passada = tz_delta(hours=+1, months=-1)
 
-        turma = Turma.objects.create(nome='turma1',
-                                     inicio=inicio_turma,
-                                     fim=fim_turma)
-        Matricula.objects.create(aluno=aluno_matriculado, turma=turma)
+        turma = cria_turma(nome='turma1', inicio=inicio_turma, fim=fim_turma)
+        cria_matricula(aluno=aluno_matriculado, turma=turma)
         prova_passada = Prova.objects.create(inicio=inicio_prova_passada,
                                              fim=fim_prova_passada,
                                              titulo='Prova 1',

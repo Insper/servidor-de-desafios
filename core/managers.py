@@ -109,7 +109,6 @@ ProvaManager = ProvaQuerySet.as_manager
 
 class TurmaQuerySet(models.QuerySet):
     def get_date_range(self, usuario):
-        # TODO TESTAR ISSO
         turmas = self.filter(matricula__aluno__id=usuario.id)
         hoje = timezone.now().date()
         inicio = None
