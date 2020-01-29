@@ -213,3 +213,12 @@ class ProvaTestCase(TestCase):
         self.assertFalse(prova_passada.disponivel_para(aluno_nao_matriculado))
         self.assertTrue(prova_atual.disponivel_para(aluno_matriculado))
         self.assertFalse(prova_atual.disponivel_para(aluno_nao_matriculado))
+
+        # Provas do aluno matriculado
+        provas = Prova.objects.disponiveis_para(aluno_matriculado)
+        self.assertTrue(prova_atual in provas)
+        self.assertTrue(prova_passada not in provas)
+        # Provas do aluno não matriculado
+        provas = Prova.objects.disponiveis_para(aluno_nao_matriculado)
+        self.assertTrue(prova_atual not in provas)
+        self.assertTrue(prova_passada not in provas)
