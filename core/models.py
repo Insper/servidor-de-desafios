@@ -122,9 +122,8 @@ class RespostaExProgramacao(RespostaSubmetida):
     class Meta:
         verbose_name_plural = 'respostas exercicios de programacao'
 
-    all_objects = RespostaExProgramacaoManager(
-        incluir_deletados=True)  # Inclui os deletados
-    objects = RespostaExProgramacaoManager()  # Somente os não deletados
+    all_objects = RespostaExProgramacaoManager(incluir_deletados=True)
+    objects = RespostaExProgramacaoManager()
 
     def __str__(self):
         return '{0}: Ex{1} - data[{2}] resultado[{3}]'.format(
@@ -201,7 +200,9 @@ class Prova(models.Model):
         return self.titulo
 
     def disponivel_para(self, usuario):
-        return self.turma.esta_matriculado(usuario)
+        agora = timezone.now()
+        horario_ok = self.inicio <= agora and agora <= self.fim
+        return self.turma.esta_matriculado(usuario) and horario_ok
 
     @property
     def exercicios_por_nome(self):
