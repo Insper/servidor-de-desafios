@@ -19,10 +19,10 @@ from django.contrib.staticfiles.urls import static, staticfiles_urlpatterns
 from . import settings
 
 urlpatterns = [
-    path('admin/report/', include('report.urls')),
+    # path('admin/report/', include('report.urls')),
     path('admin/', admin.site.urls),
-    path('tutorial/', include('tutorials.urls')),
-    path('', include('challenges.urls')),
+    # path('tutorial/', include('tutorials.urls')),
+    path('', include('core.urls')),
     path('', include('django.contrib.auth.urls')),
 ]
 

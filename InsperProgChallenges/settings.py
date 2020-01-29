@@ -27,7 +27,6 @@ except:
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -42,11 +41,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Application definition
 
 INSTALLED_APPS = [
-    'challenges.apps.ChallengesConfig',
-    'tutorials.apps.TutorialsConfig',
-    'report.apps.ReportConfig',
-    'course.apps.CourseConfig',
-    'taggit',
+    'core.apps.CoreConfig',
+    # 'tutorials.apps.TutorialsConfig',
+    # 'report.apps.ReportConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -64,7 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'challenges.middleware.LogIPMiddleware',
+    'core.middleware.LogIPMiddleware',
 ]
 
 ROOT_URLCONF = 'InsperProgChallenges.urls'
@@ -87,7 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'InsperProgChallenges.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -96,7 +92,7 @@ try:
         db_credentials = json.load(f)
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': db_credentials['db'],
             'USER': db_credentials['user'],
             'PASSWORD': db_credentials['password'],
@@ -105,15 +101,15 @@ try:
         }
     }
 except Exception as e:
-    print('Something went wrong with .db_credentials. Giving up on PostgreSQL, using sqlite3 instead. If you want to use PostgreSQL make sure that .db_credentials exist in this project\'s root folder and the keys are correct.', file=sys.stderr)
-    print(e, file=sys.stderr)
+    print(
+        'Using sqlite3. If you want to use PostgreSQL make sure that .db_credentials exists in this project\'s root folder and the keys are correct.',
+        file=sys.stderr)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -133,11 +129,12 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
 ]
 
+AUTH_USER_MODEL = 'core.Usuario'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'pt-BR'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Sao_Paulo'
 
@@ -146,11 +143,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Taggit
-TAGGIT_CASE_INSENSITIVE = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/

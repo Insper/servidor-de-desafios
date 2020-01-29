@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra-css %}
+<link href="{%  static 'lib/codemirror.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block extra-js %}
+<script src="{% static 'lib/codemirror.js' %}"></script>
+<script src="{% static 'mode/python/python.js' %}"></script>
+<script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("codeeditor"), {
+        mode: {name: "python",
+            version: 3,
+            singleLineStringErrors: false},
+        lineNumbers: true,
+        indentUnit: 4,
+        matchBrackets: true,
+    });
+    editor.setValue("{{ ultima_submissao | safe }}");
+</script>
+{% endblock %}
+
+{% block pagecontent %}
+
+{% if exercicio %}
+    <h1>{{ exercicio.titulo_completo }}</h1>
+
+    <section class="placeholders">
+    {% for tag in exercicio.tags.all %}
+        <a href="/?tag={{ tag }}" class="badge badge-primary">{{ tag }}</a>
+    {% endfor %}
+    </section>
+
+    {% if messages %}
+    <h3>Ultimo envio:</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Tentativa</th>
+                <th>Feedback</th>
+            </tr>
+            </thead>
+            <tbody>
+        <tr>
+            {% for message in messages %}
+                <td>
+                    {{message}}
+                </td>
+            {% endfor %}
+        </tr>
+            </tbody>
+        </table>
+        </div>
+    {% endif %}
+
+
+    <section class="row placeholders">
+        <div class="col-12 col-sm-12 placeholder">
+            {% if exercicio_programado.fim is not None %}
+            <div class="text-muted">Prazo: {{ exercicio_programado.fim|date:'l d/m/Y H:i' }}</div>
+            {% endif %}
+            <div>{{ exercicio.descricao_html | safe }}</div>
+            {% if exercicio.nome_funcao %}
+            <div>O nome da sua função deve ser <code>{{ exercicio.nome_funcao }}</code>.</div>
+            {% endif %}
+            {% if exercicio.imagem %}
+            <div><img src="{{ exercicio.imagem.url }}"></div>
+            {% endif %}
+            <div></div>
+        </div>
+        <div class="col-4 col-md-1 placeholder"></div>
+    </section>
+
+    <div class="row text-left">
+        <div class="col-2 col-md-2 placeholder"></div>
+        <div class="col-10 col-md-10 placeholder">
+        <form method="POST" enctype="multipart/form-data">
+            <h5>Resposta</h5>
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="resposta">Selecione um arquivo:</label>
+                    <input type="file" class="form-control-file" id="resposta" name="codigo_arquivo">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="codeeditor">Ou escreva seu código aqui:</label>
+                    <textarea name="codigo_texto" id="codeeditor"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+        </div>
+    </div>
+    <br/><br/>
+    <h3>Envios:</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Tentativa</th>
+                <th>Feedback</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ans in respostas %}
+                {% if ans.sucesso %}
+                <tr class = "bg-success text-white">
+                {% else %}
+                <tr class = "bg-danger text-white">
+                {% endif %}
+                    <td>{{ ans.data_submissao|date:'d/m/Y H:i' }}</td>
+                    <td>
+                        <ul class="challenge-feedback-list">
+                        {% for feedback in ans.feedback_limpo %}
+                            <li>
+                                {% if not feedback.stacktrace or feedback.stacktrace == '-' %}
+                                {{ feedback.mensagem }}
+                                {% else %}
+                                <div class="challenge-feedback">
+                                    <span>{{ feedback.mensagem }}</span>
+                                    <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
+                                        Stack trace
+                                    </button>
+                                    <div class="stacktrace collapse" id="error{{ error_counter.cur }}">
+                                        <div class="card card-body">
+                                            {{ feedback.stacktrace|safe }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {{ error_counter.next }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>O exercício não existe... :(</p>
+{% endif %}
+
+{% endblock %}
