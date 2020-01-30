@@ -5,12 +5,22 @@ from enum import Enum
 import markdown
 from collections import namedtuple, defaultdict
 from .models_helper import *
-from .managers import ExercicioManager, RespostaExProgramacaoManager, ProvaManager, TurmaManager
+from .managers import ExercicioManager, RespostaExProgramacaoManager, ProvaManager, TurmaManager, ExercicioProgramadoManager, ViewDeExercicioManager
 from .choices import Resultado
 
 
 class Usuario(AbstractUser):
-    pass
+    def todas_turmas(self):
+        return Turma.objects.do_aluno(self)
+
+    def turmas_atuais(self):
+        return Turma.objects.atuais().do_aluno(self)
+
+    def exercicios_programados_disponiveis(self):
+        return ExercicioProgramado.objects.disponiveis_para(self)
+
+    def exercicios_disponiveis(self):
+        return Exercicio.objects.disponiveis_para(self)
 
 
 class Turma(models.Model):
@@ -78,6 +88,12 @@ class Exercicio(models.Model):
     def __str__(self):
         return self.titulo_completo
 
+    def especifico(self):
+        for modelo in ViewDeExercicio.objects.modelos():
+            if hasattr(self, modelo):
+                return getattr(self, modelo)
+        return self
+
 
 class ExercicioProgramado(models.Model):
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
@@ -87,6 +103,8 @@ class ExercicioProgramado(models.Model):
 
     class Meta:
         verbose_name_plural = 'exercicios programados'
+
+    objects = ExercicioProgramadoManager()
 
 
 class ExercicioDeProgramacao(Exercicio):
@@ -207,3 +225,10 @@ class Prova(models.Model):
     @property
     def exercicios_por_nome(self):
         return self.exercicios.order_by('exercicio__titulo')
+
+
+class ViewDeExercicio(models.Model):
+    modelo = models.CharField(max_length=1024, blank=False, unique=True)
+    view = models.CharField(max_length=1024, blank=False)
+
+    objects = ViewDeExercicioManager()

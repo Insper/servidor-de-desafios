@@ -41,36 +41,59 @@ class TurmaTestCase(TestCase):
             for aluno in nao_matriculados:
                 self.assertFalse(turma.esta_matriculado(aluno))
 
-    def test_date_range(self):
+    def cria_varias_turmas(self):
         # Datas
-        ano_passado = tz_delta(years=-1)
-        dois_meses_atras = tz_delta(months=-2)
-        mes_passado = tz_delta(months=-1)
-        ontem = tz_ontem()
-        hoje = tz_agora()
-        amanha = tz_amanha()
-        ano_que_vem = tz_delta(years=1)
+        self.ano_passado = tz_delta(years=-1)
+        self.dois_meses_atras = tz_delta(months=-2)
+        self.mes_passado = tz_delta(months=-1)
+        self.ontem = tz_ontem()
+        self.hoje = tz_agora()
+        self.amanha = tz_amanha()
+        self.ano_que_vem = tz_delta(years=1)
         # Alunos
-        aluno1 = cria_aluno(1)
-        aluno2 = cria_aluno(2)
+        self.aluno1 = cria_aluno(1)
+        self.aluno2 = cria_aluno(2)
         # Turmas
-        turma1 = cria_turma(inicio=dois_meses_atras, fim=ontem)
-        turma2 = cria_turma(inicio=ano_passado, fim=ano_que_vem)
-        turma3 = cria_turma(inicio=mes_passado, fim=amanha)
-        turma4 = cria_turma()
+        self.turma1 = cria_turma(inicio=self.dois_meses_atras, fim=self.ontem)
+        self.turma2 = cria_turma(inicio=self.ano_passado, fim=self.ano_que_vem)
+        self.turma3 = cria_turma(inicio=self.mes_passado, fim=self.amanha)
+        self.turma4 = cria_turma()
         # Matricula
-        cria_matricula(aluno1, turma1)
-        cria_matricula(aluno1, turma3)
-        cria_matricula(aluno1, turma4)
-        cria_matricula(aluno2, turma1)
-        cria_matricula(aluno2, turma2)
-        # Asserts
-        date_range1 = Turma.objects.get_date_range(aluno1)
-        date_range2 = Turma.objects.get_date_range(aluno2)
-        self.assertEqual(mes_passado.date(), date_range1.start_date)
-        self.assertEqual(ano_passado.date(), date_range2.start_date)
-        self.assertEqual(hoje.date(), date_range1.end_date)
-        self.assertEqual(hoje.date(), date_range2.end_date)
+        cria_matricula(self.aluno1, self.turma1)
+        cria_matricula(self.aluno1, self.turma3)
+        cria_matricula(self.aluno1, self.turma4)
+        cria_matricula(self.aluno2, self.turma1)
+        cria_matricula(self.aluno2, self.turma2)
+
+    def test_date_range(self):
+        self.cria_varias_turmas()
+
+        date_range1 = Turma.objects.get_date_range(self.aluno1)
+        date_range2 = Turma.objects.get_date_range(self.aluno2)
+        self.assertEqual(self.mes_passado.date(), date_range1.start_date)
+        self.assertEqual(self.ano_passado.date(), date_range2.start_date)
+        self.assertEqual(self.hoje.date(), date_range1.end_date)
+        self.assertEqual(self.hoje.date(), date_range2.end_date)
+
+    def test_lista_turmas_do_aluno(self):
+        self.cria_varias_turmas()
+
+        turmas1 = Turma.objects.do_aluno(self.aluno1)
+        self.assertEqual(3, len(turmas1))
+        self.assertTrue(self.turma1 in turmas1)
+        self.assertTrue(self.turma3 in turmas1)
+        self.assertTrue(self.turma4 in turmas1)
+        turmas2 = Turma.objects.do_aluno(self.aluno2)
+        self.assertEqual(2, len(turmas2))
+        self.assertTrue(self.turma1 in turmas2)
+        self.assertTrue(self.turma2 in turmas2)
+        turmas_atuais1 = Turma.objects.atuais().do_aluno(self.aluno1)
+        self.assertEqual(2, len(turmas_atuais1))
+        self.assertTrue(self.turma3 in turmas_atuais1)
+        self.assertTrue(self.turma4 in turmas_atuais1)
+        turmas_atuais2 = Turma.objects.do_aluno(self.aluno2).atuais()
+        self.assertEqual(1, len(turmas_atuais2))
+        self.assertTrue(self.turma2 in turmas_atuais2)
 
 
 class ExercicioDeProgramacaoTestCase(TestCase):

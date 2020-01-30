@@ -9,8 +9,13 @@ class Command(BaseCommand):
     help = 'Create users from Blackboard file'
 
     def add_arguments(self, parser):
-        parser.add_argument('filename', type=str, help='Indicates the file to be used')
-        parser.add_argument('course', type=str, help='Indicates the name of the course to add the students')
+        parser.add_argument('filename',
+                            type=str,
+                            help='Indicates the file to be used')
+        parser.add_argument(
+            'course',
+            type=str,
+            help='Indicates the name of the course to add the students')
 
     def handle(self, *args, **kwargs):
         filename = Path(kwargs['filename'])
@@ -34,7 +39,11 @@ class Command(BaseCommand):
             users_same_name = User.objects.filter(username=username)
             if not users_same_name:
                 print('Creating user: {0}'.format(username))
-                User.objects.create_user(username=username, email=email, password=username, first_name=first_name, last_name=last_name)
+                User.objects.create_user(username=username,
+                                         email=email,
+                                         password=username,
+                                         first_name=first_name,
+                                         last_name=last_name)
             user = User.objects.get(username=username)
             if user not in course.students.all():
                 print('Adding {0} in {1}'.format(username, coursename))

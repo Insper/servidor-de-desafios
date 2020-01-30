@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+import inspect
+
 from .models_helper import escape_js
 from .date_utils import DateRange
 from collections import defaultdict
@@ -10,8 +12,44 @@ class ExercicioQuerySet(models.QuerySet):
     def publicados(self):
         return self.filter(publicado=True)
 
+    def disponiveis_para(self, usuario):
+        if usuario.is_staff:
+            return self
+        disponiveis = usuario.exercicios_programados_disponiveis()
+        return [d.exercicio for d in disponiveis]
+
+    def disponivel_para(self, exercicio, usuario):
+        return exercicio in self.disponiveis_para(usuario)
+
+    def carrega_para(self, exercicio_id, usuario):
+        exercicio = None
+        try:
+            exercicio = self.get(pk=exercicio_id)
+            if not self.disponivel_para(exercicio, usuario):
+                return None
+        except self.model.DoesNotExist:
+            return None
+        return exercicio.especifico()
+
 
 ExercicioManager = ExercicioQuerySet.as_manager
+
+
+class ExercicioProgramadoQuerySet(models.QuerySet):
+    def disponiveis_para(self, usuario):
+        if usuario.is_staff:
+            return self
+        turmas_ids = [t.id for t in usuario.turmas_atuais()]
+        agora = timezone.now()
+        hoje = agora.date()
+        q_inicio = Q(inicio__isnull=True) | Q(inicio_date__lte=hoje)
+        q_fim = Q(fim__isnull=True) | Q(fim_date__gt=hoje)
+        return self.filter(q_inicio & q_fim,
+                           turma__id__in=turmas_ids,
+                           exercicio__publicado=True)
+
+
+ExercicioProgramadoManager = ExercicioProgramadoQuerySet.as_manager
 
 
 class RespostaExProgramacaoManager(models.Manager):
@@ -118,5 +156,47 @@ class TurmaQuerySet(models.QuerySet):
                     inicio = t.inicio
         return DateRange(inicio, hoje)
 
+    def do_aluno(self, usuario):
+        return self.filter(matricula__aluno__id=usuario.id)
+
+    def atuais(self):
+        agora = timezone.now()
+        hoje = agora.date()
+        q_inicio = models.Q(inicio__isnull=True) | models.Q(inicio__lte=hoje)
+        q_fim = models.Q(fim__isnull=True) | models.Q(fim__gt=hoje)
+        return self.filter(q_inicio & q_fim)
+
 
 TurmaManager = TurmaQuerySet.as_manager
+
+
+class ViewDeExercicioQuerySet(models.QuerySet):
+    def modelos(self):
+        return self.values_list('modelo', flat=True)
+
+    def do_modelo(self, modelo):
+        try:
+            view_name = self.get(modelo=modelo.__name__.lower()).view
+            *modulo, nome = view_name.split('.')
+            modulo = '.'.join(modulo)
+            my_globals = globals()
+            exec('from {0} import {1}'.format(modulo, nome), my_globals)
+            return my_globals[nome]
+        except self.model.DoesNotExist:
+            return None
+
+    def registra(self, modelo, view):
+        view_name = '{0}.{1}'.format(
+            inspect.getmodule(view).__name__, view.__name__)
+        try:
+            view_de_exercicio = self.get(modelo=modelo.__name__.lower())
+        except self.model.DoesNotExist:
+            view_de_exercicio = None
+        if view_de_exercicio is None:
+            self.create(modelo=modelo.__name__.lower(), view=view_name)
+        elif view_de_exercicio.view != view_name:
+            view_de_exercicio.view = view_name
+            view_de_exercicio.save()
+
+
+ViewDeExercicioManager = ViewDeExercicioQuerySet.as_manager

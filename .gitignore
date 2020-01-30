@@ -8,6 +8,7 @@ InsperProgChallenges/production_settings.py
 .db_credentials
 *.code-workspace
 *.bak
+full_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

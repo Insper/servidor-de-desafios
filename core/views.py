@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -11,7 +12,7 @@ from core.code_runner import executa_codigo
 from django.contrib import messages
 from collections import defaultdict
 
-from .models import Exercicio, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag
+from .models import Exercicio, ExercicioDeProgramacao, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag, ViewDeExercicio
 from .choices import Resultado
 from .models_helper import caminho_submissoes_usuario
 # from tutorials.models import Tutorial
@@ -20,7 +21,6 @@ from .models_helper import caminho_submissoes_usuario
 # Constantes de contexto
 EXERCICIOS = 'exercicios'
 EXERCICIO = 'exercicio'
-EXERCICIOS_VISIVEIS_IDS = 'exercicios_visiveis_ids'
 EXERCICIOS_PROGRAMADOS = 'exercicios_programados'
 EXERCICIOS_PROGRAMADO = 'exercicios_programado'
 ULTIMA_SUBMISSAO = 'ultima_submissao'
@@ -38,32 +38,31 @@ ERROR_COUNTER = 'error_counter'
 RESULTADOS = 'resultados'
 
 
+def registra_view_de_exercicios(modelo):
+    def registra(view):
+        ViewDeExercicio.objects.registra(modelo, view)
+        return view
+
+    return registra
+
+
+def carrega_modelo_especifico(exercicios):
+    return [ex.especifico() for ex in exercicios]
+
+
 def cria_contexto(usuario):
     exercicios_programados = {}
-    if usuario.is_staff:
-        exercicios = Exercicio.objects.publicados().order_by('id')
-    else:
-        turmas_ids = usuario.matricula_set.values_list('turma_id', flat=True)
-        agora = datetime.now()
-        hoje = agora.date()
-        q_inicio = Q(inicio__isnull=True) | Q(inicio_date__lte=hoje)
-        q_fim = Q(fim__isnull=True) | Q(fim_date__gt=hoje)
-        exercicios_programados = ExercicioProgramado.objects.filter(
-            q_inicio & q_fim, turma__id__in=turmas_ids)
-        provas_atuais = Prova.objects.disponiveis_para(usuario)
-        exercicios_prova = provas_atuais.values_list('exercicios', flat=True)
-
-        exercicios = set(exercicios_programados.values('exercicio')) | \
-                     set(exercicios_programados.values('exercicio'))
-        exercicios_programados = {
-            e.exercicio.id: e
-            for e in exercicios_programados
-        }
-    exercicios_visiveis_ids = [ex.id for ex in exercicios]
+    # TODO incluir exercícios de prova
+    exercicios_programados = usuario.exercicios_programados_disponiveis()
+    exercicios_programados = {
+        e.exercicio.id: e
+        for e in exercicios_programados
+    }
+    exercicios = usuario.exercicios_disponiveis()
+    exercicios = carrega_modelo_especifico(exercicios)
 
     return {
         EXERCICIOS: exercicios,
-        EXERCICIOS_VISIVEIS_IDS: exercicios_visiveis_ids,
         SHOW_NAV: True,
         EXERCICIOS_PROGRAMADOS: exercicios_programados,
     }
@@ -137,24 +136,23 @@ class Counter:
         return self.val
 
 
-def carrega_exercicio(e_id, usuario, id_visiveis):
-    exercicio = None
-    if e_id in id_visiveis:
-        try:
-            exercicio = Exercicio.objects.get(pk=e_id).exerciciodeprogramacao
-            if not exercicio.publicado and not usuario.is_staff:
-                exercicio = None
-        except Exercicio.DoesNotExist:
-            exercicio = None
-    return exercicio
-
-
 @login_required
 def exercicio(request, c_id):
     usuario = request.user
     ctx = cria_contexto(usuario)
 
-    exercicio = carrega_exercicio(c_id, usuario, ctx[EXERCICIOS_VISIVEIS_IDS])
+    ex = Exercicio.objects.carrega_para(c_id, usuario)
+
+    view = ViewDeExercicio.objects.do_modelo(ex.__class__)
+    if view:
+        return view(request, ex, ctx)
+    raise Http404('Esse exercício não existe')
+
+
+@login_required
+@registra_view_de_exercicios(ExercicioDeProgramacao)
+def exercicio_de_programacao(request, exercicio, ctx):
+    usuario = request.user
 
     # TODO Usar messages framework ao invés de colocar no contexto (na verdade acho que não está sendo utilizado atualmente)
     msg = ''
@@ -182,7 +180,7 @@ def exercicio(request, c_id):
                 request, submissao.data_submissao.strftime("%d/%m/%Y %H:%M"))
             messages.success(request, submissao.feedback)
 
-            return redirect('exercicio', c_id=c_id)
+            return redirect('exercicio', c_id=exercicio.id)
 
     ctx[EXERCICIO] = exercicio
     exercicio_programado = None
