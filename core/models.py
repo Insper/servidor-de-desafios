@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.conf import settings
 from enum import Enum
 import markdown
 from collections import namedtuple, defaultdict
 from .models_helper import *
-from .managers import ExercicioManager, RespostaExProgramacaoManager, ProvaManager, TurmaManager, ExercicioProgramadoManager, ViewDeExercicioManager
+from .managers import ExercicioManager, RespostaExProgramacaoManager, ProvaManager, TurmaManager, ExercicioProgramadoManager
 from .choices import Resultado
 
 
@@ -89,10 +90,14 @@ class Exercicio(models.Model):
         return self.titulo_completo
 
     def especifico(self):
-        for modelo in ViewDeExercicio.objects.modelos():
+        for modelo in tipos_de_exercicio():
             if hasattr(self, modelo):
                 return getattr(self, modelo)
         return self
+
+
+def tipos_de_exercicio():
+    return [m.lower() for m in settings.VIEWS_DE_EXERCICIOS.keys()]
 
 
 class ExercicioProgramado(models.Model):
@@ -225,10 +230,3 @@ class Prova(models.Model):
     @property
     def exercicios_por_nome(self):
         return self.exercicios.order_by('exercicio__titulo')
-
-
-class ViewDeExercicio(models.Model):
-    modelo = models.CharField(max_length=1024, blank=False, unique=True)
-    view = models.CharField(max_length=1024, blank=False)
-
-    objects = ViewDeExercicioManager()

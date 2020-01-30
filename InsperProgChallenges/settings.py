@@ -154,3 +154,11 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# Registre novos tipos de exercício aqui
+VIEWS_DE_EXERCICIOS = {
+    'ExercicioDeProgramacao': 'core.views.exercicio_de_programacao',
+    'Tutorial': 'tutorials.views.tutorial',
+}
+
+VIEWS_DE_EXERCICIOS = {k.lower(): v for k, v in VIEWS_DE_EXERCICIOS.items()}

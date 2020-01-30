@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.core.files.base import ContentFile
@@ -12,7 +13,7 @@ from core.code_runner import executa_codigo
 from django.contrib import messages
 from collections import defaultdict
 
-from .models import Exercicio, ExercicioDeProgramacao, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag, ViewDeExercicio
+from .models import Exercicio, ExercicioDeProgramacao, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag
 from .choices import Resultado
 from .models_helper import caminho_submissoes_usuario
 # from tutorials.models import Tutorial
@@ -38,12 +39,15 @@ ERROR_COUNTER = 'error_counter'
 RESULTADOS = 'resultados'
 
 
-def registra_view_de_exercicios(modelo):
-    def registra(view):
-        ViewDeExercicio.objects.registra(modelo, view)
-        return view
-
-    return registra
+def view_do_modelo(modelo):
+    view_name = settings.VIEWS_DE_EXERCICIOS.get(modelo.__name__.lower())
+    if view_name is None:
+        return None
+    *modulo, nome = view_name.split('.')
+    modulo = '.'.join(modulo)
+    my_globals = globals()
+    exec('from {0} import {1}'.format(modulo, nome), my_globals)
+    return my_globals[nome]
 
 
 def carrega_modelo_especifico(exercicios):
@@ -143,14 +147,13 @@ def exercicio(request, c_id):
 
     ex = Exercicio.objects.carrega_para(c_id, usuario)
 
-    view = ViewDeExercicio.objects.do_modelo(ex.__class__)
+    view = view_do_modelo(ex.__class__)
     if view:
         return view(request, ex, ctx)
     raise Http404('Esse exercício não existe')
 
 
 @login_required
-@registra_view_de_exercicios(ExercicioDeProgramacao)
 def exercicio_de_programacao(request, exercicio, ctx):
     usuario = request.user
 

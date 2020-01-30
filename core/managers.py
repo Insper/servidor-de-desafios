@@ -168,35 +168,3 @@ class TurmaQuerySet(models.QuerySet):
 
 
 TurmaManager = TurmaQuerySet.as_manager
-
-
-class ViewDeExercicioQuerySet(models.QuerySet):
-    def modelos(self):
-        return self.values_list('modelo', flat=True)
-
-    def do_modelo(self, modelo):
-        try:
-            view_name = self.get(modelo=modelo.__name__.lower()).view
-            *modulo, nome = view_name.split('.')
-            modulo = '.'.join(modulo)
-            my_globals = globals()
-            exec('from {0} import {1}'.format(modulo, nome), my_globals)
-            return my_globals[nome]
-        except self.model.DoesNotExist:
-            return None
-
-    def registra(self, modelo, view):
-        view_name = '{0}.{1}'.format(
-            inspect.getmodule(view).__name__, view.__name__)
-        try:
-            view_de_exercicio = self.get(modelo=modelo.__name__.lower())
-        except self.model.DoesNotExist:
-            view_de_exercicio = None
-        if view_de_exercicio is None:
-            self.create(modelo=modelo.__name__.lower(), view=view_name)
-        elif view_de_exercicio.view != view_name:
-            view_de_exercicio.view = view_name
-            view_de_exercicio.save()
-
-
-ViewDeExercicioManager = ViewDeExercicioQuerySet.as_manager
