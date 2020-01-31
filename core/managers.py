@@ -42,8 +42,8 @@ class ExercicioProgramadoQuerySet(models.QuerySet):
         turmas_ids = [t.id for t in usuario.turmas_atuais()]
         agora = timezone.now()
         hoje = agora.date()
-        q_inicio = Q(inicio__isnull=True) | Q(inicio_date__lte=hoje)
-        q_fim = Q(fim__isnull=True) | Q(fim_date__gt=hoje)
+        q_inicio = models.Q(inicio__isnull=True) | models.Q(inicio__lte=hoje)
+        q_fim = models.Q(fim__isnull=True) | models.Q(fim__gt=hoje)
         return self.filter(q_inicio & q_fim,
                            turma__id__in=turmas_ids,
                            exercicio__publicado=True)

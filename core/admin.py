@@ -11,6 +11,7 @@ from .models import Usuario, Turma, Tag, Matricula, Exercicio, ExercicioPrograma
 class MatriculaInline(admin.TabularInline):
     model = Matricula
     extra = 1
+    classes = ['collapse']
 
 
 class TagInline(admin.TabularInline):
