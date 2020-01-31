@@ -6,6 +6,9 @@ import markdown
 class Tutorial(Exercicio):
     replit_url = models.CharField(max_length=1024, blank=True)
 
+    class Meta:
+        verbose_name_plural = 'tutoriais'
+
     @property
     def titulo_completo(self):
         return '[TUTORIAL] {0}'.format(self.titulo)
@@ -45,6 +48,9 @@ class AcessoAoTutorial(models.Model):
     total_acessos = models.IntegerField(default=0)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     tutorial = models.ForeignKey(Tutorial, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'acessos ao tutorial'
 
     def __str__(self):
         return '{0}: Tutorial {1} Primeiro Acesso[{2}] Último Acesso[{3}] Total de Acessos[{4}]'.format(

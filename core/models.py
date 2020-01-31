@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.utils.text import slugify
 from django.conf import settings
 from enum import Enum
 import markdown
@@ -54,15 +55,25 @@ class Matricula(models.Model):
     class Meta:
         unique_together = ('aluno', 'turma')
 
+    def __str__(self):
+        return '{0}-{1} [{2}]'.format(self.aluno, self.turma,
+                                      self.exercicios_liberados)
+
 
 class Tag(models.Model):
     nome = models.CharField(max_length=128)
+    slug = models.CharField(max_length=128)
 
     class Meta:
-        ordering = ['nome']
+        ordering = ['slug']
 
     def __str__(self):
         return self.nome
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nome)
+        super().save(*args, **kwargs)
 
 
 class Exercicio(models.Model):

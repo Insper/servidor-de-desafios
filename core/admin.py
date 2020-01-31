@@ -35,7 +35,8 @@ class FilterComboBox(RelatedFieldListFilter):
 
 class RespostaExProgramacaoAdmin(admin.ModelAdmin):
     list_filter = [('autor', FilterComboBox), ('exercicio', FilterComboBox)]
-    list_display = ('autor', 'exercicio')
+    list_display = ('autor', 'exercicio', 'codigo', 'data_submissao',
+                    'resultado')
 
     def soft_delete(self, request, queryset):
         queryset.update(deletado=True)
