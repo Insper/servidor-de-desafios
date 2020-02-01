@@ -72,6 +72,7 @@ window.onload = function () {
     // let collapser = document.getElementById("fieldsetcollapser1");
     // collapser.click();
 
+    // Toggle exercícios
     django.jQuery(".adicionar-exercicios").click(toggleExercicios);
     django.jQuery("#adicionar-exercicios").click(function () {
         let selecionados = django.jQuery(".sem-bloco input[type='checkbox']:checked");
@@ -94,6 +95,18 @@ window.onload = function () {
         reordenaExercicios(novaLista);
     });
 
+    // Toggle tags
+    django.jQuery(".select-tag").click(function () {
+        let tag = django.jQuery(this).text();
+        django.jQuery(".sem-bloco .tag-" + tag).prop("checked", true);
+        return false;
+    });
+    django.jQuery("#desseleciona-tudo").click(function () {
+        django.jQuery(".sem-bloco input[type=checkbox]").prop("checked", false);
+        return false;
+    });
+
+    // Cria bloco
     addBlock.onclick = function () {
         var newBlock = document.getElementById("bloco-template").content.cloneNode(true);
 

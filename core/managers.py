@@ -9,6 +9,9 @@ from .choices import Resultado
 
 
 class ExercicioQuerySet(models.QuerySet):
+    def ordenados(self):
+        return self.order_by('id')
+
     def publicados(self):
         return self.filter(publicado=True)
 

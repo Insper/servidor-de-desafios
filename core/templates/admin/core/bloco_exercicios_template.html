@@ -1,3 +1,5 @@
+{% load utils %}
+
 <fieldset class="card bloco">
     <div class="form-row">
         <div>
@@ -20,6 +22,9 @@
             <li class="exercicio em-bloco" value="{{ ex.id }}">
                 <input type="checkbox" id="ex-{{ ex.id }}">
                 <label for="ex-{{ ex.id }}">{{ ex.titulo_completo }}</label>
+                {% for tag in ex.tags.all %}
+                <label class="tag {{ tag_classes|get_item:tag.nome }}">{{ tag }}</label>
+                {% endfor %}
             </li>
             {% endfor %}
         </ul>

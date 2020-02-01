@@ -1,5 +1,6 @@
 {% extends 'admin/change_form.html' %}
 {% load static %}
+{% load utils %}
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{% static 'admin/js/course_change_form.js' %}"></script>
@@ -31,11 +32,18 @@
         <div class="exercicios-disponiveis hidden">
             <h3>Exercícios Disponíveis</h3>
             <p>Os exercícios que continuarem nesta lista não serão visíveis para os alunos.</p>
+            {% for tag in todas_tags %}
+            <button class="select-tag {{ tag_classes|get_item:tag.nome }}">{{ tag }}</button>
+            {% endfor %}
+            <button id="desseleciona-tudo" class="select-tag Red">Desselecionar tudo</button>
             <ul id="lista-disponiveis" class="sortable-list scroll-col">
                 {% for ex in em_nenhum_bloco %}
                 <li class="exercicio sem-bloco" value="{{ ex.id }}">
-                <input type="checkbox" id="ex-{{ ex.id }}">
+                <input class="{% for tag in ex.tags.all %}tag-{{ tag.nome }}{% endfor %}" type="checkbox" id="ex-{{ ex.id }}">
                 <label for="ex-{{ ex.id }}">{{ ex.titulo_completo }}</label>
+                {% for tag in ex.tags.all %}
+                <label class="tag {{ tag_classes|get_item:tag.nome }}">{{ tag }}</label>
+                {% endfor %}
                 </li>
                 {% endfor %}
             </ul>

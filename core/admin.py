@@ -3,9 +3,11 @@ from django.contrib.auth.admin import UserAdmin
 from django.forms import CheckboxSelectMultiple
 from django.utils import timezone
 from django.contrib.admin.filters import RelatedFieldListFilter
+import random
 import json
 
 from .models import Usuario, Turma, Tag, Matricula, Exercicio, ExercicioProgramado, ExercicioDeProgramacao, RespostaSubmetida, RespostaExProgramacao, Prova
+from .utils import CORES_ESCURAS_CSS
 
 
 class MatriculaInline(admin.TabularInline):
@@ -83,8 +85,13 @@ def _cria_contexto(contexto, turma_id=None):
         contexto['blocos'] = blocos
     except Turma.DoesNotExist:
         pass
-    contexto['em_nenhum_bloco'] = em_nenhum_bloco
+    contexto['em_nenhum_bloco'] = sorted(em_nenhum_bloco, key=lambda ex: ex.id)
     contexto['exercicios'] = exercicios
+    contexto['todas_tags'] = Tag.objects.all()
+    contexto['tag_classes'] = {
+        tag.nome: random.choice(CORES_ESCURAS_CSS)
+        for tag in Tag.objects.all()
+    }
     return contexto
 
 
