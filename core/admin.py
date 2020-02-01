@@ -65,6 +65,8 @@ def monta_blocos(exercicios_programados):
         bloco = blocos.setdefault((inicio, fim),
                                   BlocoDeExercicios(inicio, fim))
         bloco.exercicios.append(ex.exercicio)
+    for bloco in blocos.values():
+        bloco.exercicios.sort(key=lambda ex: ex.id)
     return list(blocos.values())
 
 
@@ -88,7 +90,8 @@ def _cria_contexto(contexto, turma_id=None):
 
 class TurmaAdmin(admin.ModelAdmin):
     change_form_template = 'admin/core/turma_change_form.html'
-    inlines = (MatriculaInline, )
+    # TODO COLOCAR DE VOLTA
+    # inlines = (MatriculaInline, )
     fieldsets = ((None, {
         'fields': (
             'nome',

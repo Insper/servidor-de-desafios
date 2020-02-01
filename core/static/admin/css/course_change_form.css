@@ -1,17 +1,16 @@
 .two-columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 2em;
+    grid-template-columns: 1fr min-content 1fr;
+    grid-column-gap: 1em;
+    min-height: 500px;
 }
 
 .scroll-col {
-    max-height: 0;
-    min-height: 100%;
+    max-height: 60vh;
     overflow-y: scroll;
 }
 
 form ul.sortable-list {
-    min-height: 3em;
     background-color: #79aec8;
     padding: 10px;
     margin-left: 10px;
@@ -34,12 +33,6 @@ form ul.sortable-list li:last-child {
     margin-bottom: 0;
 }
 
-form ul.sortable-list li::before {
-    content: "||";
-    margin-right: 10px;
-    color: lightgray;
-}
-
 label.implicit-label {
     display: grid;
     grid-auto-flow: column;
@@ -56,4 +49,8 @@ fieldset.card {
 
 .left-0 {
     margin-left: 0 !important;
+}
+
+.bloco.selected {
+    background-color: #afdaff;
 }

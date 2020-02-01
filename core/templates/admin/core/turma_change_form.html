@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block extrahead %}{{ block.super }}
-<script type="text/javascript" src="{% static '/js/html5sortable.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'admin/js/course_change_form.js' %}"></script>
 {% endblock %}
 
@@ -25,12 +24,19 @@
             <input type="button" value="Adicionar Bloco" id="adiciona-bloco">
             <input type="hidden" value="[]" name="blocos">
         </div>
-        <div class="scroll-col">
+        <div>
+            <input type="button" value="<" id="adicionar-exercicios" disabled>
+            <input type="button" value=">" id="remover-exercicios">
+        </div>
+        <div class="exercicios-disponiveis hidden">
             <h3>Exercícios Disponíveis</h3>
             <p>Os exercícios que continuarem nesta lista não serão visíveis para os alunos.</p>
-            <ul class="sortable-list">
+            <ul id="lista-disponiveis" class="sortable-list scroll-col">
                 {% for ex in em_nenhum_bloco %}
-                <li class="exercicio" value="{{ ex.id }}">{{ ex.titulo_completo }}</li>
+                <li class="exercicio sem-bloco" value="{{ ex.id }}">
+                <input type="checkbox" id="ex-{{ ex.id }}">
+                <label for="ex-{{ ex.id }}">{{ ex.titulo_completo }}</label>
+                </li>
                 {% endfor %}
             </ul>
         </div>

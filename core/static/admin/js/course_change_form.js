@@ -21,11 +21,45 @@ function serializeBlockList() {
     return JSON.stringify(newBlockList);
 }
 
-function initSortable(blocks) {
-    sortable('.sortable-list', 'destroy');
-    var list = sortable('.sortable-list', {
-        acceptFrom: '.sortable-list'
+let blocoAtual = null;
+function toggleExercicios() {
+    let novoBloco = django.jQuery(this).parents('.bloco');
+    let ativa;
+    if (novoBloco.hasClass("selected")) {
+        novoBloco.removeClass("selected");
+        novoBloco.find(".adicionar-exercicios").attr("value", "Adicionar Exercícios")
+        ativa = false;
+    }
+    else {
+        if (blocoAtual != null) {
+            blocoAtual.removeClass("selected");
+            blocoAtual.find(".adicionar-exercicios").attr("value", "Adicionar Exercícios")
+        }
+        novoBloco.addClass("selected");
+        novoBloco.find(".adicionar-exercicios").attr("value", "Esconder Exercícios")
+        ativa = true;
+    }
+
+    let exerciciosDisponiveis = django.jQuery(".exercicios-disponiveis");
+    let adicionarExercicios = django.jQuery("#adicionar-exercicios");
+    if (ativa) {
+        exerciciosDisponiveis.removeClass("hidden");
+        adicionarExercicios.removeAttr("disabled");
+    }
+    else {
+        exerciciosDisponiveis.addClass("hidden");
+        adicionarExercicios.attr("disabled", true);
+    }
+
+    blocoAtual = novoBloco;
+}
+
+function reordenaExercicios(bloco) {
+    exercicios = bloco.find(".exercicio");
+    exercicios.sort(function (a, b) {
+        return parseInt(a.value) - parseInt(b.value)
     });
+    exercicios.detach().appendTo(bloco);
 }
 
 window.onload = function () {
@@ -35,7 +69,30 @@ window.onload = function () {
     var blocks = document.getElementsByName("blocos")[0];
     blocks.value = serializeBlockList();
 
-    initSortable(blocks);
+    // let collapser = document.getElementById("fieldsetcollapser1");
+    // collapser.click();
+
+    django.jQuery(".adicionar-exercicios").click(toggleExercicios);
+    django.jQuery("#adicionar-exercicios").click(function () {
+        let selecionados = django.jQuery(".sem-bloco input[type='checkbox']:checked");
+        let novaLista = blocoAtual.find(".bloco-exercicios");
+        let lis = selecionados.parents(".sem-bloco");
+        lis.appendTo(novaLista);
+        lis.removeClass("sem-bloco");
+        lis.addClass("em-bloco");
+        selecionados.prop("checked", false);
+        reordenaExercicios(novaLista);
+    });
+    django.jQuery("#remover-exercicios").click(function () {
+        let selecionados = django.jQuery(".em-bloco input[type='checkbox']:checked");
+        let novaLista = django.jQuery("#lista-disponiveis");
+        let lis = selecionados.parents(".em-bloco");
+        lis.appendTo(novaLista);
+        lis.removeClass("em-bloco");
+        lis.addClass("sem-bloco");
+        selecionados.prop("checked", false);
+        reordenaExercicios(novaLista);
+    });
 
     addBlock.onclick = function () {
         var newBlock = document.getElementById("bloco-template").content.cloneNode(true);
@@ -43,14 +100,14 @@ window.onload = function () {
         // Create
         blockContainer.insertBefore(newBlock, addBlock);
 
-        initSortable(blocks);
-
         // We can't use newBlock, because it is a fragment that is not connected to its parents
         var allCards = blockContainer.querySelectorAll(".card");
         var insertedBlock = allCards[allCards.length - 1];
         insertedBlock.querySelectorAll(".vDateField").forEach(function (e) {
             DateTimeShortcuts.addCalendar(e);
         });
+
+        django.jQuery(django.jQuery(insertedBlock).find(".adicionar-exercicios")).click(toggleExercicios);
     }
 
     django.jQuery('#turma_form').submit(function () {

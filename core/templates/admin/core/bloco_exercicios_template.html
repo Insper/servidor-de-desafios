@@ -14,9 +14,13 @@
         <label>
             Exercícios:
         </label>
+        <input type="button" value="Adicionar Exercícios" class="adicionar-exercicios">
         <ul class="bloco-exercicios sortable-list left-0">
-            {% for exercicio in bloco.exercicios %}
-            <li class="exercicio" value="{{ exercicio.id }}">{{ exercicio.titulo_completo }}</li>
+            {% for ex in bloco.exercicios %}
+            <li class="exercicio em-bloco" value="{{ ex.id }}">
+                <input type="checkbox" id="ex-{{ ex.id }}">
+                <label for="ex-{{ ex.id }}">{{ ex.titulo_completo }}</label>
+            </li>
             {% endfor %}
         </ul>
     </div>
