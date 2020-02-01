@@ -114,7 +114,7 @@ def tipos_de_exercicio():
 class ExercicioProgramado(models.Model):
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
     exercicio = models.ForeignKey(Exercicio, on_delete=models.CASCADE)
-    inicio = models.DateTimeField('data inicio', default=timezone.now)
+    inicio = models.DateTimeField('data inicio', blank=True, null=True)
     fim = models.DateTimeField('data fim', blank=True, null=True)
 
     class Meta:

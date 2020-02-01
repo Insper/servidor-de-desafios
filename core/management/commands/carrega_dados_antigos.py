@@ -6,7 +6,7 @@ import shutil
 from collections import defaultdict
 from pprint import pprint
 
-from core.models import Usuario, ExercicioDeProgramacao, Turma, Matricula, RespostaExProgramacao, Tag
+from core.models import Usuario, ExercicioDeProgramacao, Turma, Matricula, RespostaExProgramacao, Tag, ExercicioProgramado
 from tutorials.models import Tutorial, AcessoAoTutorial
 
 
@@ -114,7 +114,6 @@ def cria_tutoriais(data_dir):
                      traducoes)
 
 
-# TODO CHECAR DATAS E HORARIOS DEPOIS
 def acesso_factory(usuarios, tutoriais):
     def novo_acesso(*args, **kwargs):
         primeiro_acesso = kwargs.pop('primeiro_acesso')
@@ -143,7 +142,6 @@ def cria_acessos_a_tutoriais(data_dir, usuarios, tutoriais):
                      traducoes=traducoes)
 
 
-# TODO CHECAR DATAS E HORARIOS DEPOIS
 def submissao_factory(usuarios, exercicios):
     def nova_submissao(*args, **kwargs):
         data_submissao = kwargs.pop('data_submissao')
@@ -207,6 +205,31 @@ def cria_tags(data_dir):
                      traducoes=traducoes)
 
 
+def bloco_factory(turmas, exercicios):
+    def novo_bloco(*args, **kwargs):
+        exercicio_ids = kwargs.pop('exercicios')
+        kwargs['turma'] = turmas[kwargs['turma']]
+        eps = []
+        for eid in exercicio_ids:
+            kwargs['exercicio'] = exercicios[eid]
+            ex = ExercicioProgramado.objects.create(*args, **kwargs)
+            eps.append(ex)
+        return eps
+
+    return novo_bloco
+
+
+def cria_blocos_de_exercicio(data_dir, turmas, exercicios):
+    remover = ['name']
+    traducoes = {
+        'release_date': 'inicio',
+        'challenges': 'exercicios',
+        'block_class': 'turma'
+    }
+    return cria_objs(bloco_factory(turmas, exercicios),
+                     data_dir / 'challenge_blocks.json', remover, traducoes)
+
+
 class Command(BaseCommand):
     help = 'Carrega dados da versão anterior do servidor'
 
@@ -236,4 +259,7 @@ class Command(BaseCommand):
                                      exercicios_de_programacao)
         print('Criando turmas')
         turmas = cria_turmas(data_dir, usuarios)
+        print('Criando blocos de exercício')
+        blocos = cria_blocos_de_exercicio(data_dir, turmas,
+                                          exercicios_de_programacao)
         print('Concluido')
