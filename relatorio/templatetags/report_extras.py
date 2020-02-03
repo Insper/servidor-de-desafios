@@ -1,17 +1,20 @@
 from django import template
+from core.choices import Resultado
 
 register = template.Library()
 
+
 @register.filter
-def get_css_class(submissions_by_challenge):
+def get_css_class(submissoes_por_exercicio):
     try:
-        if submissions_by_challenge.best_result == 'OK':
+        if submissoes_por_exercicio.melhor_resultado == Resultado.OK:
             return 'success'
-        elif submissions_by_challenge.best_result == 'Erro' and submissions_by_challenge.attempts > 0:
+        elif submissoes_por_exercicio.melhor_resultado == Resultado.ERRO and submissoes_por_exercicio.tentativas > 0:
             return 'error'
     except:
         pass
     return 'noattempt'
+
 
 @register.filter
 def get_css_count_class(count):

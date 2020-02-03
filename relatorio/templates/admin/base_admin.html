@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/changelists.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/report/report.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% block extra-js %}
+{% endblock %}
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div id="changelist-filter">
+    <h2>Tipo de Relatório</h2>
+    <ul>
+        <li {% if current_view == '/' %}class="selected"{% endif %}><a href="" title="Overall">Geral</a></li>
+        <li {% if current_view == '/evolucao' %}class="selected"{% endif %}><a href="evolucao" title="Evolução">Evolução</a></li>
+        <li {% if current_view == '/tutoriais' %}class="selected"{% endif %}><a href="tutoriais" title="Tutoriais">Tutoriais</a></li>
+        <li {% if current_view == '/exercicios-de-programacao' %}class="selected"{% endif %}><a href="exercicios-de-programacao" title="Exercícios de Programação">Exercícios de Programação</a></li>
+        <li {% if current_view == '/situacao' %}class="selected"{% endif %}><a href="situacao" title="Situação">Situação</a></li>
+    </ul>
+
+    <h2>Filtros</h2>
+
+    <h3>Por Turma</h3>
+    <ul>
+
+        <li {% if turma_filter == -1 %}class="selected"{% endif %}><a href="?" title="Todos">Todos</a></li>
+        {% for t in turmas %}
+        <li {% if turma_filter == t.id %}class="selected"{% endif %}><a href="?turma={{ t.id }}" title="{{ t }}">{{ t }}</a></li>
+        {% endfor %}
+
+    </ul>
+
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@ import pandas as pd
 import random
 import json
 
-from .models import Usuario, Turma, Tag, Matricula, Exercicio, ExercicioProgramado, ExercicioDeProgramacao, RespostaSubmetida, RespostaExProgramacao, Prova
+from .models import Usuario, Turma, Tag, Matricula, Exercicio, ExercicioProgramado, ExercicioDeProgramacao, RespostaSubmetida, RespostaExProgramacao, Prova, InteracaoUsarioExercicio
 from .utils import CORES_ESCURAS_CSS
 
 
@@ -192,4 +192,5 @@ admin.site.register(Tag)
 admin.site.register(ExercicioProgramado)
 admin.site.register(ExercicioDeProgramacao, ExercicioAdmin)
 admin.site.register(RespostaExProgramacao, RespostaExProgramacaoAdmin)
+admin.site.register(InteracaoUsarioExercicio)
 admin.site.register(Prova)

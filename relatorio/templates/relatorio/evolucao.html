@@ -4,7 +4,7 @@
 {% load utils %}
 
 {% block content_title %}
-<h1>Evolution Report</h1>
+<h1>Relatório de Evolução</h1>
 {% endblock %}
 
 {% block extra-js %}
@@ -12,9 +12,9 @@
 <script>
     var submissionDates = {};
     var submissionData = {};
-    {% for u in submissions_by_date_user %}
-    submissionDates["{{ u }}"] = [{% for d in submissions_by_date_user|get_item:u %}"{{ d }}",{% endfor %}];
-    submissionData["{{ u }}"] = [{% for d in submissions_by_date_user|get_item:u %}"{{ submissions_by_date_user|get_item:u|get_item:d }}",{% endfor %}];
+    {% for u in submissoes_por_data_usuario %}
+    submissionDates["{{ u }}"] = [{% for d in submissoes_por_data_usuario|get_item:u %}"{{ d }}",{% endfor %}];
+    submissionData["{{ u }}"] = [{% for d in submissoes_por_data_usuario|get_item:u %}"{{ submissoes_por_data_usuario|get_item:u|get_item:d }}",{% endfor %}];
     {% endfor %}
 </script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -33,12 +33,12 @@
       </tr>
     </thead>
     <tbody>
-      {% for usr in users %}
+      {% for usr in usuarios %}
       <tr>
         <td>{{ usr|smartname }} ({{ usr.username }})</td>
-        <td>{{ has_attempt|get_item:usr }}</td>
-        <td>{{ gave_up|get_item:usr }}</td>
-        <td>{{ ratio|get_item:usr }}</td>
+        <td>{{ tem_tentativa|get_item:usr }}</td>
+        <td>{{ desistiu|get_item:usr }}</td>
+        <td>{{ razao|get_item:usr }}</td>
       </tr>
       {% endfor %}
     </tbody>

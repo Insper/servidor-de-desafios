@@ -2,7 +2,7 @@ import os
 from django.test import TestCase
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-from core.models import Usuario, Turma, Matricula, RespostaExProgramacao, ExercicioDeProgramacao, Prova
+from core.models import Usuario, Turma, Matricula, RespostaExProgramacao, ExercicioDeProgramacao, Prova, InteracaoUsarioExercicio
 from core.choices import Resultado
 from core.date_utils import *
 from .factories import *
@@ -233,3 +233,34 @@ class ProvaTestCase(TestCase):
         provas = Prova.objects.disponiveis_para(aluno_nao_matriculado)
         self.assertTrue(prova_atual not in provas)
         self.assertTrue(prova_passada not in provas)
+
+
+class InteracaoUsarioExercicioTestCase(TestCase):
+    def test_atualiza_interacao_com_exercicio(self):
+        exercicio = ExercicioDeProgramacao.objects.create()
+        autor = cria_aluno(1)
+        # Primeira tentativa
+        ex = RespostaExProgramacao.objects.create(exercicio=exercicio,
+                                                  autor=autor,
+                                                  resultado=Resultado.ERRO)
+        interacao = InteracaoUsarioExercicio.objects.get(usuario=autor,
+                                                         exercicio=exercicio)
+        self.assertEqual(1, interacao.tentativas)
+        self.assertEqual(Resultado.ERRO, interacao.melhor_resultado)
+
+        # Segunda tentativa
+        ex = RespostaExProgramacao.objects.create(exercicio=exercicio,
+                                                  autor=autor,
+                                                  resultado=Resultado.ERRO)
+        interacao = InteracaoUsarioExercicio.objects.get(usuario=autor,
+                                                         exercicio=exercicio)
+        self.assertEqual(2, interacao.tentativas)
+        self.assertEqual(Resultado.ERRO, interacao.melhor_resultado)
+
+        # Atualizando resposta
+        ex.resultado = Resultado.OK
+        ex.save()
+        interacao = InteracaoUsarioExercicio.objects.get(usuario=autor,
+                                                         exercicio=exercicio)
+        self.assertEqual(2, interacao.tentativas)
+        self.assertEqual(Resultado.OK, interacao.melhor_resultado)

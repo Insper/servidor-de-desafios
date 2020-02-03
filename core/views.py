@@ -16,8 +16,6 @@ from collections import defaultdict
 from .models import Exercicio, ExercicioDeProgramacao, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag
 from .choices import Resultado
 from .models_helper import caminho_submissoes_usuario
-# from tutorials.models import Tutorial
-# from course.models import ChallengeBlock, get_daterange
 
 # Constantes de contexto
 EXERCICIOS = 'exercicios'

@@ -39,7 +39,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 INSTALLED_APPS = [
     'core',
     'tutorials',
-    # 'report.apps.ReportConfig',
+    'relatorio',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

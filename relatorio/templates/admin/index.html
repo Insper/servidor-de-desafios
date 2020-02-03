@@ -1,0 +1,10 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="float-left module">
+    <a href="/admin/relatorio" class="button" title="Relatórios">Ir Para Relatórios</a>
+    <a href="/admin/relatorio/download" class="button" title="Baixar Dados do Relatório">Baixar Dados do Relatório</a>
+</div>
+{{ block.super }}
+{% endblock %}

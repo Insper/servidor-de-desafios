@@ -15,16 +15,16 @@
 <script src="{% static 'js/plotly-latest.min.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-{% for student in student_data %}
+{% for aluno in dados_do_aluno %}
 var data = [{
     x: [
-        {% for d in days %}
+        {% for d in dias %}
         '{{ d|date:"Y-m-d" }}',
         {% endfor %}
     ],
     y: [
-        {% for d in days %}
-        {{ user_submissions_per_day|get_item:student|get_item:d }},
+        {% for d in dias %}
+        {{ submissoes_por_dia_usuario|get_item:aluno|get_item:d }},
         {% endfor %}
     ],
     type: 'bar'
@@ -42,7 +42,7 @@ var layout = {
     },
 }
 
-Plotly.newPlot('plotDias{{ student.username }}', data, layout);
+Plotly.newPlot('plotDias{{ aluno.username }}', data, layout);
 {% endfor %}
 });
 </script>
@@ -63,8 +63,8 @@ Plotly.newPlot('plotDias{{ student.username }}', data, layout);
             <label for="selectTurma">Turma</label>
             <select class="selectpicker form-control" id="selectTurma" name="turma">
                 <option>Todas</option>
-                {% for course in classes %}
-                <option {% if course.name == selectedClass %}selected{% endif %}>{{ course }}</option>
+                {% for turma in turmas %}
+                <option {% if turma.nome == turma_selecionada %}selected{% endif %}>{{ turma }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -72,8 +72,8 @@ Plotly.newPlot('plotDias{{ student.username }}', data, layout);
             <label for="selectAluno">Aluno</label>
             <select class="selectpicker form-control" id="selectAluno" name="aluno" data-live-search="true">
                 <option>Todos</option>
-                {% for student in students %}
-                <option value="{{ student.username }}" {% if student.username == selectedStudent %}selected{% endif %}>{{ student|smartname }} ({{ student.username }})</option>
+                {% for aluno in alunos %}
+                <option value="{{ aluno.username }}" {% if aluno.username == aluno_selecionado %}selected{% endif %}>{{ aluno|smartname }} ({{ aluno.username }})</option>
                 {% endfor %}
             </select>
         </div>
@@ -81,12 +81,12 @@ Plotly.newPlot('plotDias{{ student.username }}', data, layout);
     </form>
 </section>
 
-{% if student_data %}
+{% if dados_do_aluno %}
 <section>
     <h2>Alunos</h2>
-    {% for student in student_data %}
-    <h3>{{ student|smartname }}</h3>
-    <div id="plotDias{{ student.username }}"></div>
+    {% for aluno in dados_do_aluno %}
+    <h3>{{ aluno|smartname }}</h3>
+    <div id="plotDias{{ aluno.username }}"></div>
     {% endfor %}
 </section>
 {% endif %}

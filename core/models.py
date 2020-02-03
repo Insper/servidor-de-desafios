@@ -3,11 +3,13 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.utils.text import slugify
 from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from enum import Enum
 import markdown
 from collections import namedtuple, defaultdict
 from .models_helper import *
-from .managers import ExercicioManager, RespostaExProgramacaoManager, ProvaManager, TurmaManager, ExercicioProgramadoManager
+from .managers import ExercicioManager, RespostaExProgramacaoManager, ProvaManager, TurmaManager, ExercicioProgramadoManager, InteracaoUsarioExercicioManager
 from .choices import Resultado
 
 
@@ -52,8 +54,7 @@ class Turma(models.Model):
         Matricula.objects.create(turma=self, aluno=aluno)
 
     def alunos(self):
-        return Matricula.objects.filter(turma_id=self.id).values_list(
-            'aluno', flat=True)
+        return Usuario.objects.filter(matricula__turma_id=self.id)
 
 
 class Matricula(models.Model):
@@ -145,6 +146,9 @@ class RespostaSubmetida(models.Model):
     exercicio = models.ForeignKey(Exercicio, on_delete=models.CASCADE)
     autor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     data_submissao = models.DateTimeField('data submissao', auto_now_add=True)
+    resultado = models.CharField(max_length=2,
+                                 choices=Resultado.choices,
+                                 blank=True)
 
     class Meta:
         abstract = True
@@ -157,9 +161,6 @@ class RespostaExProgramacao(RespostaSubmetida):
     feedback = models.TextField(blank=True)
     erros = models.TextField(blank=True)
     codigo = models.FileField(upload_to=caminho_submissoes_usuario)
-    resultado = models.CharField(max_length=2,
-                                 choices=Resultado.choices,
-                                 blank=True)
     deletado = models.BooleanField(default=False)
 
     class Meta:
@@ -250,3 +251,43 @@ class Prova(models.Model):
     @property
     def exercicios_por_nome(self):
         return self.exercicios.order_by('exercicio__titulo')
+
+
+class InteracaoUsarioExercicio(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    exercicio = models.ForeignKey(Exercicio, on_delete=models.CASCADE)
+    tentativas = models.IntegerField(default=0)
+    melhor_resultado = models.CharField(max_length=2,
+                                        choices=Resultado.choices,
+                                        default=Resultado.ERRO)
+
+    class Meta:
+        unique_together = (
+            'usuario',
+            'exercicio',
+        )
+
+    objects = InteracaoUsarioExercicioManager()
+
+    def __str__(self):
+        return '{0}-{1} ({2}) [{3}]'.format(self.usuario, self.exercicio,
+                                            self.tentativas,
+                                            self.melhor_resultado)
+
+
+@receiver(post_save, sender=RespostaExProgramacao)
+def post_resposta_save(sender, instance, created, raw, using, update_fields,
+                       **kwargs):
+    autor = instance.autor
+    exercicio = instance.exercicio
+    try:
+        interacao = InteracaoUsarioExercicio.objects.get(exercicio=exercicio,
+                                                         usuario=autor)
+    except InteracaoUsarioExercicio.DoesNotExist:
+        interacao = InteracaoUsarioExercicio.objects.create(
+            exercicio=exercicio, usuario=autor)
+    if created:
+        interacao.tentativas += 1
+    if instance.resultado == Resultado.OK:
+        interacao.melhor_resultado = Resultado.OK
+    interacao.save()

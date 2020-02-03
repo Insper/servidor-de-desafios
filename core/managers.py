@@ -171,3 +171,17 @@ class TurmaQuerySet(models.QuerySet):
 
 
 TurmaManager = TurmaQuerySet.as_manager
+
+
+class InteracaoUsarioExercicioQuerySet(models.QuerySet):
+    def submissoes_por_usuario(self, usuarios):
+        usuario2interacao = {u.id: {} for u in usuarios}
+        for interacao in self:
+            uid = interacao.usuario_id
+            eid = interacao.exercicio_id
+            if uid in usuario2interacao:
+                usuario2interacao[uid][eid] = interacao
+        return usuario2interacao
+
+
+InteracaoUsarioExercicioManager = InteracaoUsarioExercicioQuerySet.as_manager

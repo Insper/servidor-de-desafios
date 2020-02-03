@@ -3,7 +3,7 @@
 {% load utils %}
 
 {% block content_title %}
-<h1>Tutorials Report</h1>
+<h1>Relatório de Tutoriais</h1>
 {% endblock %}
 
 {% block content %}
@@ -11,19 +11,19 @@
 <table class="table table-striped">
     <thead>
       <tr>
-        <th>Username</th>
-        {% for tutorial in tutorials %}
-        <th><a href="/tutorial/{{ tutorial.id }}">{{ tutorial.id }}</a></th>
+        <th>Usuário</th>
+        {% for tutorial in tutoriais %}
+        <th><a href="{% url 'exercicio' c_id=tutorial.id %}">{{ tutorial.id }}</a></th>
         {% endfor %}
       </tr>
     </thead>
     <tbody>
-      {% for usr in users %}
+      {% for usr in usuarios %}
       <tr>
         <td>{{ usr|smartname }} ({{ usr.username }})</td>
-        {% for tutorial in tutorials %}
-        {% with access_count=accesses_by_user|get_item:usr|get_item:tutorial %}
-        <td class="{{ access_count|get_css_count_class }}">{{ access_count }}</td>
+        {% for tutorial in tutoriais %}
+        {% with acessos=acessos_por_usuario|get_item:usr|get_item:tutorial %}
+        <td class="{{ acessos|get_css_count_class }}">{{ acessos }}</td>
         {% endwith %}
         {% endfor %}
       </tr>
