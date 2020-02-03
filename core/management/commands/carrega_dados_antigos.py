@@ -7,6 +7,7 @@ from collections import defaultdict
 from pprint import pprint
 
 from core.models import Usuario, ExercicioDeProgramacao, Turma, Matricula, RespostaExProgramacao, Tag, ExercicioProgramado
+from core.choices import Resultado
 from tutorials.models import Tutorial, AcessoAoTutorial
 
 
@@ -87,7 +88,7 @@ def cria_ex_prog(data_dir):
         'title': 'titulo',
     }
 
-    shutil.copytree(data_dir / 'media', settings.MEDIA_ROOT)
+    # shutil.copytree(data_dir / 'media', settings.MEDIA_ROOT)
     return cria_objs(novo_ex_prog, data_dir / 'challenges.json', remover,
                      traducoes)
 
@@ -145,7 +146,13 @@ def cria_acessos_a_tutoriais(data_dir, usuarios, tutoriais):
 def submissao_factory(usuarios, exercicios):
     def nova_submissao(*args, **kwargs):
         data_submissao = kwargs.pop('data_submissao')
+        resultado = kwargs.pop('resultado')
+        if resultado.lower() == 'ok':
+            resultado = Resultado.OK
+        else:
+            resultado = Resultado.ERRO
 
+        kwargs['resultado'] = resultado
         kwargs['autor'] = usuarios[kwargs.pop('autor')]
         kwargs['exercicio'] = exercicios[kwargs.pop('exercicio')]
         kwargs['codigo'] = kwargs['codigo'].replace('upload', 'usuarios')

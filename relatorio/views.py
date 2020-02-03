@@ -213,7 +213,6 @@ def situacao(request):
 
     dias = []
     if dados_do_aluno:
-        print('ASDASDASDASD', dados_do_aluno)
         dias = Turma.objects.get_date_range(dados_do_aluno[0])
 
     submissoes_por_dia_usuario = {
