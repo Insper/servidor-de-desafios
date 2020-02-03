@@ -46,6 +46,15 @@ class Turma(models.Model):
             return False
         return False
 
+    def matricula(self, aluno):
+        if self.esta_matriculado(aluno):
+            return
+        Matricula.objects.create(turma=self, aluno=aluno)
+
+    def alunos(self):
+        return Matricula.objects.filter(turma_id=self.id).values_list(
+            'aluno', flat=True)
+
 
 class Matricula(models.Model):
     aluno = models.ForeignKey(Usuario, on_delete=models.CASCADE)

@@ -69,8 +69,8 @@ window.onload = function () {
     var blocks = document.getElementsByName("blocos")[0];
     blocks.value = serializeBlockList();
 
-    // let collapser = document.getElementById("fieldsetcollapser1");
-    // collapser.click();
+    let collapser = document.getElementById("fieldsetcollapser1");
+    collapser.click();
 
     // Toggle exercícios
     django.jQuery(".adicionar-exercicios").click(toggleExercicios);

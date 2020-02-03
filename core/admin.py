@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.forms import CheckboxSelectMultiple
+from django.forms import CheckboxSelectMultiple, ModelForm, FileField
 from django.utils import timezone
 from django.contrib.admin.filters import RelatedFieldListFilter
+from io import TextIOWrapper
+import pandas as pd
 import random
 import json
 
@@ -95,17 +97,28 @@ def _cria_contexto(contexto, turma_id=None):
     return contexto
 
 
+class TurmaForm(ModelForm):
+    arquivo_alunos = FileField()
+
+    class Meta:
+        model = Turma
+        fields = '__all__'
+
+
 class TurmaAdmin(admin.ModelAdmin):
     change_form_template = 'admin/core/turma_change_form.html'
-    # TODO COLOCAR DE VOLTA
-    # inlines = (MatriculaInline, )
+    inlines = (MatriculaInline, )
     fieldsets = ((None, {
         'fields': (
             'nome',
             'inicio',
             'fim',
         )
-    }), )
+    }), ('Arquivo de alunos (Blackboard)', {
+        'fields': ('arquivo_alunos', )
+    }))
+
+    form = TurmaForm
 
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = _cria_contexto(extra_context)
@@ -115,7 +128,36 @@ class TurmaAdmin(admin.ModelAdmin):
         extra_context = _cria_contexto(extra_context, object_id)
         return super().change_view(request, object_id, form_url, extra_context)
 
+    def adiciona_alunos(self, arquivo, obj):
+        text_f = TextIOWrapper(arquivo, encoding='utf-16')
+        df = pd.read_csv(text_f, sep='\t')
+
+        for user_data in df.iterrows():
+            primeiro_nome = user_data[1]['Nome']
+            try:
+                sobrenome = user_data[1]['Sobrenome']
+            except:
+                primeiro_nome = primeiro_nome.split(' ')[0]
+                sobrenome = ' '.join(primeiro_nome.split(' ')[1:])
+            username = user_data[1]['Nome do usuário']
+            email = username + '@al.insper.edu.br'
+            usuarios_com_mesmo_nome = Usuario.objects.filter(username=username)
+            if not usuarios_com_mesmo_nome:
+                print('Criando usuário: {0}'.format(username))
+                Usuario.objects.create_user(username=username,
+                                            email=email,
+                                            password=username,
+                                            first_name=primeiro_nome,
+                                            last_name=sobrenome)
+            usuario = Usuario.objects.get(username=username)
+            alunos_matriculados = obj.alunos()
+            if usuario not in alunos_matriculados:
+                print('Adicionando {0} em {1}'.format(usuario, obj))
+                obj.matricula(usuario)
+        obj.save()
+
     def save_model(self, request, obj, form, change):
+        self.adiciona_alunos(form.cleaned_data.get('arquivo_alunos'), obj)
         super().save_model(request, obj, form, change)
         exercicios = {e.id: e for e in Exercicio.objects.publicados()}
         # Sempre deletar todos os exercícios programados anteriores (dessa turma),
