@@ -6,6 +6,9 @@ lambda_code.zip
 InsperProgChallenges/production_settings.py
 .idea
 .db_credentials
+*.code-workspace
+*.bak
+full_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

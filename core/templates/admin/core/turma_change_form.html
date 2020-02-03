@@ -1,0 +1,53 @@
+{% extends 'admin/change_form.html' %}
+{% load static %}
+{% load utils %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% static 'admin/js/course_change_form.js' %}"></script>
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link href="{% static 'admin/css/course_change_form.css' %}" rel="stylesheet">{% endblock %}
+
+{% block after_related_objects %}
+
+<template id="bloco-template">
+    {% include "admin/core/bloco_exercicios_template.html" %}
+</template>
+
+<fieldset class="module collapse">
+    <h2>Exercícios</h2>
+    <div class="two-columns">
+        <div id="bloco-container">
+            <h3>Blocos de Exercícios</h3>
+            {% for bloco in blocos %}
+            {% include "admin/core/bloco_exercicios_template.html" with bloco=bloco %}
+            {% endfor %}
+            <input type="button" value="Adicionar Bloco" id="adiciona-bloco">
+            <input type="hidden" value="[]" name="blocos">
+        </div>
+        <div>
+            <input type="button" value="<" id="adicionar-exercicios" disabled>
+            <input type="button" value=">" id="remover-exercicios">
+        </div>
+        <div class="exercicios-disponiveis hidden">
+            <h3>Exercícios Disponíveis</h3>
+            <p>Os exercícios que continuarem nesta lista não serão visíveis para os alunos.</p>
+            {% for tag in todas_tags %}
+            <button class="select-tag {{ tag_classes|get_item:tag.nome }}">{{ tag }}</button>
+            {% endfor %}
+            <button id="desseleciona-tudo" class="select-tag Red">Desselecionar tudo</button>
+            <ul id="lista-disponiveis" class="sortable-list scroll-col">
+                {% for ex in em_nenhum_bloco %}
+                <li class="exercicio sem-bloco" value="{{ ex.id }}">
+                <input class="{% for tag in ex.tags.all %}tag-{{ tag.nome }}{% endfor %}" type="checkbox" id="ex-{{ ex.id }}">
+                <label for="ex-{{ ex.id }}">{{ ex.titulo_completo }}</label>
+                {% for tag in ex.tags.all %}
+                <label class="tag {{ tag_classes|get_item:tag.nome }}">{{ tag }}</label>
+                {% endfor %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</fieldset>
+{% endblock %}

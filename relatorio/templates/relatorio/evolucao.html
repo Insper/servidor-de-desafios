@@ -1,0 +1,48 @@
+{% extends "admin/base_admin.html" %}
+{% load static %}
+{% load report_extras %}
+{% load utils %}
+
+{% block content_title %}
+<h1>Relatório de Evolução</h1>
+{% endblock %}
+
+{% block extra-js %}
+{{ block.super }}
+<script>
+    var submissionDates = {};
+    var submissionData = {};
+    {% for u in submissoes_por_data_usuario %}
+    submissionDates["{{ u }}"] = [{% for d in submissoes_por_data_usuario|get_item:u %}"{{ d }}",{% endfor %}];
+    submissionData["{{ u }}"] = [{% for d in submissoes_por_data_usuario|get_item:u %}"{{ submissoes_por_data_usuario|get_item:u|get_item:d }}",{% endfor %}];
+    {% endfor %}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="{% static '/js/report/evolutionReport.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Problemas atacados</th>
+        <th>Desistências</th>
+        <th>Razão</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usr in usuarios %}
+      <tr>
+        <td>{{ usr|smartname }} ({{ usr.username }})</td>
+        <td>{{ tem_tentativa|get_item:usr }}</td>
+        <td>{{ desistiu|get_item:usr }}</td>
+        <td>{{ razao|get_item:usr }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+
+<div id="plotHere"></div>
+{% endblock %}

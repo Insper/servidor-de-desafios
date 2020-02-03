@@ -14,11 +14,11 @@
 {% block pagecontent %}
 
 {% if tutorial %}
-    <h1>{{ tutorial.full_title }}</h1>
+    <h1>{{ tutorial.titulo_completo }}</h1>
 
     <section class="row placeholders flex-1">
         <div class="col-md-6 col-sm-12 placeholder is-flex slidedeck">
-            <div class="with-scroll">{{ tutorial.html_description | safe }}</div>
+            <div class="with-scroll">{{ tutorial.descricao_html | safe }}</div>
             <div class="slide-ctrl">
                 <a href="#" class="btn back-btn"><span class="fas fa-angle-left"></span></a>
                 <a href="#" id="toggleSlide">Mostrar tudo</a>

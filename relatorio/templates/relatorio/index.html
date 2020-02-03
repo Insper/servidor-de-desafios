@@ -1,0 +1,37 @@
+{% extends "admin/base_admin.html" %}
+{% load report_extras %}
+{% load utils %}
+
+{% block content_title %}
+<h1>Relatório</h1>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="table-div">
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            {% for ex in exercicios %}
+            <th><a href="{% url 'exercicio' c_id=ex.id %}">{{ ex.id }}</a></th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for usr in usuarios %}
+          <tr>
+            <td>{{ usr|smartname }} ({{ usr.username }})</td>
+            {% for ex in exercicios %}
+            {% with interacao=interacoes|get_item:usr.id|get_item:ex.id %}
+            <td class="{{ interacao|get_css_class }}">{{ interacao.tentativas }}</td>
+            {% endwith %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}

@@ -1,0 +1,32 @@
+{% load utils %}
+
+<fieldset class="card bloco">
+    <div class="form-row">
+        <div>
+            <label class="implicit-label">Início: <input type="text" class="bloco-inicio vDateField" size="10" value="{{ bloco.inicio|date:"d/m/Y" }}"></label>
+        </div>
+    </div>
+    <div class="form-row">
+        <div>
+            <label class="implicit-label">Fim: <input type="text" class="bloco-fim vDateField" size="10" value="{{ bloco.fim|date:"d/m/Y" }}"></label>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <label>
+            Exercícios:
+        </label>
+        <input type="button" value="Adicionar Exercícios" class="adicionar-exercicios">
+        <ul class="bloco-exercicios sortable-list left-0">
+            {% for ex in bloco.exercicios %}
+            <li class="exercicio em-bloco" value="{{ ex.id }}">
+                <input type="checkbox" id="ex-{{ ex.id }}">
+                <label for="ex-{{ ex.id }}">{{ ex.titulo_completo }}</label>
+                {% for tag in ex.tags.all %}
+                <label class="tag {{ tag_classes|get_item:tag.nome }}">{{ tag }}</label>
+                {% endfor %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</fieldset>

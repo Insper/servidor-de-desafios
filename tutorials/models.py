@@ -1,59 +1,58 @@
 from django.db import models
-from django.contrib.auth.models import User
+from core.models import Usuario, Exercicio
 import markdown
 
 
-class Tutorial(models.Model):
-    release = models.DateTimeField('date released', auto_now=True)
-    title = models.CharField(max_length=1024, blank=True)
-    description = models.TextField(blank=False)
+class Tutorial(Exercicio):
     replit_url = models.CharField(max_length=1024, blank=True)
-    published = models.BooleanField(default=True)
 
-    @classmethod
-    def all_published(cls):
-        return Tutorial.objects.filter(published=True)
+    class Meta:
+        verbose_name_plural = 'tutoriais'
 
     @property
-    def full_title(self):
-        title = 'Tutorial {0}'.format(self.id)
-        if self.title:
-            title += ': {0}'.format(self.title)
-        return title
-
-    def __str__(self):
-        return self.full_title
+    def titulo_completo(self):
+        return '[TUTORIAL] {0}'.format(self.titulo)
 
     @property
-    def html_description(self):
-        replacements = [
-            ('<span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span>', '>'),
-            ('<span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span>', '<'),
+    def descricao_html(self):
+        substituicoes = [
+            ('<span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span>',
+             '>'),
+            ('<span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span>',
+             '<'),
         ]
-        result = markdown.markdown(self.description, extensions=['codehilite'])
-        with_div = ''
+        resultado = markdown.markdown(self.descricao,
+                                      extensions=['codehilite'])
+        com_div = ''
         slide_id = 1
-        for line in result.split('\n'):
-            if '---slide---' in line:
+        for linha in resultado.split('\n'):
+            if '---slide---' in linha:
                 if slide_id > 1:
-                    with_div += '</div>\n'
-                with_div += '<div class="slide" id="slide{0}">\n'.format(slide_id)
+                    com_div += '</div>\n'
+                com_div += '<div class="slide" id="slide{0}">\n'.format(
+                    slide_id)
                 slide_id += 1
             else:
-                for text, replacement in replacements:
-                    line = line.replace(text, replacement)
-                with_div += line + '\n'
+                for texto, substituicao in substituicoes:
+                    linha = linha.replace(texto, substituicao)
+                com_div += linha + '\n'
         if slide_id > 1:
-            with_div += '</div>\n'
-        return with_div
+            com_div += '</div>\n'
+        return com_div
 
 
-class TutorialAccess(models.Model):
-    first_access = models.DateTimeField('first accessed', auto_now_add=True)
-    last_access = models.DateTimeField('last accessed', auto_now=True)
-    access_count = models.IntegerField(default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class AcessoAoTutorial(models.Model):
+    primeiro_acesso = models.DateTimeField('primeiro acesso',
+                                           auto_now_add=True)
+    ultimo_acesso = models.DateTimeField('ultimo acesso', auto_now=True)
+    total_acessos = models.IntegerField(default=0)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     tutorial = models.ForeignKey(Tutorial, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name_plural = 'acessos ao tutorial'
+
     def __str__(self):
-        return '{0}: Tutorial {1} First Access[{2}] Last Access[{3}] Access Count[{4}]'.format(self.user.username, self.tutorial.id, self.first_access, self.last_access, self.access_count)
+        return '{0}: Tutorial {1} Primeiro Acesso[{2}] Último Acesso[{3}] Total de Acessos[{4}]'.format(
+            self.usuario.username, self.tutorial.id, self.primeiro_acesso,
+            self.ultimo_acesso, self.total_acessos)

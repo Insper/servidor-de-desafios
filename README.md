@@ -78,8 +78,7 @@ Para isso, vá até a pasta `ChallengeTestRunner` e instale a biblioteca:
 
 ### Servidor de Produção
 
-Para utilizar as configurações de produção é necessário que o arquivo
-`InsperProgChallenges/production_settings.py` exista (ele pode estar vazio).
+Para utilizar as configurações de produção modifique o arquivo `servidor_dessoft/production.py`.
 
 Para atualizar o servidor de produção basta executar um `git pull` e reiniciar o
 Apache.

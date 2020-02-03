@@ -11,7 +11,7 @@
 <h1>Tutoriais</h1>
 
 <div>
-{% for tag in all_tags %}
+{% for tag in todas_tags %}
     <a href="#" class="filter-challenge-tag challenge-tag badge">{{ tag }}</a>
 {% endfor %}
 </div>
@@ -19,7 +19,7 @@
 {% if tutorials %}
     <ul>
     {% for tutorial in tutorials %}
-        <li><a href="/tutorial/{{ tutorial.id }}">{{ tutorial }}</a></li>
+        <li><a href="{% url 'exercicio' c_id=tutorial.id %}">{{ tutorial }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
