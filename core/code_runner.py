@@ -16,7 +16,14 @@ def executa_codigo(exercicio, resposta):
     if settings.DEV_SERVER:
         return ch.run_tests(resposta, testes, exercicio.nome_funcao)
     else:
-        lamb = boto3.client('lambda', region_name='us-east-1')
+        kwargs = {
+            'region_name': 'us-east-1',
+        }
+        if settings.AWS_ACCESS_KEY:
+            kwargs['aws_access_key_id'] = settings.AWS_ACCESS_KEY
+        if settings.AWS_SECRET_KEY:
+            kwargs['aws_secret_access_key'] = settings.AWS_SECRET_KEY
+        lamb = boto3.client('lambda', **kwargs)
         args = {
             'answer': resposta,
             'test_code': testes,

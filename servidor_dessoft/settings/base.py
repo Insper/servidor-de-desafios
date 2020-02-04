@@ -80,6 +80,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'servidor_dessoft.wsgi.application'
 
+AWS_ACCESS_KEY = None
+AWS_SECRET_KEY = None
+try:
+    with open(str(Path(BASE_DIR) / '.aws_credentials')) as f:
+        aws_credentials = json.load(f)
+    AWS_ACCESS_KEY = aws_credentials['AWS_ACCESS_KEY'],
+    AWS_SECRET_KEY = aws_credentials['AWS_SECRET_KEY'],
+except:
+    print('Utilizando configuração padrão para aws lambda', file=sys.stderr)
+
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
