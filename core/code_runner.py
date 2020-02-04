@@ -16,7 +16,7 @@ def executa_codigo(exercicio, resposta):
     if settings.DEV_SERVER:
         return ch.run_tests(resposta, testes, exercicio.nome_funcao)
     else:
-        lamb = boto3.client('lambda')
+        lamb = boto3.client('lambda', region_name='us-east-1')
         args = {
             'answer': resposta,
             'test_code': testes,
