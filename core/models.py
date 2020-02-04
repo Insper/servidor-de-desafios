@@ -22,7 +22,7 @@ class Usuario(AbstractUser):
         return ExercicioProgramado.objects.disponiveis_para(self)
 
     def exercicios_disponiveis(self):
-        return Exercicio.objects.disponiveis_para(self)
+        return Exercicio.objects.disponiveis_para(self).ordenados()
 
 
 class Turma(models.Model):

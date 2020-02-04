@@ -6,6 +6,8 @@ lambda_code.zip
 InsperProgChallenges/production_settings.py
 .idea
 .db_credentials
+.aws_credentials
+staticfiles
 *.code-workspace
 *.bak
 full_data
