@@ -173,6 +173,15 @@ class TurmaQuerySet(models.QuerySet):
 TurmaManager = TurmaQuerySet.as_manager
 
 
+class InteracaoMock:
+    def __init__(self, exercicio, tentativas, melhor_resultado,
+                 ultima_submissao):
+        self.exercicio = exercicio
+        self.tentativas = tentativas
+        self.melhor_resultado = melhor_resultado
+        self.ultima_submissao = ultima_submissao
+
+
 class InteracaoUsarioExercicioQuerySet(models.QuerySet):
     def submissoes_por_usuario(self, usuarios):
         usuario2interacao = {u.id: {} for u in usuarios}
@@ -182,6 +191,20 @@ class InteracaoUsarioExercicioQuerySet(models.QuerySet):
             if uid in usuario2interacao:
                 usuario2interacao[uid][eid] = interacao
         return usuario2interacao
+
+    def por(self, usuario):
+        return self.filter(usuario=usuario)
+
+    def agrupado_por(self, exercicios):
+        exercicio2submissao = {
+            ex.id: InteracaoMock(ex, 0, Resultado.ERRO, None)
+            for ex in exercicios
+        }
+        exercicio2submissao.update(
+            {interacao.exercicio.id: interacao
+             for interacao in self})
+        return sorted(exercicio2submissao.values(),
+                      key=lambda i: i.exercicio.id)
 
 
 InteracaoUsarioExercicioManager = InteracaoUsarioExercicioQuerySet.as_manager

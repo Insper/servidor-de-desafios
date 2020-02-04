@@ -13,7 +13,7 @@ from core.code_runner import executa_codigo
 from django.contrib import messages
 from collections import defaultdict
 
-from .models import Exercicio, ExercicioDeProgramacao, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag
+from .models import Exercicio, ExercicioDeProgramacao, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag, InteracaoUsarioExercicio
 from .choices import Resultado
 from .models_helper import caminho_submissoes_usuario
 
@@ -74,16 +74,11 @@ def cria_contexto(usuario):
 def index(request):
     usuario = request.user
     ctx = cria_contexto(usuario)
-    # if usuario.is_staff:
-    #     tutoriais = Tutorial.objects.all()
-    # else:
-    #     tutoriais = Tutorial.all_published()
-    # tutoriais = tutoriais.order_by('id')
-    # ctx['tutorials'] = tutoriais
     submissoes = RespostaExProgramacao.objects.por(usuario)
     ctx.update({
         SUB_POR_EX:
-        submissoes.respostas_por_exercicio(ctx['exercicios']),
+        InteracaoUsarioExercicio.objects.por(usuario).agrupado_por(
+            ctx['exercicios']),
         TODAS_TAGS: [
             tag for tag in Tag.objects.all()
             if 'prova' not in str(tag) and tag.exercicio_set.count()

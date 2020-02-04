@@ -3,8 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.utils.text import slugify
 from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from enum import Enum
 import markdown
 from collections import namedtuple, defaultdict
@@ -151,7 +149,6 @@ class RespostaSubmetida(models.Model):
                                  blank=True)
 
     class Meta:
-        abstract = True
         verbose_name_plural = 'respostas submetidas'
 
 
@@ -260,6 +257,10 @@ class InteracaoUsarioExercicio(models.Model):
     melhor_resultado = models.CharField(max_length=2,
                                         choices=Resultado.choices,
                                         default=Resultado.ERRO)
+    ultima_submissao = models.ForeignKey(RespostaSubmetida,
+                                         on_delete=models.SET_NULL,
+                                         blank=True,
+                                         null=True)
 
     class Meta:
         unique_together = (
@@ -273,21 +274,3 @@ class InteracaoUsarioExercicio(models.Model):
         return '{0}-{1} ({2}) [{3}]'.format(self.usuario, self.exercicio,
                                             self.tentativas,
                                             self.melhor_resultado)
-
-
-@receiver(post_save, sender=RespostaExProgramacao)
-def post_resposta_save(sender, instance, created, raw, using, update_fields,
-                       **kwargs):
-    autor = instance.autor
-    exercicio = instance.exercicio
-    try:
-        interacao = InteracaoUsarioExercicio.objects.get(exercicio=exercicio,
-                                                         usuario=autor)
-    except InteracaoUsarioExercicio.DoesNotExist:
-        interacao = InteracaoUsarioExercicio.objects.create(
-            exercicio=exercicio, usuario=autor)
-    if created:
-        interacao.tentativas += 1
-    if instance.resultado == Resultado.OK:
-        interacao.melhor_resultado = Resultado.OK
-    interacao.save()

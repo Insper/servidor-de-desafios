@@ -88,7 +88,7 @@ def cria_ex_prog(data_dir):
         'title': 'titulo',
     }
 
-    # shutil.copytree(data_dir / 'media', settings.MEDIA_ROOT)
+    shutil.copytree(data_dir / 'media', settings.MEDIA_ROOT)
     return cria_objs(novo_ex_prog, data_dir / 'challenges.json', remover,
                      traducoes)
 
