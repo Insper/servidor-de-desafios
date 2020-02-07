@@ -2,12 +2,14 @@ from django import template
 
 register = template.Library()
 
+
 @register.filter
 def get_item(dictionary, key):
     try:
         return dictionary[key]
     except:
         return None
+
 
 @register.filter
 def smartname(user):
@@ -19,3 +21,8 @@ def smartname(user):
     if not name:
         name = user.username
     return name.strip()
+
+
+@register.filter
+def get_repr(obj):
+    return repr(obj)

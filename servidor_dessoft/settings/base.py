@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'core',
     'tutorials',
     'relatorio',
+    'teste_de_mesa',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -165,6 +166,7 @@ MEDIA_URL = '/media/'
 VIEWS_DE_EXERCICIOS = {
     'ExercicioDeProgramacao': 'core.views.exercicio_de_programacao',
     'Tutorial': 'tutorials.views.tutorial',
+    'TesteDeMesa': 'teste_de_mesa.views.teste_de_mesa',
 }
 
 VIEWS_DE_EXERCICIOS = {k.lower(): v for k, v in VIEWS_DE_EXERCICIOS.items()}
