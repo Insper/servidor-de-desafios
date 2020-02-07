@@ -44,7 +44,7 @@ def monta_memoria(passo1, passo2):
 def get_teste_de_mesa(request, teste_mesa, passo_atual_i, context):
     user = request.user
 
-    if passo_atual_i > InteracaoUsuarioPassoTesteDeMesa.objects.passo_atual(
+    if not user.is_staff and passo_atual_i > InteracaoUsuarioPassoTesteDeMesa.objects.passo_atual(
             user, teste_mesa):
         raise Http404('Esse exercício não existe')
 
