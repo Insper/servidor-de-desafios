@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from itertools import zip_longest
 from collections import defaultdict
 
-from .models import stdout_list2str
+from .models import stdout_list2str, RespostaTesteDeMesa, InteracaoUsuarioPassoTesteDeMesa
+from core.choices import Resultado
 
 
 def name_dict2list(passo, limpa_valores=False):
@@ -43,12 +44,13 @@ def monta_memoria(passo1, passo2):
 def get_teste_de_mesa(request, teste_mesa, passo_atual_i, context):
     user = request.user
 
-    # TODO Validar se o usuário tem acesso
+    if passo_atual_i > InteracaoUsuarioPassoTesteDeMesa.objects.passo_atual(
+            user, teste_mesa):
+        raise Http404('Esse exercício não existe')
 
     context['teste_mesa'] = teste_mesa
     gabarito = teste_mesa.gabarito_list
     if passo_atual_i >= len(gabarito):
-        # TODO TELA DE FIM: https://codepen.io/cvan/pen/LYYXzWZ
         context['teste_concluido'] = True
     else:
         passo_atual = gabarito[passo_atual_i]
@@ -119,16 +121,16 @@ def memorias_iguais(recebido, esperado):
 def verifica_proxima_linha(request, gabarito, passo_atual_i):
     eh_ultimo_passo = passo_atual_i == len(gabarito) - 1
     if eh_ultimo_passo:
-        return True
+        return True, -1
     prox_linha = int(request.POST.get('ctr::prox_linha', '-1'))
-    return prox_linha == gabarito[passo_atual_i + 1].line_i + 1
+    return prox_linha == gabarito[passo_atual_i + 1].line_i + 1, prox_linha
 
 
 def verifica_memoria(request, gabarito, passo_atual_i):
     passo_atual = gabarito[passo_atual_i]
     resposta = extrai_memoria(request.POST)
     esperado = passo_atual.name_dicts
-    return memorias_iguais(resposta, esperado)
+    return memorias_iguais(resposta, esperado), resposta
 
 
 def verifica_terminal(request, gabarito, passo_atual_i):
@@ -139,7 +141,7 @@ def verifica_terminal(request, gabarito, passo_atual_i):
     resposta = request.POST.get('out::terminal', '')
     prev_out_lines = int(request.POST.get('out::prev_terminal_lines', '0'))
     esperado = stdout_list2str(passo_atual.stdout[prev_out_lines:])
-    return esperado == resposta
+    return esperado == resposta, resposta
 
 
 def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
@@ -147,28 +149,54 @@ def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
     assert passo_atual_i < len(gabarito)
 
     tag = 'teste-mesa'
-    linha_ok = verifica_proxima_linha(request, gabarito, passo_atual_i)
-    memoria_ok, mensagens = verifica_memoria(request, gabarito, passo_atual_i)
-    terminal_ok = verifica_terminal(request, gabarito, passo_atual_i)
+    linha_ok, resposta_linha = verifica_proxima_linha(request, gabarito,
+                                                      passo_atual_i)
+    (memoria_ok,
+     mensagens), resposta_memoria = verifica_memoria(request, gabarito,
+                                                     passo_atual_i)
+    terminal_ok, resposta_terminal = verifica_terminal(request, gabarito,
+                                                       passo_atual_i)
+
+    resultado_linha = Resultado.OK
+    resultado_memoria = Resultado.OK
+    resultado_terminal = Resultado.OK
     if linha_ok and memoria_ok and terminal_ok:
+        resultado = Resultado.OK
         messages.success(request,
                          'Sem erros',
                          extra_tags=' '.join([tag, 'text-success']))
         proximo_passo = passo_atual_i + 1
     else:
+        resultado = Resultado.ERRO
         if not linha_ok:
+            resultado_linha = Resultado.ERRO
             messages.error(request,
                            'Valor incorreto para próxima linha',
                            extra_tags=' '.join([tag, 'text-danger']))
         for msg in mensagens:
+            resultado_memoria = Resultado.ERRO
             messages.error(request,
                            msg,
                            extra_tags=' '.join([tag, 'text-danger']))
         if not terminal_ok:
+            resultado_terminal = Resultado.ERRO
             messages.error(request,
                            'Saída incorreta no terminal',
                            extra_tags=' '.join([tag, 'text-danger']))
         proximo_passo = passo_atual_i
+    resp = RespostaTesteDeMesa(
+        exercicio=teste_mesa,
+        autor=request.user,
+        resultado=resultado,
+        passo=passo_atual_i,
+        resultado_linha=resultado_linha,
+        resultado_memoria=resultado_memoria,
+        resultado_terminal=resultado_terminal,
+        proxima_linha=resposta_linha,
+    )
+    resp.memoria = resposta_memoria
+    resp.terminal = resposta_terminal
+    resp.save()
     return HttpResponseRedirect('{0}?passo={1}'.format(request.path_info,
                                                        proximo_passo))
 
