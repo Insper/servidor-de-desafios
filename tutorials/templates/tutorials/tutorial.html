@@ -18,12 +18,26 @@
 
     <section class="row placeholders flex-1">
         <div class="col-md-6 col-sm-12 placeholder is-flex slidedeck">
-            <div class="with-scroll">{{ tutorial.descricao_html | safe }}</div>
+            <div class="with-scroll">{{ slide_html | safe }}</div>
+            {% if tutorial.total_slides > 1 %}
             <div class="slide-ctrl">
-                <a href="#" class="btn back-btn"><span class="fas fa-angle-left"></span></a>
-                <a href="#" id="toggleSlide">Mostrar tudo</a>
-                <a href="#" class="btn forward-btn"><span class="fas fa-angle-right"></span></a>
+                {% if prev_slide is not None %}
+                <a href="?slide={{ prev_slide }}" class="btn back-btn"><span class="fas fa-angle-left"></span></a>
+                {% else %}
+                <span></span>
+                {% endif %}
+                {% if mostrar_tudo %}
+                <a href="?slide=0" id="toggleSlide">Mostrar somente slide</a>
+                {% else %}
+                <a href="?slide=-1" id="toggleSlide">Mostrar tudo</a>
+                {% endif %}
+                {% if next_slide is not None %}
+                <a href="?slide={{ next_slide }}" class="btn forward-btn"><span class="fas fa-angle-right"></span></a>
+                {% else %}
+                <span></span>
+                {% endif %}
             </div>
+            {% endif %}
         </div>
         {% if tutorial.replit_url %}
         <div class="col-md-6 col-sm-12 placeholder">

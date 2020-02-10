@@ -14,7 +14,7 @@ class Tutorial(Exercicio):
         return '[TUTORIAL] {0}'.format(self.titulo)
 
     @property
-    def descricao_html(self):
+    def slides_html(self):
         substituicoes = [
             ('<span class="o">&amp;</span><span class="n">gt</span><span class="p">;</span>',
              '>'),
@@ -23,22 +23,24 @@ class Tutorial(Exercicio):
         ]
         resultado = markdown.markdown(self.descricao,
                                       extensions=['codehilite'])
-        com_div = ''
-        slide_id = 1
-        for linha in resultado.split('\n'):
-            if '---slide---' in linha:
-                if slide_id > 1:
-                    com_div += '</div>\n'
-                com_div += '<div class="slide" id="slide{0}">\n'.format(
-                    slide_id)
-                slide_id += 1
-            else:
+        slides = []
+        for slide_str in resultado.split('---slide---')[1:]:
+            com_div = '<div class="slide">\n'
+            for linha in slide_str.split('\n'):
                 for texto, substituicao in substituicoes:
                     linha = linha.replace(texto, substituicao)
                 com_div += linha + '\n'
-        if slide_id > 1:
             com_div += '</div>\n'
-        return com_div
+            slides.append(com_div)
+        return slides
+
+    @property
+    def todos_slides_html(self):
+        return '\n'.join(self.slides_html)
+
+    @property
+    def total_slides(self):
+        return self.descricao.count('---slide---')
 
 
 class AcessoAoTutorial(models.Model):
