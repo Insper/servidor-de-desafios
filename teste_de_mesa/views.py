@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from .models import stdout_list2str, RespostaTesteDeMesa, InteracaoUsuarioPassoTesteDeMesa
 from core.choices import Resultado
+from . import code_runner as cr
 
 
 def name_dict2list(passo, limpa_valores=False):
@@ -90,34 +91,6 @@ def extrai_memoria(post_data):
     return memoria
 
 
-def memorias_iguais(recebido, esperado):
-    # TODO Jogar essa função para o lambda (por causa do eval)
-    mensagens = []
-    keys = esperado.keys() | recebido.keys()
-    for k in keys:
-        v_esperado = esperado.get(k, {})
-        v_recebido = recebido.get(k, {})
-        if (not v_esperado) and v_recebido:
-            mensagens.append(
-                'Alguma parte da memória não deveria estar mais ativa.')
-        elif v_esperado and (not v_recebido):
-            mensagens.append('A memória desativada ainda está ativa.')
-        else:
-            try:
-                v_recebido = {
-                    r_k: eval(r_v) if r_v else None
-                    for r_k, r_v in v_recebido.items()
-                }
-                if v_esperado != v_recebido:
-                    mensagens.append(
-                        'Pelo menos um valor na memória está incorreto.')
-            except NameError:
-                mensagens.append(
-                    'Não consegui entender algum dos valores da memória. Você não esqueceu as aspas em alguma string?'
-                )
-    return len(mensagens) == 0, mensagens
-
-
 def verifica_proxima_linha(request, gabarito, passo_atual_i):
     eh_ultimo_passo = passo_atual_i == len(gabarito) - 1
     if eh_ultimo_passo:
@@ -130,7 +103,8 @@ def verifica_memoria(request, gabarito, passo_atual_i):
     passo_atual = gabarito[passo_atual_i]
     resposta = extrai_memoria(request.POST)
     esperado = passo_atual.name_dicts
-    return memorias_iguais(resposta, esperado), resposta
+    memcomp = cr.verifica_memorias(resposta, esperado)
+    return memcomp.sucesso, memcomp.mensagens, resposta
 
 
 def verifica_terminal(request, gabarito, passo_atual_i):
@@ -151,9 +125,8 @@ def post_teste_de_mesa(request, teste_mesa, passo_atual_i):
     tag = 'teste-mesa'
     linha_ok, resposta_linha = verifica_proxima_linha(request, gabarito,
                                                       passo_atual_i)
-    (memoria_ok,
-     mensagens), resposta_memoria = verifica_memoria(request, gabarito,
-                                                     passo_atual_i)
+    memoria_ok, mensagens, resposta_memoria = verifica_memoria(
+        request, gabarito, passo_atual_i)
     terminal_ok, resposta_terminal = verifica_terminal(request, gabarito,
                                                        passo_atual_i)
 
