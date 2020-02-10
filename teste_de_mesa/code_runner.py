@@ -34,7 +34,7 @@ def verifica_memorias(recebido, esperado):
                                InvocationType='RequestResponse',
                                Payload=json.dumps(args))
         resultado = response['Payload'].read().decode('utf-8')
-        return json.loads(resultado)
+        return json.loads(json.loads(resultado))
 
 
 def compara_memorias(recebido_json, esperado_json):
