@@ -98,7 +98,7 @@ def _cria_contexto(contexto, turma_id=None):
 
 
 class TurmaForm(ModelForm):
-    arquivo_alunos = FileField()
+    arquivo_alunos = FileField(required=False)
 
     class Meta:
         model = Turma
@@ -129,6 +129,8 @@ class TurmaAdmin(admin.ModelAdmin):
         return super().change_view(request, object_id, form_url, extra_context)
 
     def adiciona_alunos(self, arquivo, obj):
+        if arquivo is None:
+            return
         text_f = TextIOWrapper(arquivo, encoding='utf-16')
         df = pd.read_csv(text_f, sep='\t')
 

@@ -18,8 +18,9 @@ class ExercicioQuerySet(models.QuerySet):
     def disponiveis_para(self, usuario):
         if usuario.is_staff:
             return self
-        disponiveis = usuario.exercicios_programados_disponiveis()
-        return [d.exercicio for d in disponiveis]
+        ids = usuario.exercicios_programados_disponiveis().values_list(
+            'exercicio', flat=True)
+        return self.filter(id__in=ids)
 
     def disponivel_para(self, exercicio, usuario):
         return exercicio in self.disponiveis_para(usuario)

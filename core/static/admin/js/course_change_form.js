@@ -54,12 +54,25 @@ function toggleExercicios() {
     blocoAtual = novoBloco;
 }
 
+function resetTagClick() {
+    django.jQuery(".select-tag").click(function () {
+        let tag = django.jQuery(this).text();
+        django.jQuery(".sem-bloco .tag-" + tag).prop("checked", true);
+        return false;
+    });
+    django.jQuery("#desseleciona-tudo").click(function () {
+        django.jQuery(".sem-bloco input[type=checkbox]").prop("checked", false);
+        return false;
+    });
+}
+
 function reordenaExercicios(bloco) {
     exercicios = bloco.find(".exercicio");
     exercicios.sort(function (a, b) {
         return parseInt(a.value) - parseInt(b.value)
     });
     exercicios.detach().appendTo(bloco);
+    resetTagClick();
 }
 
 window.onload = function () {
@@ -96,15 +109,7 @@ window.onload = function () {
     });
 
     // Toggle tags
-    django.jQuery(".select-tag").click(function () {
-        let tag = django.jQuery(this).text();
-        django.jQuery(".sem-bloco .tag-" + tag).prop("checked", true);
-        return false;
-    });
-    django.jQuery("#desseleciona-tudo").click(function () {
-        django.jQuery(".sem-bloco input[type=checkbox]").prop("checked", false);
-        return false;
-    });
+    resetTagClick();
 
     // Cria bloco
     addBlock.onclick = function () {

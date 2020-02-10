@@ -52,6 +52,21 @@ def carrega_modelo_especifico(exercicios):
     return [ex.especifico() for ex in exercicios]
 
 
+def exercicio_key(exercicios_programados):
+    inicio_do_universo = timezone.make_aware(
+        timezone.datetime(year=1, month=1, day=2))
+
+    def key(exercicio):
+        eid = exercicio.id
+        try:
+            inicio = exercicios_programados[eid].inicio
+        except:
+            inicio = inicio_do_universo
+        return inicio, eid
+
+    return key
+
+
 def cria_contexto(usuario):
     exercicios_programados = {}
     # TODO incluir exercícios de prova
@@ -62,6 +77,7 @@ def cria_contexto(usuario):
     }
     exercicios = usuario.exercicios_disponiveis()
     exercicios = carrega_modelo_especifico(exercicios)
+    exercicios = sorted(exercicios, key=exercicio_key(exercicios_programados))
 
     return {
         EXERCICIOS: exercicios,

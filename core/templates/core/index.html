@@ -105,7 +105,7 @@ A seguir você pode acompanhar o número de submissões realizadas por você, se
             <tbody>
             {% for sbc in submissoes_por_exercicio %}
                 <tr class="challenge-row {{ sbc.tr_class }}">
-                    <td><a href="{% url 'exercicio' c_id=sbc.exercicio.id %}">{{ sbc.exercicio.titulo_completo }}</a></td>
+                    <td><a href="{% url 'exercicio' c_id=sbc.exercicio.id %}">{{ sbc.exercicio.especifico.titulo_completo }}</a></td>
                     <td>{{ sbc.tentativas }}</td>
                     <td>{{ sbc.success }}</td>
                     <td class="challenge-tags">

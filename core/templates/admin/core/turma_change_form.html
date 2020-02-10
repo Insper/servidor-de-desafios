@@ -39,7 +39,7 @@
             <ul id="lista-disponiveis" class="sortable-list scroll-col">
                 {% for ex in em_nenhum_bloco %}
                 <li class="exercicio sem-bloco" value="{{ ex.id }}">
-                <input class="{% for tag in ex.tags.all %}tag-{{ tag.nome }}{% endfor %}" type="checkbox" id="ex-{{ ex.id }}">
+                <input class="{% for tag in ex.tags.all %} tag-{{ tag.nome }}{% endfor %}" type="checkbox" id="ex-{{ ex.id }}">
                 <label for="ex-{{ ex.id }}">{{ ex.titulo_completo }}</label>
                 {% for tag in ex.tags.all %}
                 <label class="tag {{ tag_classes|get_item:tag.nome }}">{{ tag }}</label>
