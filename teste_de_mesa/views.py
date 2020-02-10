@@ -103,8 +103,8 @@ def verifica_memoria(request, gabarito, passo_atual_i):
     passo_atual = gabarito[passo_atual_i]
     resposta = extrai_memoria(request.POST)
     esperado = passo_atual.name_dicts
-    memcomp = cr.verifica_memorias(resposta, esperado)
-    return memcomp.sucesso, memcomp.mensagens, resposta
+    sucesso, mensagens = cr.verifica_memorias(resposta, esperado)
+    return sucesso, mensagens, resposta
 
 
 def verifica_terminal(request, gabarito, passo_atual_i):
