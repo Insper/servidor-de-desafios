@@ -159,8 +159,8 @@ class TurmaAdmin(admin.ModelAdmin):
         obj.save()
 
     def save_model(self, request, obj, form, change):
-        self.adiciona_alunos(form.cleaned_data.get('arquivo_alunos'), obj)
         super().save_model(request, obj, form, change)
+        self.adiciona_alunos(form.cleaned_data.get('arquivo_alunos'), obj)
         exercicios = {e.id: e for e in Exercicio.objects.publicados()}
         # Sempre deletar todos os exercícios programados anteriores (dessa turma),
         # pois não queremos guardar o histórico (é só lixo)

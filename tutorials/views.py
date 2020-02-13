@@ -40,8 +40,6 @@ def tutorial(request, tutorial, ctx):
         slides) - 1 else None
     ctx['mostrar_tudo'] = (slide_i == -1)
 
-    print(ctx)
-
     if tutorial:
         try:
             acesso = AcessoAoTutorial.objects.get(tutorial=tutorial,
