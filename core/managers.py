@@ -44,13 +44,20 @@ class ExercicioProgramadoQuerySet(models.QuerySet):
         if usuario.is_staff:
             return self
         turmas_ids = [t.id for t in usuario.turmas_atuais()]
+        turmas_liberadas_ids = [
+            t.id for t in usuario.turmas_atuais_liberadas()
+        ]
         agora = timezone.now()
         hoje = agora.date()
         q_inicio = models.Q(inicio__isnull=True) | models.Q(inicio__lte=hoje)
         q_fim = models.Q(fim__isnull=True) | models.Q(fim__gt=hoje)
-        return self.filter(q_inicio & q_fim,
-                           turma__id__in=turmas_ids,
-                           exercicio__publicado=True)
+        exercicios_atuais = self.filter(q_inicio & q_fim,
+                                        turma__id__in=turmas_ids,
+                                        exercicio__publicado=True)
+        exercicios_liberados = self.filter(
+            turma__id__in=turmas_liberadas_ids,
+            exercicio__publicado=True).exclude(prova__isnull=False)
+        return exercicios_atuais.union(exercicios_liberados)
 
 
 ExercicioProgramadoManager = ExercicioProgramadoQuerySet.as_manager

@@ -94,29 +94,28 @@ except:
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+DATABASES = {}
 try:
     with open(str(Path(BASE_DIR) / '.db_credentials')) as f:
         db_credentials = json.load(f)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': db_credentials['db'],
-            'USER': db_credentials['user'],
-            'PASSWORD': db_credentials['password'],
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': db_credentials['db'],
+        'USER': db_credentials['user'],
+        'PASSWORD': db_credentials['password'],
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 except Exception as e:
     print(
         'Using sqlite3. If you want to use PostgreSQL make sure that .db_credentials exists in this project\'s root folder and the keys are correct.',
         file=sys.stderr)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+if 'test' in sys.argv:
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

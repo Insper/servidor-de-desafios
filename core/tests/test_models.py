@@ -2,7 +2,7 @@ import os
 from django.test import TestCase
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-from core.models import Usuario, Turma, Matricula, RespostaExProgramacao, ExercicioDeProgramacao, Prova, InteracaoUsarioExercicio
+from core.models import Usuario, Turma, Matricula, RespostaExProgramacao, ExercicioDeProgramacao, Prova, InteracaoUsarioExercicio, ExercicioProgramado
 from core.choices import Resultado
 from core.date_utils import *
 from .factories import *
@@ -195,6 +195,59 @@ class RespostaExProgramacaoTestCase(TestCase):
             self.assertEqual(c, epd[d.date()])
 
     # TODO A partir da função RespostaExProgramacaoManager.ultima_submissao não tem testes
+
+
+class ExercicioProgramadoTestCase(TestCase):
+    def setUp(self):
+        self.usuario_staff = cria_staff()
+        self.aluno = cria_aluno(1)
+        self.aluno_liberado = cria_aluno(2)
+        self.turma = cria_turma_atual()
+        self.matricula_staff = cria_matricula(self.usuario_staff, self.turma)
+        self.matricula_aluno = cria_matricula(self.aluno, self.turma)
+        self.matricula_aluno_liberado = cria_matricula(self.aluno_liberado,
+                                                       self.turma, True)
+        self.exercicio_atual = cria_exercicio_programado_atual(
+            cria_exercicio(), self.turma)
+        self.exercicio_passado = cria_exercicio_programado_passado(
+            cria_exercicio(), self.turma)
+        self.exercicio_futuro = cria_exercicio_programado_futuro(
+            cria_exercicio(), self.turma)
+        self.exercicio_prova_futura = cria_exercicio_programado_futuro(
+            cria_exercicio(), self.turma)
+        self.exercicio_prova_atual = cria_exercicio_programado_atual(
+            cria_exercicio(), self.turma)
+        self.prova_atual = cria_prova_atual(
+            self.turma, exercicios=[self.exercicio_prova_atual])
+        self.prova_futura = cria_prova_futura(
+            self.turma, exercicios=[self.exercicio_prova_futura])
+
+    def test_lista_todos_para_staff(self):
+        exercicios_disponiveis = ExercicioProgramado.objects.disponiveis_para(
+            self.usuario_staff)
+        self.assertTrue(self.exercicio_atual in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_passado in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_futuro in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_prova_futura in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_prova_atual in exercicios_disponiveis)
+
+    def test_lista_todos_para_aluno(self):
+        exercicios_disponiveis = ExercicioProgramado.objects.disponiveis_para(
+            self.aluno)
+        self.assertTrue(self.exercicio_atual in exercicios_disponiveis)
+        self.assertFalse(self.exercicio_passado in exercicios_disponiveis)
+        self.assertFalse(self.exercicio_futuro in exercicios_disponiveis)
+        self.assertFalse(self.exercicio_prova_futura in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_prova_atual in exercicios_disponiveis)
+
+    def test_lista_todos_para_aluno(self):
+        exercicios_disponiveis = ExercicioProgramado.objects.disponiveis_para(
+            self.aluno_liberado)
+        self.assertTrue(self.exercicio_atual in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_passado in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_futuro in exercicios_disponiveis)
+        self.assertFalse(self.exercicio_prova_futura in exercicios_disponiveis)
+        self.assertTrue(self.exercicio_prova_atual in exercicios_disponiveis)
 
 
 class ProvaTestCase(TestCase):

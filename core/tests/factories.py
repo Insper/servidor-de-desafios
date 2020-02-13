@@ -1,15 +1,22 @@
 from django.core.files import File
 from unittest import mock
 
-from core.models import Usuario, Turma, Matricula, RespostaExProgramacao, ExercicioDeProgramacao, Prova
+from core.models import Usuario, Turma, Matricula, RespostaExProgramacao, ExercicioDeProgramacao, ExercicioProgramado, Prova
 from core.choices import Resultado
 from core.date_utils import *
 
 
-def cria_aluno(i):
+def cria_aluno(i=0):
     return Usuario.objects.create_user(username='aluno{0}'.format(i),
                                        email='aluno{0}@email.com'.format(i),
                                        password='top_secret{0}'.format(i))
+
+
+def cria_staff(i=0):
+    return Usuario.objects.create_superuser(
+        username='staff{0}'.format(i),
+        email='staff{0}@email.com'.format(i),
+        password='top_secret{0}'.format(i))
 
 
 def cria_turma(nome='', inicio=None, fim=None):
@@ -22,8 +29,10 @@ def cria_turma_atual(nome=''):
     return cria_turma(nome, inicio, fim)
 
 
-def cria_matricula(aluno, turma):
-    return Matricula.objects.create(aluno=aluno, turma=turma)
+def cria_matricula(aluno, turma, exercicios_liberados=False):
+    return Matricula.objects.create(aluno=aluno,
+                                    turma=turma,
+                                    exercicios_liberados=exercicios_liberados)
 
 
 def cria_arquivo_teste():
@@ -41,6 +50,31 @@ def cria_exercicio(titulo='Hello World',
                                                  testes=cria_arquivo_teste())
 
 
+def cria_exercicio_programado(exercicio, turma, inicio, fim):
+    return ExercicioProgramado.objects.create(exercicio=exercicio,
+                                              turma=turma,
+                                              inicio=inicio,
+                                              fim=fim)
+
+
+def cria_exercicio_programado_atual(exercicio, turma):
+    inicio = tz_delta(months=-2)
+    fim = tz_delta(months=2)
+    return cria_exercicio_programado(exercicio, turma, inicio, fim)
+
+
+def cria_exercicio_programado_passado(exercicio, turma):
+    inicio = tz_delta(months=-2)
+    fim = tz_delta(months=-1)
+    return cria_exercicio_programado(exercicio, turma, inicio, fim)
+
+
+def cria_exercicio_programado_futuro(exercicio, turma):
+    inicio = tz_delta(months=1)
+    fim = tz_delta(months=2)
+    return cria_exercicio_programado(exercicio, turma, inicio, fim)
+
+
 def cria_resposta(autor,
                   exercicio,
                   resultado=Resultado.OK,
@@ -55,3 +89,42 @@ def cria_resposta(autor,
                                                         resultado=resultado,
                                                         deletado=deletado)
     return resposta
+
+
+def cria_prova(inicio,
+               fim,
+               turma,
+               titulo='',
+               descricao='',
+               slug='prova',
+               exercicios=None):
+    prova = Prova.objects.create(inicio=inicio,
+                                 fim=fim,
+                                 turma=turma,
+                                 titulo=titulo,
+                                 descricao=descricao,
+                                 slug=slug)
+    if exercicios:
+        prova.exercicios.add(*exercicios)
+        prova.save()
+    return prova
+
+
+def cria_prova_atual(turma,
+                     titulo='',
+                     descricao='',
+                     slug='prova',
+                     exercicios=None):
+    inicio = tz_delta(months=-2)
+    fim = tz_delta(months=2)
+    return cria_prova(inicio, fim, turma, titulo, descricao, slug, exercicios)
+
+
+def cria_prova_futura(turma,
+                      titulo='',
+                      descricao='',
+                      slug='prova',
+                      exercicios=None):
+    inicio = tz_delta(months=1)
+    fim = tz_delta(months=2)
+    return cria_prova(inicio, fim, turma, titulo, descricao, slug, exercicios)
