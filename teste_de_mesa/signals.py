@@ -30,7 +30,7 @@ def post_resposta_save(sender, instance, created, raw, using, update_fields,
     if instance.resultado == Resultado.OK:
         interacao_passo.melhor_resultado = Resultado.OK
         if passo == len(exercicio.especifico().gabarito_list) - 1:
-            interacao_passo.melhor_resultado = Resultado.OK
+            interacao.melhor_resultado = Resultado.OK
     interacao.ultima_submissao = instance
     interacao_passo.ultima_submissao = instance
     interacao.save()
