@@ -60,6 +60,8 @@ def exercicio_key(exercicios_programados):
         eid = exercicio.id
         try:
             inicio = exercicios_programados[eid].inicio
+            if inicio is None:
+                inicio = inicio_do_universo
         except:
             inicio = inicio_do_universo
         return inicio, eid
