@@ -101,7 +101,7 @@ class InteracaoVisivelParaUsuario:
         if self.interacao is None or self.inicializado:
             return
         try:
-            if self.interacao.ultima_submissao.respostaexprogramacao.deletado:
+            if self.interacao.ultima_submissao and self.interacao.ultima_submissao.respostaexprogramacao.deletado:
                 respostas = RespostaExProgramacao.objects.filter(
                     exercicio=self.exercicio,
                     autor=self.interacao.ultima_submissao.autor,
