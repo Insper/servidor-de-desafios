@@ -3,49 +3,32 @@
 {% load static %}
 {% load utils %}
 {% block extra-js %}
+{{ block.super }}
     <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+
+{% block extra-css %}
+{{ block.super }}
+    <link href="{%  static 'css/index.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block pagecontent %}
 
-<h1>Acompanhamento</h1>
-
-<h2>Progresso</h2>
-
-<p>
-A seguir você pode acompanhar o seu progresso nos desafios por tags.
-</p>
-
-<div >
-    <div>
-        <link rel="stylesheet" type="text/css" href="./static/css/loading-bar.css"/>
-        <script type="text/javascript" src="/static/js/loading-bar.js"></script>
-        <div style="width: 100%; display: table;"><div style="display: table-row"></div>
-        {% for t in prog_tags %}
-        {% with tag=prog_tags|get_item:t %}
-        {% with pct=tag|get_item:'pct' feitos=tag|get_item:'feitos' total=tag|get_item:'total' %}
-        {% if forloop.counter0|divisibleby:"4" %}
-            </div>
-            <div style="display: table-row">
-            <div style="display: table-cell;">
-            <div class="ldBar label-center" style="width:40%;height:40%;margin:auto"; align=left; data-value={{pct}} data-preset="circle"></div><div style=" text-align: center;">{{t}}: {{feitos}}/{{total}}</div></div>
-        {% else %}
-            <div style="display: table-cell;">
-            <div class="ldBar label-center" style="width:40%;height:40%;margin:auto"; align=left; data-value={{pct}} data-preset="circle"></div><div style=" text-align: center;">{{t}}: {{feitos}}/{{total}}</div></div>
-        {% endif %}
-        {% endwith %}
-        {% endwith %}
-        {% endfor %}
-    </div>
-</div>
-
 <h1>Exercícios</h1>
 
 <div>
-{% for tag in todas_tags %}
-    <a href="/?tag={{ tag }}" class="challenge-tag badge">{{ tag }}</a>
+{% for t in todas_tags %}
+    {% with tag=prog_tags|get_item:t %}
+    {% with pct=tag|get_item:'pct' feitos=tag|get_item:'feitos' total=tag|get_item:'total' %}
+    <a href="{% if t|stringformat:'s' != 'todos' %}/?tag={{ t }}{% else %}/{% endif %}" class="challenge-tag progress-badge {% if t|stringformat:'s' == tag_ativada %}bg-primary{% else %}bg-secondary{% endif %}">
+        <div class="progress-bar progress-bar-striped {% if t|stringformat:'s' == tag_ativada %}bg-info{% else %}bg-dark{% endif %}" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: {{pct}}%;">
+            <span class="progress-bar-text">{{ t }}</span>
+            <span class="sr-only">{{t}}: {{feitos}}/{{total}}</span>
+        </div>
+    </a>
+    {% endwith %}
+    {% endwith %}
 {% endfor %}
-    <a href="/" class="challenge-tag badge">all</a>
 </div>
 
 {% if submissoes_por_exercicio %}

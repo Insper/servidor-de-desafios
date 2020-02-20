@@ -3,7 +3,7 @@ var enabledClass = 'badge-primary';
 var disabledClass = 'badge-secondary';
 
 function updateVisible() {
-    $('.challenge-tag').each(function(index, element) {
+    $('.challenge-tag').each(function (index, element) {
         $(element).removeClass(enabledClass);
         $(element).removeClass(disabledClass);
         if (visibleTags.indexOf(element.innerHTML) < 0) {
@@ -13,10 +13,10 @@ function updateVisible() {
             $(element).addClass(enabledClass);
         }
     });
-    $('.challenge-row').each(function(index, element) {
+    $('.challenge-row').each(function (index, element) {
         var tags = $(element).find('.challenge-tags').children();
         var visible = true;
-        if(visibleTags[0] != ["all"]){
+        if (visibleTags[0] != ["todos"]) {
             visible = false;
             for (var i = 0; i < tags.length; i++) {
                 if (visibleTags.indexOf(tags[i].innerHTML) >= 0) {
@@ -30,8 +30,8 @@ function updateVisible() {
     });
 }
 
-$(document).ready(function() {
-    $('.filter-challenge-tag').click(function(event) {
+$(document).ready(function () {
+    $('.filter-challenge-tag').click(function (event) {
         event.preventDefault();
         var tagName = this.innerHTML;
         var index = visibleTags.indexOf(tagName);
@@ -49,8 +49,8 @@ $(document).ready(function() {
     visibleTags = [];
     if (tag != null) visibleTags = [tag];
     else {
-        visibleTags = ["all"];
-        $('.filter-challenge-tag').each(function(index, element) {
+        visibleTags = ["todos"];
+        $('.filter-challenge-tag').each(function (index, element) {
             visibleTags.push(element.innerHTML);
         });
     }

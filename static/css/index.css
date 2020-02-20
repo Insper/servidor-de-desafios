@@ -1,0 +1,11 @@
+.progress-badge {
+    display: inline-block;
+    height: 1rem;
+    overflow: hidden;
+    font-size: .75rem;
+    border-radius: .25rem;
+}
+
+.progress-bar-text {
+    margin: 0 10px;
+}

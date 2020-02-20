@@ -35,6 +35,7 @@ FEITOS = 'feitos'
 PCT = 'pct'
 ERROR_COUNTER = 'error_counter'
 RESULTADOS = 'resultados'
+TAG_ATIVADA = 'tag_ativada'
 
 
 def view_do_modelo(modelo):
@@ -142,7 +143,9 @@ def interacoes_agrupadas_por(usuario, exercicios):
         for ex in exercicios
     }
     for interacao in interacoes:
-        exercicio2submissao[interacao.exercicio.id].interacao = interacao
+        ex = interacao.exercicio
+        exercicio2submissao.setdefault(
+            ex.id, InteracaoVisivelParaUsuario(ex)).interacao = interacao
     return sorted(exercicio2submissao.values(), key=lambda i: i.exercicio.id)
 
 
@@ -157,10 +160,18 @@ def index(request):
         TODAS_TAGS: [
             tag for tag in Tag.objects.all()
             if 'prova' not in str(tag) and tag.exercicio_set.count()
-        ],
+        ] + ['todos'],
         SHOW_NAV:
         False,
-        PROG_TAGS: {},
+        PROG_TAGS: {
+            'todos': {
+                TOTAL: 0,
+                FEITOS: 0,
+                PCT: 0
+            }
+        },
+        TAG_ATIVADA:
+        request.GET.get('tag', 'todos'),
     })
 
     for c in ctx[EXERCICIOS]:
@@ -171,6 +182,7 @@ def index(request):
                 ctx[PROG_TAGS][tag] = {TOTAL: 1, FEITOS: 0, PCT: 0}
             else:
                 ctx[PROG_TAGS][tag][TOTAL] += 1
+            ctx[PROG_TAGS]['todos'][TOTAL] += 1
 
     for spe in ctx[SUB_POR_EX]:
         if spe.tentativas == 0:
@@ -185,6 +197,10 @@ def index(request):
                     ctx[PROG_TAGS][tag][PCT] = int(
                         (ctx[PROG_TAGS][tag][FEITOS] /
                          ctx[PROG_TAGS][tag][TOTAL]) * 100)
+                    ctx[PROG_TAGS]['todos'][FEITOS] += 1
+                    ctx[PROG_TAGS]['todos'][PCT] = int(
+                        (ctx[PROG_TAGS]['todos'][FEITOS] /
+                         ctx[PROG_TAGS]['todos'][TOTAL]) * 100)
         else:
             spe.tr_class = 'table-warning'
             spe.success = 'Não'
