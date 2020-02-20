@@ -158,10 +158,6 @@ def index(request):
             tag for tag in Tag.objects.all()
             if 'prova' not in str(tag) and tag.exercicio_set.count()
         ],
-        SUB_POR_DIA:
-        submissoes.conta_exercicios_por_dia(),
-        DIAS:
-        Turma.objects.get_date_range(usuario),
         SHOW_NAV:
         False,
         PROG_TAGS: {},
