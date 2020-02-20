@@ -88,6 +88,64 @@ def cria_contexto(usuario):
     }
 
 
+class InteracaoVisivelParaUsuario:
+    def __init__(self, exercicio):
+        self.exercicio = exercicio
+        self.interacao = None
+        self.inicializado = False
+        self._tentativas = 0
+        self._melhor_resultado = Resultado.ERRO
+        self._ultima_submissao = None
+
+    def inicializa(self):
+        if self.interacao is None or self.inicializado:
+            return
+        try:
+            if self.interacao.ultima_submissao.respostaexprogramacao.deletado:
+                respostas = RespostaExProgramacao.objects.filter(
+                    exercicio=self.exercicio,
+                    autor=self.interacao.ultima_submissao.autor,
+                    deletado=False).order_by('-data_submissao')
+                self._tentativas = respostas.count()
+                if respostas.filter(resultado=Resultado.OK.value):
+                    self._melhor_resultado = Resultado.OK
+                if respostas:
+                    self._ultima_submissao = respostas[0]
+            else:
+                self._tentativas = self.interacao.tentativas
+                self._melhor_resultado = self.interacao.melhor_resultado
+                self._ultima_submissao = self.interacao.ultima_submissao
+        except RespostaExProgramacao.DoesNotExist:
+            pass
+        self.inicializado = True
+
+    @property
+    def tentativas(self):
+        self.inicializa()
+        return self._tentativas
+
+    @property
+    def melhor_resultado(self):
+        self.inicializa()
+        return self._melhor_resultado
+
+    @property
+    def ultima_submissao(self):
+        self.inicializa()
+        return self._ultima_submissao
+
+
+def interacoes_agrupadas_por(usuario, exercicios):
+    interacoes = InteracaoUsarioExercicio.objects.por(usuario)
+    exercicio2submissao = {
+        ex.id: InteracaoVisivelParaUsuario(ex)
+        for ex in exercicios
+    }
+    for interacao in interacoes:
+        exercicio2submissao[interacao.exercicio.id].interacao = interacao
+    return sorted(exercicio2submissao.values(), key=lambda i: i.exercicio.id)
+
+
 @login_required
 def index(request):
     usuario = request.user
@@ -95,8 +153,7 @@ def index(request):
     submissoes = RespostaExProgramacao.objects.por(usuario)
     ctx.update({
         SUB_POR_EX:
-        InteracaoUsarioExercicio.objects.por(usuario).agrupado_por(
-            ctx['exercicios']),
+        interacoes_agrupadas_por(usuario, ctx['exercicios']),
         TODAS_TAGS: [
             tag for tag in Tag.objects.all()
             if 'prova' not in str(tag) and tag.exercicio_set.count()
