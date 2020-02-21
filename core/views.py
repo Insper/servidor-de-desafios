@@ -101,6 +101,9 @@ class InteracaoVisivelParaUsuario:
     def inicializa(self):
         if self.interacao is None or self.inicializado:
             return
+        self._tentativas = self.interacao.tentativas
+        self._melhor_resultado = self.interacao.melhor_resultado
+        self._ultima_submissao = self.interacao.ultima_submissao
         try:
             if self.interacao.ultima_submissao and self.interacao.ultima_submissao.respostaexprogramacao.deletado:
                 respostas = RespostaExProgramacao.objects.filter(
@@ -112,10 +115,6 @@ class InteracaoVisivelParaUsuario:
                     self._melhor_resultado = Resultado.OK
                 if respostas:
                     self._ultima_submissao = respostas[0]
-            else:
-                self._tentativas = self.interacao.tentativas
-                self._melhor_resultado = self.interacao.melhor_resultado
-                self._ultima_submissao = self.interacao.ultima_submissao
         except RespostaExProgramacao.DoesNotExist:
             pass
         self.inicializado = True
