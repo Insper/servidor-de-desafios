@@ -10,6 +10,20 @@ from .factories import *
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
+class UsuarioTestCase(TestCase):
+    def setUp(self):
+        self.aluno = cria_aluno(1)
+        self.aluno_liberado = cria_aluno(2)
+        self.turma = cria_turma_atual()
+        self.matricula_aluno = cria_matricula(self.aluno, self.turma)
+        self.matricula_aluno_liberado = cria_matricula(self.aluno_liberado,
+                                                       self.turma, True)
+
+    def test_turmas_atuais_liberadas(self):
+        self.assertEqual(0, len(self.aluno.turmas_atuais_liberadas()))
+        self.assertEqual(1, len(self.aluno_liberado.turmas_atuais_liberadas()))
+
+
 class TurmaTestCase(TestCase):
     def test_alunos_matriculados(self):
         anos = sorted(list(range(-1, 2)) * 2)

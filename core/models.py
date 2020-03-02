@@ -19,8 +19,7 @@ class Usuario(AbstractUser):
         return Turma.objects.atuais().do_aluno(self)
 
     def turmas_atuais_liberadas(self):
-        return Turma.objects.atuais().do_aluno(self).filter(
-            matricula__exercicios_liberados=True)
+        return Turma.objects.atuais().do_aluno(self).exercicios_liberados(self)
 
     def exercicios_programados_disponiveis(self):
         return ExercicioProgramado.objects.disponiveis_para(self)

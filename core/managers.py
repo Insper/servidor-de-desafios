@@ -177,6 +177,11 @@ class TurmaQuerySet(models.QuerySet):
         q_fim = models.Q(fim__isnull=True) | models.Q(fim__gt=hoje)
         return self.filter(q_inicio & q_fim)
 
+    def exercicios_liberados(self, aluno):
+        return self.filter(
+            models.Q(matricula__exercicios_liberados=True)
+            & models.Q(matricula__aluno=aluno))
+
 
 TurmaManager = TurmaQuerySet.as_manager
 
