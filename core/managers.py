@@ -196,6 +196,13 @@ class InteracaoUsarioExercicioQuerySet(models.QuerySet):
                 usuario2interacao[uid][eid] = interacao
         return usuario2interacao
 
+    def total_por_usuario(self, usuarios):
+        uids = [u.id for u in usuarios]
+        total = defaultdict(lambda: 0)
+        for interacao in self.filter(usuario__id__in=usuarios):
+            total[interacao.usuario] += interacao.tentativas
+        return total
+
     def por(self, usuario):
         return self.filter(usuario=usuario)
 

@@ -20,6 +20,7 @@
     <h2>Tipo de Relatório</h2>
     <ul>
         <li {% if current_view == '/' %}class="selected"{% endif %}><a href="" title="Overall">Geral</a></li>
+        <li {% if current_view == '/total-por-aluno' %}class="selected"{% endif %}><a href="total-por-aluno" title="Total por Aluno">Total por Aluno</a></li>
         <li {% if current_view == '/evolucao' %}class="selected"{% endif %}><a href="evolucao" title="Evolução">Evolução</a></li>
         <li {% if current_view == '/tutoriais' %}class="selected"{% endif %}><a href="tutoriais" title="Tutoriais">Tutoriais</a></li>
         <li {% if current_view == '/exercicios-de-programacao' %}class="selected"{% endif %}><a href="exercicios-de-programacao" title="Exercícios de Programação">Exercícios de Programação</a></li>

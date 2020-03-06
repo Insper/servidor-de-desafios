@@ -45,6 +45,16 @@ def index(request):
     return render(request, 'relatorio/index.html', ctx)
 
 
+@staff_member_required
+def total_por_aluno(request):
+    ctx = cria_contexto(request)
+    usuarios = ctx['usuarios']
+    ctx['exercicios'] = ExercicioDeProgramacao.objects.all()
+    ctx['total_interacoes'] = InteracaoUsarioExercicio.objects.total_por_usuario(
+        usuarios).values()
+    return render(request, 'relatorio/total_por_aluno.html', ctx)
+
+
 def conta_subissoes_por_usuario_e_data(submissoes):
     fmt = '%Y-%m-%d'
     datas = [sub.data_submissao for sub in submissoes]
@@ -153,7 +163,6 @@ def csv_str(header, values):
 
 @staff_member_required
 def download(request):
-    # TODO ESSA FUNÇÃO ESTÁ QUEBRADA. ARRUMAR USANDO A NOVA ARQUITETURA
     # Carrega dados
     usuarios = Usuario.objects.filter(is_staff=False).exclude(
         username='aluno.teste')
