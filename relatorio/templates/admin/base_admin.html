@@ -10,6 +10,7 @@
 {% block extrahead %}
 {{ block.super }}
 {% block extra-js %}
+<script src="{% static 'js/report/report.js' %}"></script>
 {% endblock %}
 {% endblock %}
 
@@ -37,5 +38,7 @@
 
     </ul>
 
+    <h3>Mostrar nomes</h3>
+    <ul><li><input type="checkbox" id="mostrar-nomes" checked><label for="mostrar-nomes">Mostrar</label></li></ul>
 </div>
 {% endblock %}

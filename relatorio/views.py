@@ -18,6 +18,7 @@ def cria_contexto(request):
     usuarios = Usuario.objects.filter(is_staff=False).exclude(
         username='aluno.teste')
     turma_filter = request.GET.get('turma', '')
+    anonimo = request.GET.get('anonimo', '')
 
     if turma_filter:
         usuarios = usuarios.filter(matricula__turma__id=turma_filter)

@@ -15,3 +15,11 @@
 .table-div {
     overflow-x: scroll;
 }
+
+.esconde {
+    display: none;
+}
+
+.mostra {
+    display: inherit;
+}

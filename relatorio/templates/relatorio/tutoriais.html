@@ -11,7 +11,7 @@
 <table class="table table-striped">
     <thead>
       <tr>
-        <th>Usuário</th>
+        <th class="nome-aluno">Usuário</th>
         {% for tutorial in tutoriais %}
         <th><a href="{% url 'exercicio' c_id=tutorial.id %}">{{ tutorial.id }}</a></th>
         {% endfor %}
@@ -20,7 +20,7 @@
     <tbody>
       {% for usr in usuarios %}
       <tr>
-        <td>{{ usr|smartname }} ({{ usr.username }})</td>
+        <td class="nome-aluno">{{ usr|smartname }} ({{ usr.username }})</td>
         {% for tutorial in tutoriais %}
         {% with acessos=acessos_por_usuario|get_item:usr|get_item:tutorial %}
         <td class="{{ acessos|get_css_count_class }}">{{ acessos }}</td>

@@ -12,7 +12,7 @@
     <table class="table table-striped">
         <thead>
           <tr>
-            <th>Usuário</th>
+            <th class="nome-aluno">Usuário</th>
             {% for ex in exercicios %}
             <th><a href="{% url 'exercicio' c_id=ex.id %}">{{ ex.id }}</a></th>
             {% endfor %}
@@ -21,7 +21,7 @@
         <tbody>
           {% for usr in usuarios %}
           <tr>
-            <td>{{ usr|smartname }} ({{ usr.username }})</td>
+            <td class="nome-aluno">{{ usr|smartname }} ({{ usr.username }})</td>
             {% for ex in exercicios %}
             {% with interacao=interacoes|get_item:usr.id|get_item:ex.id %}
             <td class="{{ interacao|get_css_class }}">{{ interacao.tentativas }}</td>

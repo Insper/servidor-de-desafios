@@ -26,7 +26,7 @@
 <table class="table table-striped">
     <thead>
       <tr>
-        <th>Username</th>
+        <th class="nome-aluno">Username</th>
         <th>Problemas atacados</th>
         <th>Desistências</th>
         <th>Razão</th>
@@ -35,7 +35,7 @@
     <tbody>
       {% for usr in usuarios %}
       <tr>
-        <td>{{ usr|smartname }} ({{ usr.username }})</td>
+        <td class="nome-aluno">{{ usr|smartname }} ({{ usr.username }})</td>
         <td>{{ tem_tentativa|get_item:usr }}</td>
         <td>{{ desistiu|get_item:usr }}</td>
         <td>{{ razao|get_item:usr }}</td>
