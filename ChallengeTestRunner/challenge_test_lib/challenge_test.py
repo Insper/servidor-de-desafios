@@ -4,24 +4,28 @@ from collections import namedtuple
 import signal
 from contextlib import contextmanager
 import builtins
+from itertools import cycle
 import traceback
 import imp
-
+from challenge_test_lib.mock_import import register_module, deactivate_custom_imports
 
 # This might be useful someday: https://docs.python.org/3/library/unittest.mock.html#mock-open
 
-
-TestResults = namedtuple('TestResults', 'result_obj,failure_msgs,success,stack_traces')
+TestResults = namedtuple('TestResults',
+                         'result_obj,failure_msgs,success,stack_traces')
 START_SEP = '<|><'
 END_SEP = '><|>'
 TIME_LIMIT_EXCEEDED = 'Tempo limite excedido'
+SYNTAX_ERROR = 'Erro de sintaxe (código Python inválido)'
 DEFAULT_MSG = 'Não funcionou para algum teste'
+FILE_STR = 'File "<string>", '
 
 
 def error_message(msg=''):
     def anotate(fun):
         fun.msg = msg
         return fun
+
     return anotate
 
 
@@ -30,51 +34,56 @@ def get_message(test_case):
     return getattr(test_method, 'msg', DEFAULT_MSG)
 
 
+def format_message(msg):
+    if not msg:
+        return ''
+    return START_SEP + msg + END_SEP
+
+
 def run_tests(challenge_code, test_code, challenge_name):
     try:
-        if challenge_name:
-            python_input = builtins.input
-            try:
-                builtins.input = ForbiddenInput()
-                exec(challenge_code, locals())
-            except ForbiddenInputError:
-                return TestResults(None, ['Não deveria usar input neste código.'], False, ['Esse desafio não espera nenhuma chamada da função input. Você pode utilizá-la em seu código para testes, mas envie o código sem o input para o servidor.'])
-            finally:
-                builtins.input = python_input
         # test_code MUST define a class named TestCase
         # It should be ok to use globals here because this code is provided by the instructors, not students
         exec(test_code, globals())
 
         # Setup
+        if challenge_name:
+            TestCase.CHALLENGE_FUN_NAME = challenge_name
         if TestCase.CHALLENGE_CODE is None:
             TestCase.CHALLENGE_CODE = challenge_code
-        if TestCase.CHALLENGE_FUN is None and challenge_name:
-            try:
-                TestCase.CHALLENGE_FUN = eval(challenge_name)
-            except NameError:
-                return TestResults(None, ['Função não encontrada. Sua função deveria se chamar {}'.format(challenge_name)], False, ['Função inexistente ou com o nome errado.'])
 
         stream = StringIO()
 
         runner = unittest.TextTestRunner(stream=stream)
         result = runner.run(unittest.makeSuite(TestCase))
         stream.seek(0)
-        failure_msgs = []
-        stack_traces = []
+        msgs = []
         success = result.wasSuccessful()
         for failure in result.failures + result.errors:
             st = failure[1]
             fm = get_message(failure[0])
-            stack_traces.append(st)
             if START_SEP in st and END_SEP in st:
                 fm = st[st.find(START_SEP) + len(START_SEP):st.find(END_SEP)]
             elif 'TimeoutError' in st:
                 fm = TIME_LIMIT_EXCEEDED
-            failure_msgs.append(fm)
+            elif 'SyntaxError: invalid syntax' in st:
+                fm = SYNTAX_ERROR
+                if FILE_STR in st:
+                    st = st[st.rindex(FILE_STR) + len(FILE_STR):]
+            if 'PriorityError' in st:
+                st = st[st.rindex('PriorityError'):st.index(START_SEP)]
+            if (fm, st) not in msgs:
+                msgs.append((fm, st))
             success = False
+        # Filter repeated messages
+        if msgs:
+            failure_msgs, stack_traces = zip(*msgs)
+        else:
+            failure_msgs, stack_traces = [], []
         return TestResults(result, failure_msgs, success, stack_traces)
     except:
-        return TestResults(None, ['Código com erros de sintaxe'], False, [traceback.format_exc()])
+        return TestResults(None, ['Código com erros de sintaxe'], False,
+                           [traceback.format_exc()])
 
 
 @contextmanager
@@ -111,12 +120,15 @@ def timeout_decorator(time):
         def timed_fun(*args, **kwargs):
             with timeout(time):
                 fun(*args, **kwargs)
+
         # Copy attributes from fun to timed_fun
         for attr in dir(fun):
             if not attr.startswith('__'):
                 setattr(timed_fun, attr, getattr(fun, attr))
         return timed_fun
+
     return anotate
+
 
 class MockFunction:
     def __init__(self):
@@ -138,8 +150,34 @@ class MockPrint(MockFunction):
 
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
-        self.printed.append(' '.join([str(arg) for arg in args]))  # There is probably a more reliable way to do this...
-        self.python_print(*args, ** kwargs)
+        self.printed.append(' '.join([
+            str(arg) for arg in args
+        ]))  # There is probably a more reliable way to do this...
+        self.python_print(*args, **kwargs)
+
+
+class MockRandint(MockFunction):
+    def __init__(self):
+        super().__init__()
+        self._numbers = {}
+
+    def __setitem__(self, key, value):
+        self._numbers[key] = iter(cycle(value))
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        if args in self._numbers:
+            return next(self._numbers[args])
+        else:
+            raise PriorityError(
+                '',
+                'Não deveria executar o randint com os argumentos {}'.format(
+                    ','.join(str(arg) for arg in args)))
+
+
+class PriorityError(AssertionError):
+    def __init__(self, msg, formated_msg):
+        super().__init__(msg + format_message(formated_msg))
 
 
 class ForbiddenInputError(AssertionError):
@@ -177,7 +215,15 @@ class MockOpen(MockFunction):
         self.files = {}
         self._opened = []
 
-    def __call__(self, file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None):
+    def __call__(self,
+                 file,
+                 mode='r',
+                 buffering=-1,
+                 encoding=None,
+                 errors=None,
+                 newline=None,
+                 closefd=True,
+                 opener=None):
         args = [file]
         kwargs = {
             'mode': mode,
@@ -190,7 +236,8 @@ class MockOpen(MockFunction):
         }
         super().__call__(*args, **kwargs)
         if file not in self.files and 'r' in mode:
-            raise FileNotFoundError("[Errno 2] No such file or directory: '{0}'".format(file))
+            raise FileNotFoundError(
+                "[Errno 2] No such file or directory: '{0}'".format(file))
         outfile = MockFile(file, self.files.get(file, ''), self, **kwargs)
         self._opened.append(outfile)
         return outfile
@@ -228,6 +275,7 @@ class MockFile(StringIO):
 class TestCaseWrapper(unittest.TestCase):
     CHALLENGE_CODE = None
     CHALLENGE_FUN = None
+    CHALLENGE_FUN_NAME = None
     TIMEOUT = 3
 
     @classmethod
@@ -238,6 +286,7 @@ class TestCaseWrapper(unittest.TestCase):
                 fun = getattr(cls, attr)
                 fun = timeout_decorator(cls.TIMEOUT)(fun)
                 setattr(cls, attr, fun)
+        cls.func_loading_errors = []
 
     def setUp(self):
         # Replace builtin print
@@ -255,6 +304,10 @@ class TestCaseWrapper(unittest.TestCase):
         self.mock_open = MockOpen()
         builtins.open = self.mock_open
 
+        # Replace random module
+        self.mock_random = register_module('random',
+                                           {'randint': MockRandint()})
+
     def tearDown(self):
         # Restore builtin print
         builtins.print = self.python_print
@@ -264,6 +317,9 @@ class TestCaseWrapper(unittest.TestCase):
 
         # Restore builtin open
         builtins.open = self.python_open
+
+        # Restore random module
+        deactivate_custom_imports()
 
     @property
     def module(self):
@@ -277,24 +333,70 @@ class TestCaseWrapper(unittest.TestCase):
 
     def challenge_fun(self, *args, **kwargs):
         # We need the __class__ because in that way it doesn't pass self as argument to the function
+        if not self.__class__.CHALLENGE_FUN:
+            python_input = builtins.input
+            try:
+                builtins.input = ForbiddenInput()
+                exec(self.__class__.CHALLENGE_CODE, locals())
+                if self.__class__.CHALLENGE_FUN_NAME:
+                    self.__class__.CHALLENGE_FUN = eval(
+                        self.__class__.CHALLENGE_FUN_NAME)
+            except ForbiddenInputError:
+                self.func_loading_errors.append(
+                    PriorityError(
+                        'Esse desafio não espera nenhuma chamada da função input. Você pode utilizá-la em seu código para testes, mas envie o código sem o input para o servidor.',
+                        'Não deveria usar input neste código.'))
+            except NameError:
+                self.func_loading_errors.append(
+                    PriorityError(
+                        'Função inexistente ou com o nome errado.',
+                        'Função não encontrada. Sua função deveria se chamar {}'
+                        .format(self.__class__.CHALLENGE_FUN_NAME)))
+            finally:
+                builtins.input = python_input
+        for err in self.func_loading_errors:
+            raise err
         return self.__class__.CHALLENGE_FUN(*args, **kwargs)
 
     def assert_printed(self, value, index=None, msg=None):
         str_value = str(value)
-        if index is not None and str_value not in self.mock_print.printed[index]:
-            standard_msg = 'Value not found in print of index {index}'.format(index=index)
-            msg = self._formatMessage(msg, standard_msg)
+        if index is not None and str_value not in self.mock_print.printed[
+                index]:
+            if not msg:
+                msg = 'Value not found in print of index {index}'.format(
+                    index=index)
+            msg = self._formatMessage(msg)
             self.fail(msg)
 
-        contains_str = any(str_value in printed for printed
-                           in self.mock_print.printed)
+        contains_str = any(str_value in printed
+                           for printed in self.mock_print.printed)
 
         if not contains_str:
-            msg = self._formatMessage(msg, 'Value not found in printed strings')
+            if not msg:
+                msg = 'Value not found in printed strings'
+            msg = self._formatMessage(msg)
             self.fail(msg)
 
-    def _formatMessage(self, msg, standardMsg):
+    def assert_printed_all(self, values, msg=None):
+        str_values = [str(value) for value in values]
+        i = 0
+        j = 0
+        while i < len(self.mock_print.printed) and j < len(str_values):
+            printed = self.mock_print.printed[i]
+            str_value = str_values[j]
+
+            if str_value in printed:
+                j += 1
+            else:
+                i += 1
+
+        if j < len(str_values):
+            if not msg:
+                msg = 'Value {0} not found in printed strings'.format(
+                    str_values[j])
+            msg = self._formatMessage(msg)
+            self.fail(msg)
+
+    def _formatMessage(self, msg, standardMsg=None):
         # Include message separators in all messages and ignore standardMsg
-        if not msg:
-            return ''
-        return START_SEP + msg + END_SEP
+        return format_message(msg)
