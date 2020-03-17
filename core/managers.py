@@ -20,7 +20,9 @@ class ExercicioQuerySet(models.QuerySet):
             return self
         ids = usuario.exercicios_programados_disponiveis().values_list(
             'exercicio', flat=True)
-        return self.filter(id__in=ids)
+        ex_prova_ids = usuario.provas_disponiveis().values_list('exercicios',
+                                                                flat=True)
+        return self.filter(id__in=ids.union(ex_prova_ids))
 
     def disponivel_para(self, exercicio, usuario):
         return exercicio in self.disponiveis_para(usuario)
@@ -54,9 +56,9 @@ class ExercicioProgramadoQuerySet(models.QuerySet):
         exercicios_atuais = self.filter(q_inicio & q_fim,
                                         turma__id__in=turmas_ids,
                                         exercicio__publicado=True)
-        exercicios_liberados = self.filter(
-            turma__id__in=turmas_liberadas_ids,
-            exercicio__publicado=True).exclude(prova__isnull=False)
+        exercicios_liberados = self.filter(q_fim,
+                                           turma__id__in=turmas_liberadas_ids,
+                                           exercicio__publicado=True)
         return exercicios_atuais.union(exercicios_liberados)
 
 

@@ -227,41 +227,75 @@ class ExercicioProgramadoTestCase(TestCase):
             cria_exercicio(), self.turma)
         self.exercicio_futuro = cria_exercicio_programado_futuro(
             cria_exercicio(), self.turma)
-        self.exercicio_prova_futura = cria_exercicio_programado_futuro(
-            cria_exercicio(), self.turma)
-        self.exercicio_prova_atual = cria_exercicio_programado_atual(
-            cria_exercicio(), self.turma)
+        self.exercicio_prova_futura = cria_exercicio()
+        self.exercicio_prova_atual = cria_exercicio()
         self.prova_atual = cria_prova_atual(
             self.turma, exercicios=[self.exercicio_prova_atual])
         self.prova_futura = cria_prova_futura(
             self.turma, exercicios=[self.exercicio_prova_futura])
 
     def test_lista_todos_para_staff(self):
-        exercicios_disponiveis = ExercicioProgramado.objects.disponiveis_para(
+        exercicios_programados_disponiveis = ExercicioProgramado.objects.disponiveis_para(
             self.usuario_staff)
-        self.assertTrue(self.exercicio_atual in exercicios_disponiveis)
-        self.assertTrue(self.exercicio_passado in exercicios_disponiveis)
-        self.assertTrue(self.exercicio_futuro in exercicios_disponiveis)
-        self.assertTrue(self.exercicio_prova_futura in exercicios_disponiveis)
-        self.assertTrue(self.exercicio_prova_atual in exercicios_disponiveis)
+        exercicios_disponiveis_ids = [
+            e.id for e in self.usuario_staff.exercicios_disponiveis()
+        ]
+        self.assertTrue(
+            self.exercicio_atual in exercicios_programados_disponiveis)
+        self.assertTrue(
+            self.exercicio_passado in exercicios_programados_disponiveis)
+        self.assertTrue(
+            self.exercicio_futuro in exercicios_programados_disponiveis)
+        self.assertTrue(
+            self.exercicio_atual.exercicio.id in exercicios_disponiveis_ids)
+        self.assertTrue(
+            self.exercicio_passado.exercicio.id in exercicios_disponiveis_ids)
+        self.assertTrue(
+            self.exercicio_futuro.exercicio.id in exercicios_disponiveis_ids)
+        self.assertTrue(
+            self.exercicio_prova_futura.id in exercicios_disponiveis_ids)
+        self.assertTrue(
+            self.exercicio_prova_atual.id in exercicios_disponiveis_ids)
 
     def test_lista_todos_para_aluno(self):
         exercicios_disponiveis = ExercicioProgramado.objects.disponiveis_para(
             self.aluno)
+        exercicios_disponiveis_ids = [
+            e.id for e in self.aluno.exercicios_disponiveis()
+        ]
         self.assertTrue(self.exercicio_atual in exercicios_disponiveis)
         self.assertFalse(self.exercicio_passado in exercicios_disponiveis)
         self.assertFalse(self.exercicio_futuro in exercicios_disponiveis)
-        self.assertFalse(self.exercicio_prova_futura in exercicios_disponiveis)
-        self.assertTrue(self.exercicio_prova_atual in exercicios_disponiveis)
+        self.assertTrue(
+            self.exercicio_atual.exercicio.id in exercicios_disponiveis_ids)
+        self.assertFalse(
+            self.exercicio_passado.exercicio.id in exercicios_disponiveis_ids)
+        self.assertFalse(
+            self.exercicio_futuro.exercicio.id in exercicios_disponiveis_ids)
+        self.assertFalse(
+            self.exercicio_prova_futura.id in exercicios_disponiveis_ids)
+        self.assertTrue(
+            self.exercicio_prova_atual.id in exercicios_disponiveis_ids)
 
-    def test_lista_todos_para_aluno(self):
+    def test_lista_todos_para_aluno_liberado(self):
         exercicios_disponiveis = ExercicioProgramado.objects.disponiveis_para(
             self.aluno_liberado)
+        exercicios_disponiveis_ids = [
+            e.id for e in self.aluno_liberado.exercicios_disponiveis()
+        ]
         self.assertTrue(self.exercicio_atual in exercicios_disponiveis)
-        self.assertTrue(self.exercicio_passado in exercicios_disponiveis)
+        self.assertFalse(self.exercicio_passado in exercicios_disponiveis)
         self.assertTrue(self.exercicio_futuro in exercicios_disponiveis)
-        self.assertFalse(self.exercicio_prova_futura in exercicios_disponiveis)
-        self.assertTrue(self.exercicio_prova_atual in exercicios_disponiveis)
+        self.assertTrue(
+            self.exercicio_atual.exercicio.id in exercicios_disponiveis_ids)
+        self.assertFalse(
+            self.exercicio_passado.exercicio.id in exercicios_disponiveis_ids)
+        self.assertTrue(
+            self.exercicio_futuro.exercicio.id in exercicios_disponiveis_ids)
+        self.assertFalse(
+            self.exercicio_prova_futura.id in exercicios_disponiveis_ids)
+        self.assertTrue(
+            self.exercicio_prova_atual.id in exercicios_disponiveis_ids)
 
 
 class ProvaTestCase(TestCase):
@@ -296,8 +330,14 @@ class ProvaTestCase(TestCase):
         provas = Prova.objects.disponiveis_para(aluno_matriculado)
         self.assertTrue(prova_atual in provas)
         self.assertTrue(prova_passada not in provas)
+        provas = aluno_matriculado.provas_disponiveis()
+        self.assertTrue(prova_atual in provas)
+        self.assertTrue(prova_passada not in provas)
         # Provas do aluno não matriculado
         provas = Prova.objects.disponiveis_para(aluno_nao_matriculado)
+        self.assertTrue(prova_atual not in provas)
+        self.assertTrue(prova_passada not in provas)
+        provas = aluno_nao_matriculado.provas_disponiveis()
         self.assertTrue(prova_atual not in provas)
         self.assertTrue(prova_passada not in provas)
 

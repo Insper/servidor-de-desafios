@@ -301,14 +301,15 @@ class ProvaDetailView(DetailView):
         resultados = defaultdict(lambda: defaultdict(lambda: {}))
         if self.request.user.is_staff:
             for exercicio in self.object.exercicios.all():
-                for submission in exercicio.respostaexprogramacao_set.order_by(
+                for submissao in exercicio.respostasubmetida_set.order_by(
                         'data_submissao'):
                     sub_dict = {
-                        'data_submissao': submission.created,
-                        'codigo': str(submission.code.url),
+                        'data_submissao': submissao.data_submissao,
+                        'codigo':
+                        str(submissao.respostaexprogramacao.codigo.url),
                     }
-                    resultados[exercicio.title][
-                        submission.author.username] = sub_dict
+                    resultados[exercicio.titulo][
+                        submissao.autor.username] = sub_dict
             ctx[RESULTADOS] = resultados
         return ctx
 

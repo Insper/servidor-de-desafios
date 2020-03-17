@@ -27,6 +27,9 @@ class Usuario(AbstractUser):
     def exercicios_disponiveis(self):
         return Exercicio.objects.disponiveis_para(self).ordenados()
 
+    def provas_disponiveis(self):
+        return Prova.objects.disponiveis_para(self)
+
 
 class Turma(models.Model):
     nome = models.CharField(max_length=1024, blank=True)
@@ -238,7 +241,7 @@ class Prova(models.Model):
     fim = models.DateTimeField('data final')
     titulo = models.CharField(max_length=1024, blank=True)
     descricao = models.TextField(blank=True)
-    exercicios = models.ManyToManyField(ExercicioProgramado)
+    exercicios = models.ManyToManyField(Exercicio, blank=True)
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
     slug = models.SlugField()
 
@@ -254,7 +257,7 @@ class Prova(models.Model):
 
     @property
     def exercicios_por_nome(self):
-        return self.exercicios.order_by('exercicio__titulo')
+        return self.exercicios.order_by('titulo')
 
 
 class InteracaoUsarioExercicio(models.Model):
