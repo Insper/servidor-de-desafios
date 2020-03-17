@@ -128,6 +128,10 @@ class ExercicioProgramado(models.Model):
     inicio = models.DateTimeField('data inicio', blank=True, null=True)
     fim = models.DateTimeField('data fim', blank=True, null=True)
 
+    def __str__(self):
+        return '{0} ({1}-{2}) [{3}]'.format(self.exercicio, self.inicio,
+                                            self.fim, self.turma)
+
     class Meta:
         verbose_name_plural = 'exercicios programados'
 
