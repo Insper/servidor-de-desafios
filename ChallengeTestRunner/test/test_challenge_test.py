@@ -285,6 +285,48 @@ def random_int():
     return randint(1, 10)
 '''
 
+TEST_CODE10 = '''
+from challenge_test_lib import challenge_test as ch
+from itertools import cycle
+
+
+class TestCase(ch.TestCaseWrapper):
+    TIMEOUT = 2
+
+    def test_1(self):
+        self.mock_input.input_list = cycle(['sim', 'talvez', 'ainda um pouco', 'não'])
+        self.challenge_program()
+        self.assertEqual(
+            self.mock_input.calls, 4,
+            'Número de chamadas para o input foi diferente do esperado')
+        self.assertEqual(self.mock_print.calls, 4,
+                         'Use exatamente um print por resposta do usuário')
+        for i in range(3):
+            self.assertTrue('Pratique mais' in self.mock_print.printed[i])
+        self.assertTrue('Até a próxima' in self.mock_print.printed[-1])
+
+    def test_de_primeira(self):
+        self.mock_input.input_list = cycle(['não'])
+        self.challenge_program()
+        self.assertEqual(
+            self.mock_input.calls, 1,
+            'Número de chamadas para o input foi diferente do esperado')
+        self.assertEqual(self.mock_print.calls, 1,
+                         'Use exatamente um print por resposta do usuário')
+        self.assertTrue('Até a próxima' in self.mock_print.printed[-1])
+'''
+
+CHALLENGE_CODE_23 = '''
+resp_aluno = True
+while resp_aluno == True:
+    resp_D_aluno = input("Você tem mais dúvidas? ")
+    if resp_D_aluno == "não":
+        resp_aluno = False
+        print ("Até a próxima")
+    else:
+        print("Pratique mais")
+'''
+
 
 class ChallengeTestTest(unittest.TestCase):
     def test_doesnt_break_with_syntax_error(self):
@@ -437,6 +479,10 @@ class ChallengeTestTest(unittest.TestCase):
         self.assertFalse(result.success)
         self.assertTrue('Não deveria executar o randint com os argumentos 1,10'
                         in result.failure_msgs[0])
+
+    def test_doesnt_break_with_multiple_inputs(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_23, TEST_CODE10, None)
+        self.assertTrue(result.success)
 
 
 class TestCaseWrapperTest(unittest.TestCase):
