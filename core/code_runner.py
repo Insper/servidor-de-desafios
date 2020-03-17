@@ -34,6 +34,18 @@ def executa_codigo(exercicio, resposta):
                                InvocationType='RequestResponse',
                                Payload=json.dumps(args))
         feedback = response['Payload'].read().decode('utf-8')
-        feedback = json.loads(json.loads(feedback))
+        feedback = json.loads(feedback)
+        if isinstance(
+                feedback,
+                dict) and 'Task timed out after' in feedback['errorMessage']:
+            msg = feedback['errorMessage']
+            msg = msg[msg.index('Task timed out'):]
+            feedback = {
+                'success': False,
+                'failure_msgs': [ch.TIME_LIMIT_EXCEEDED],
+                'stack_traces': [msg]
+            }
+        else:
+            feedback = json.loads(feedback)
         return TestResults(feedback['failure_msgs'], feedback['success'],
                            feedback['stack_traces'])
