@@ -193,15 +193,24 @@ class ForbiddenInput:
 class MockInput(MockFunction):
     def __init__(self):
         super().__init__()
-        self.input_list = []
-        self.cur_input_idx = 0
+        self._input_list = []
+        self.il_iter = iter(self._input_list)
+
+    @property
+    def input_list(self):
+        return self._input_list
+
+    @input_list.setter
+    def input_list(self, il):
+        self._input_list = il
+        self.il_iter = iter(self._input_list)
 
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
-        retval = ''
-        if self.cur_input_idx < len(self.input_list):
-            retval = self.input_list[self.cur_input_idx]
-            self.cur_input_idx += 1
+        try:
+            retval = next(self.il_iter)
+        except StopIteration:
+            retval = ''
         return str(retval)
 
 

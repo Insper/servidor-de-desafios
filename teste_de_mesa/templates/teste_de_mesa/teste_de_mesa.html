@@ -34,7 +34,7 @@ hljs.initHighlightLinesOnLoad([
 
     <p>
     {% if teste_mesa.descricao %}
-        {{ teste_mesa.descricao }}
+        {{ teste_mesa.descricao_html|safe }}
     {% else %}
     Atualize as variáveis na memória e a saída do terminal de acordo com a linha atual.
     {% endif %}
