@@ -12,6 +12,7 @@ def handle(event, context):
         'failure_msgs': result.failure_msgs,
         'success': result.success,
         'stack_traces': result.stack_traces,
+        'stdouts': result.stdouts,
     }
 
     return json.dumps(retval)
