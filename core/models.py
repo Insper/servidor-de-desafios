@@ -229,7 +229,7 @@ class RespostaExProgramacao(RespostaSubmetida):
     def stdouts_limpos(self):
         if self.stdouts:
             return tuple(
-                tuple(tuple((t + (None, None))[:2]) for t in s)
+                tuple((tuple(t) + (None, None))[:2] for t in s)
                 for s in eval(self.stdouts))
         else:
             return tuple()
