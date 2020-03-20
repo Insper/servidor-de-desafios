@@ -253,6 +253,7 @@ def exercicio_de_programacao(request, exercicio, ctx):
             resultado = executa_codigo(exercicio, codigo_texto)
             submissao.lista_de_falhas = resultado.failure_msgs
             submissao.stack_traces = resultado.stack_traces
+            submissao.stdouts = resultado.stdouts
             submissao.resultado = Resultado.OK if resultado.success else Resultado.ERRO
             submissao.save()
             submissao.codigo.save(caminho_submissoes_usuario(submissao, ''),

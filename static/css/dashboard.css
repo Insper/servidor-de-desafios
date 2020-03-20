@@ -40,16 +40,29 @@ label {
 
 .challenge-feedback {
   display: grid;
-  grid-template-columns: auto fit-content(50px);
+  grid-template-columns: auto fit-content(50px) fit-content(50px);
   grid-row-gap: 10px;
+  grid-column-gap: 10px;
   margin-bottom: 1em;
 }
 
-.challenge-feedback .stacktrace {
+.challenge-feedback .output {
   grid-column-start: 1;
-  grid-column-end: 3;
-  color: lightcoral;
+  grid-column-end: 4;
   font-family: monospace;
+}
+
+.challenge-feedback .stacktrace {
+  color: lightcoral;
+}
+
+.challenge-feedback .terminal {
+  background-color: black;
+  color: white;
+}
+
+.challenge-feedback .terminal .term-input {
+  color: #27e427;
 }
 
 .CodeMirror {

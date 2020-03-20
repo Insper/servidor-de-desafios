@@ -11,8 +11,8 @@ from challenge_test_lib.mock_import import register_module, deactivate_custom_im
 
 # This might be useful someday: https://docs.python.org/3/library/unittest.mock.html#mock-open
 
-TestResults = namedtuple('TestResults',
-                         'result_obj,failure_msgs,success,stack_traces')
+TestResults = namedtuple(
+    'TestResults', 'result_obj,failure_msgs,success,stack_traces,stdouts')
 START_SEP = '<|><'
 END_SEP = '><|>'
 TIME_LIMIT_EXCEEDED = 'Tempo limite excedido'
@@ -32,6 +32,10 @@ def error_message(msg=''):
 def get_message(test_case):
     test_method = getattr(test_case, test_case._testMethodName)
     return getattr(test_method, 'msg', DEFAULT_MSG)
+
+
+def get_stdout(test_case):
+    return test_case.stdout
 
 
 def format_message(msg):
@@ -57,11 +61,12 @@ def run_tests(challenge_code, test_code, challenge_name):
         runner = unittest.TextTestRunner(stream=stream)
         result = runner.run(unittest.makeSuite(TestCase))
         stream.seek(0)
-        msgs = []
+        msgs = {}
         success = result.wasSuccessful()
         for failure in result.failures + result.errors:
             st = failure[1]
             fm = get_message(failure[0])
+            stdout = get_stdout(failure[0])
             if START_SEP in st and END_SEP in st:
                 fm = st[st.find(START_SEP) + len(START_SEP):st.find(END_SEP)]
             elif 'TimeoutError' in st:
@@ -73,17 +78,19 @@ def run_tests(challenge_code, test_code, challenge_name):
             if 'PriorityError' in st:
                 st = st[st.rindex('PriorityError'):st.index(START_SEP)]
             if (fm, st) not in msgs:
-                msgs.append((fm, st))
+                msgs[(fm, st)] = stdout
             success = False
         # Filter repeated messages
         if msgs:
             failure_msgs, stack_traces = zip(*msgs)
+            stdouts = list(msgs.values())
         else:
-            failure_msgs, stack_traces = [], []
-        return TestResults(result, failure_msgs, success, stack_traces)
+            failure_msgs, stack_traces, stdouts = [], [], []
+        return TestResults(result, failure_msgs, success, stack_traces,
+                           stdouts)
     except:
         return TestResults(None, ['Código com erros de sintaxe'], False,
-                           [traceback.format_exc()])
+                           [traceback.format_exc()], [''])
 
 
 @contextmanager
@@ -143,16 +150,18 @@ class MockFunction:
 
 
 class MockPrint(MockFunction):
-    def __init__(self, python_print):
+    def __init__(self, python_print, stdout):
         super().__init__()
         self.printed = []
+        self.stdout = stdout
         self.python_print = python_print
 
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
-        self.printed.append(' '.join([
-            str(arg) for arg in args
-        ]))  # There is probably a more reliable way to do this...
+        # There is probably a more reliable way to do this...
+        printed = ' '.join([str(arg) for arg in args])
+        self.stdout.append((printed, ))
+        self.printed.append(printed)
         self.python_print(*args, **kwargs)
 
 
@@ -191,9 +200,10 @@ class ForbiddenInput:
 
 
 class MockInput(MockFunction):
-    def __init__(self):
+    def __init__(self, stdout):
         super().__init__()
         self._input_list = []
+        self.stdout = stdout
         self.il_iter = iter(self._input_list)
 
     @property
@@ -211,6 +221,7 @@ class MockInput(MockFunction):
             retval = next(self.il_iter)
         except StopIteration:
             retval = ''
+        self.stdout.append((' '.join([str(arg) for arg in args]), retval))
         return str(retval)
 
 
@@ -298,14 +309,16 @@ class TestCaseWrapper(unittest.TestCase):
         cls.func_loading_errors = []
 
     def setUp(self):
+        self.stdout = []
+
         # Replace builtin print
         self.python_print = builtins.print
-        self.mock_print = MockPrint(self.python_print)
+        self.mock_print = MockPrint(self.python_print, self.stdout)
         builtins.print = self.mock_print
 
         # Replace builtin input
         self.python_input = builtins.input
-        self.mock_input = MockInput()
+        self.mock_input = MockInput(self.stdout)
         builtins.input = self.mock_input
 
         # Replace builtin open

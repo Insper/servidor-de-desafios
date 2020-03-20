@@ -163,10 +163,12 @@ class RespostaSubmetida(models.Model):
 
 
 class RespostaExProgramacao(RespostaSubmetida):
-    DetalhesDoErro = namedtuple('DetalhesDoErro', 'mensagem, stacktrace')
+    DetalhesDoErro = namedtuple('DetalhesDoErro',
+                                'mensagem, stacktrace,stdout')
 
     feedback = models.TextField(blank=True)
     erros = models.TextField(blank=True)
+    stdouts = models.TextField(blank=True)
     codigo = models.FileField(upload_to=caminho_submissoes_usuario)
     deletado = models.BooleanField(default=False)
 
@@ -224,16 +226,27 @@ class RespostaExProgramacao(RespostaSubmetida):
         return retval
 
     @property
+    def stdouts_limpos(self):
+        if self.stdouts:
+            return tuple(
+                tuple(tuple((t + (None, None))[:2]) for t in s)
+                for s in eval(self.stdouts))
+        else:
+            return tuple()
+
+    @property
     def feedback_limpo(self):
         msgs = self.lista_de_falhas
         stacktraces = ['' for _ in msgs]
         sts = self.stack_traces_limpos
         stacktraces[:len(sts)] = sts
+        stdouts = ['' for _ in msgs]
+        sts = self.stdouts_limpos
+        stdouts[:len(sts)] = sts
         return list(
-            set([
-                RespostaExProgramacao.DetalhesDoErro(msg, st)
-                for msg, st in zip(msgs, stacktraces)
-            ]))
+            set(
+                RespostaExProgramacao.DetalhesDoErro(msg, st, stdout)
+                for msg, st, stdout in zip(msgs, stacktraces, stdouts)))
 
 
 class Prova(models.Model):

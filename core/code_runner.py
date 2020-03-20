@@ -7,7 +7,7 @@ if not settings.DEV_SERVER:
     from collections import namedtuple
 
     TestResults = namedtuple('TestResults',
-                             'failure_msgs,success,stack_traces')
+                             'failure_msgs,success,stack_traces,stdouts')
 
 
 def executa_codigo(exercicio, resposta):
@@ -43,9 +43,10 @@ def executa_codigo(exercicio, resposta):
             feedback = {
                 'success': False,
                 'failure_msgs': [ch.TIME_LIMIT_EXCEEDED],
-                'stack_traces': [msg]
+                'stack_traces': [msg],
+                'stdouts': [''],
             }
         else:
             feedback = json.loads(feedback)
         return TestResults(feedback['failure_msgs'], feedback['success'],
-                           feedback['stack_traces'])
+                           feedback['stack_traces'], feedback['stdouts'])

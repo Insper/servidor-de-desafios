@@ -327,6 +327,28 @@ while resp_aluno == True:
         print("Pratique mais")
 '''
 
+TEST_CODE11 = '''
+from challenge_test_lib import challenge_test as ch
+
+
+class TestCase(ch.TestCaseWrapper):
+    TIMEOUT = 2
+
+    def test_1(self):
+        self.mock_input.input_list = cycle(['sim', 'sim', 'não'])
+        self.challenge_program()
+        self.assertFalse(True)
+'''
+
+CHALLENGE_CODE_24 = '''
+print('Começando')
+continuar = True
+while continuar:
+    if input('Continuar? ') != 'sim':
+        continuar = False
+print('Fim')
+'''
+
 
 class ChallengeTestTest(unittest.TestCase):
     def test_doesnt_break_with_syntax_error(self):
@@ -483,6 +505,13 @@ class ChallengeTestTest(unittest.TestCase):
     def test_doesnt_break_with_multiple_inputs(self):
         result = challenge_test.run_tests(CHALLENGE_CODE_23, TEST_CODE10, None)
         self.assertTrue(result.success)
+
+    def test_get_stdout(self):
+        result = challenge_test.run_tests(CHALLENGE_CODE_24, TEST_CODE11, None)
+        self.assertFalse(result.success)
+        self.assertEqual([('Começando', ), ('Continuar? ', 'sim'),
+                          ('Continuar? ', 'sim'), ('Continuar? ', 'não'),
+                          ('Fim', )], result.stdouts[0])
 
 
 class TestCaseWrapperTest(unittest.TestCase):
