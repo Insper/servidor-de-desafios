@@ -499,8 +499,9 @@ class ChallengeTestTest(unittest.TestCase):
         result = challenge_test.run_tests(CHALLENGE_CODE_22, TEST_CODE9,
                                           'random_int')
         self.assertFalse(result.success)
-        self.assertTrue('Não deveria executar o randint com os argumentos 1,10'
-                        in result.failure_msgs[0])
+        self.assertTrue(
+            'Não deveria executar o randint com os argumentos 1, 10' in
+            result.failure_msgs[0])
 
     def test_doesnt_break_with_multiple_inputs(self):
         result = challenge_test.run_tests(CHALLENGE_CODE_23, TEST_CODE10, None)

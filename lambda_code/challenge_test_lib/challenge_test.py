@@ -181,7 +181,7 @@ class MockRandint(MockFunction):
             raise PriorityError(
                 '',
                 'Não deveria executar o randint com os argumentos {}'.format(
-                    ','.join(str(arg) for arg in args)))
+                    ', '.join(str(arg) for arg in args)))
 
 
 class PriorityError(AssertionError):
@@ -381,30 +381,24 @@ class TestCaseWrapper(unittest.TestCase):
         return self.__class__.CHALLENGE_FUN(*args, **kwargs)
 
     def assert_printed(self, value, index=None, msg=None):
-        str_value = str(value)
-        if index is not None and str_value not in self.mock_print.printed[
-                index]:
+        if index is not None:
             if not msg:
-                msg = 'Value not found in print of index {index}'.format(
-                    index=index)
-            msg = self._formatMessage(msg)
-            self.fail(msg)
+                msg = 'O valor {0} não foi impresso na {1}a chamada da função print'.format(
+                    value, index)
+            return self.assert_printed_all(
+                [value], msg, printed=self.mock_print.printed[index:index + 1])
 
-        contains_str = any(str_value in printed
-                           for printed in self.mock_print.printed)
+        self.assert_printed_all([value], msg)
 
-        if not contains_str:
-            if not msg:
-                msg = 'Value not found in printed strings'
-            msg = self._formatMessage(msg)
-            self.fail(msg)
-
-    def assert_printed_all(self, values, msg=None):
+    def assert_printed_all(self, values, msg=None, **kwargs):
+        printed_values = self.mock_print.printed
+        if 'printed' in kwargs:
+            printed_values = kwargs['printed']
         str_values = [str(value) for value in values]
         i = 0
         j = 0
-        while i < len(self.mock_print.printed) and j < len(str_values):
-            printed = self.mock_print.printed[i]
+        while i < len(printed_values) and j < len(str_values):
+            printed = printed_values[i]
             str_value = str_values[j]
 
             if str_value in printed:
@@ -414,7 +408,7 @@ class TestCaseWrapper(unittest.TestCase):
 
         if j < len(str_values):
             if not msg:
-                msg = 'Value {0} not found in printed strings'.format(
+                msg = 'Era esperada uma chamada da função print com o valor: {0}'.format(
                     str_values[j])
             msg = self._formatMessage(msg)
             self.fail(msg)
