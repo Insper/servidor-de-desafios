@@ -341,6 +341,55 @@ class ProvaTestCase(TestCase):
         self.assertTrue(prova_atual not in provas)
         self.assertTrue(prova_passada not in provas)
 
+    def test_fica_disponivel_por_mais_tempo_para_aluno_que_precisa(self):
+        aluno_regular = cria_aluno(1)
+        aluno_mais_tempo = cria_aluno(2)
+
+        inicio_turma = tz_delta(months=-2)
+        fim_turma = tz_delta(months=+2)
+        inicio_prova_regular = tz_delta(hours=-2)
+        fim_prova_regular = tz_delta(hours=-1)
+        inicio_prova_mais_tempo = tz_delta(hours=-2)
+        fim_prova_mais_tempo = tz_delta(hours=+1)
+
+        turma_regular = cria_turma(nome='turma regular',
+                                   inicio=inicio_turma,
+                                   fim=fim_turma)
+        turma_mais_tempo = cria_turma(nome='turma mais tempo',
+                                      inicio=inicio_turma,
+                                      fim=fim_turma)
+        cria_matricula(aluno=aluno_regular, turma=turma_regular)
+        cria_matricula(aluno=aluno_mais_tempo, turma=turma_regular)
+        cria_matricula(aluno=aluno_mais_tempo, turma=turma_mais_tempo)
+        prova_regular = Prova.objects.create(inicio=inicio_prova_regular,
+                                             fim=fim_prova_regular,
+                                             titulo='Prova regular',
+                                             turma=turma_regular)
+        prova_mais_tempo = Prova.objects.create(inicio=inicio_prova_mais_tempo,
+                                                fim=fim_prova_mais_tempo,
+                                                titulo='Prova mais tempo',
+                                                turma=turma_mais_tempo)
+
+        self.assertFalse(prova_regular.disponivel_para(aluno_regular))
+        self.assertFalse(prova_regular.disponivel_para(aluno_mais_tempo))
+        self.assertTrue(prova_mais_tempo.disponivel_para(aluno_mais_tempo))
+        self.assertFalse(prova_mais_tempo.disponivel_para(aluno_regular))
+
+        # Provas do aluno regular
+        provas = Prova.objects.disponiveis_para(aluno_regular)
+        self.assertTrue(prova_regular not in provas)
+        self.assertTrue(prova_mais_tempo not in provas)
+        provas = aluno_regular.provas_disponiveis()
+        self.assertTrue(prova_regular not in provas)
+        self.assertTrue(prova_mais_tempo not in provas)
+        # Provas do aluno não matriculado
+        provas = Prova.objects.disponiveis_para(aluno_mais_tempo)
+        self.assertTrue(prova_regular not in provas)
+        self.assertTrue(prova_mais_tempo in provas)
+        provas = aluno_mais_tempo.provas_disponiveis()
+        self.assertTrue(prova_regular not in provas)
+        self.assertTrue(prova_mais_tempo in provas)
+
 
 class InteracaoUsarioExercicioTestCase(TestCase):
     def test_atualiza_interacao_com_exercicio(self):
