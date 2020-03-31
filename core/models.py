@@ -272,6 +272,11 @@ class Prova(models.Model):
     def exercicios_por_nome(self):
         return self.exercicios.order_by('titulo')
 
+    @property
+    def descricao_html(self):
+        return markdown.markdown(self.descricao,
+                                 extensions=['extra', 'codehilite'])
+
 
 class InteracaoUsarioExercicio(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
