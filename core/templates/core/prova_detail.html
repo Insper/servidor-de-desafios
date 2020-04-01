@@ -8,29 +8,33 @@
 
 <h3>Exercícios</h3>
 
-{% for ex in object.exercicios_por_nome %}
+{% for ex in exercicios %}
 <a href="{% url 'exercicio' c_id=ex.id %}">{{ ex.titulo }}</a>
 {% endfor %}
 
 {% if user.is_staff %}
 <h3>Submissões</h3>
 
-<table>
-<tr><th>Exercício</th><th>Usuário</th><th>Horário</th><th>Link</th></tr>
-{% for ex in object.exercicios_por_nome %}
-{% with submissoes=resultados|get_item:ex.titulo %}
-{% for autor in submissoes %}
-{% with sub_data=submissoes|get_item:autor %}
-{% with horario=sub_data|get_item:'data_submissao' codigo=sub_data|get_item:'codigo' %}
+<table class="table">
 <tr>
-    <td>{{ ex.titulo }}</td>
-    <td>{{ autor }}</td>
-    <td>{{ horario|date:'Y-m-d H:i:s' }}</td>
-    <td>{{ codigo }}</td>
+<th>Usuário</th>
+    {% for ex in exercicios %}
+    <th>{{ ex.titulo }}</th>
+    {% endfor %}
 </tr>
+
+{% for autor in resultados %}
+{% with sub_data=resultados|get_item:autor %}
+<tr>
+    <td>{{ autor }}</td>
+{% for ex in exercicios %}
+{% with sub=sub_data|get_item:ex.titulo %}
+{% with horario=sub|get_item:'data_submissao' codigo=sub|get_item:'codigo' cls=sub|get_item:'class' %}
+    <td class="{{ cls }}"><a href="{{ codigo }}">{{ horario|date:'Y-m-d H:i:s' }}</a></td>
 {% endwith %}
 {% endwith %}
 {% endfor %}
+</tr>
 {% endwith %}
 {% endfor %}
 </table>

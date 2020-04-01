@@ -299,19 +299,30 @@ class ProvaDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        resultados = defaultdict(lambda: defaultdict(lambda: {}))
+        exercicios = self.object.exercicios_por_nome
+        resultados = defaultdict(
+            lambda: defaultdict(lambda: {
+                'class': 'warning',
+                'data_submissao': '',
+                'codigo': '',
+            }))
         if self.request.user.is_staff:
-            for exercicio in self.object.exercicios.all():
+            for exercicio in exercicios:
                 for submissao in exercicio.respostasubmetida_set.order_by(
                         'data_submissao'):
                     sub_dict = {
-                        'data_submissao': submissao.data_submissao,
+                        'class':
+                        'table-success' if submissao.resultado == Resultado.OK
+                        else 'table-danger',
+                        'data_submissao':
+                        submissao.data_submissao,
                         'codigo':
                         str(submissao.respostaexprogramacao.codigo.url),
                     }
-                    resultados[exercicio.titulo][
-                        submissao.autor.username] = sub_dict
+                    resultados[submissao.autor.username][
+                        exercicio.titulo] = sub_dict
             ctx[RESULTADOS] = resultados
+        ctx[EXERCICIOS] = exercicios
         return ctx
 
     def get_queryset(self):
