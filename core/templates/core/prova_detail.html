@@ -18,7 +18,7 @@
 <table>
 <tr><th>Exercício</th><th>Usuário</th><th>Horário</th><th>Link</th></tr>
 {% for ex in object.exercicios_por_nome %}
-{% with submissoes=results|get_item:ex.titulo %}
+{% with submissoes=resultados|get_item:ex.titulo %}
 {% for autor in submissoes %}
 {% with sub_data=submissoes|get_item:autor %}
 {% with horario=sub_data|get_item:'data_submissao' codigo=sub_data|get_item:'codigo' %}
