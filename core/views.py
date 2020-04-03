@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -12,6 +13,9 @@ from datetime import datetime
 from core.code_runner import executa_codigo
 from django.contrib import messages
 from collections import defaultdict
+from django.http import HttpResponse
+import io
+import zipfile
 
 from .models import Exercicio, ExercicioDeProgramacao, ExercicioProgramado, RespostaExProgramacao, Turma, Prova, Tag, InteracaoUsarioExercicio
 from .choices import Resultado
@@ -327,6 +331,36 @@ class ProvaDetailView(DetailView):
 
     def get_queryset(self):
         return Prova.objects.disponiveis_para(self.request.user)
+
+
+@staff_member_required
+def download_submissoes_prova(request, slug):
+    prova = Prova.objects.get(slug=slug)
+
+    submissoes = {}
+    exercicios = prova.exercicios_por_nome
+    for exercicio in exercicios:
+        for submissao in exercicio.respostasubmetida_set.order_by(
+                'data_submissao'):
+            codigo = submissao.respostaexprogramacao.codigo.read().decode(
+                'utf-8')
+            resultado = str(submissao.resultado)
+            nome_arquivo = '{0}-ex{1}-{{0}}.py'.format(
+                submissao.autor.username, exercicio.id)
+            submissoes[nome_arquivo] = (resultado, codigo)
+
+    # Cria arquivo zip
+    arquivo_zip = io.BytesIO()
+    with zipfile.ZipFile(arquivo_zip, 'w', zipfile.ZIP_DEFLATED) as zipped:
+        for nome, (res, cod) in submissoes.items():
+            zipped.writestr(nome.format(res), cod)
+
+    arquivo_zip.seek(0)
+    response = HttpResponse(arquivo_zip, content_type='application/zip')
+    response[
+        'Content-Disposition'] = 'attachment; filename=submissoes-{0}.zip'.format(
+            slug)
+    return response
 
 
 @login_required

@@ -38,6 +38,8 @@
 {% endwith %}
 {% endfor %}
 </table>
+
+<a href="{% url 'download_prova' slug=object.slug %}" class="btn btn-primary">Download de submissões</a>
 {% endif %}
 
 {% endblock %}
