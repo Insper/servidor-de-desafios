@@ -1,0 +1,15 @@
+site_name: Insper Softdes Documentation
+# mkdocs.yml
+theme:
+  name: "material"
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          rendering:
+            show_source: true
+      watch:
+        - ../src/softdes.py
