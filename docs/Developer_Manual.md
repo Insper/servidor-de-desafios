@@ -45,4 +45,30 @@ $ pylint <name_of_the_file>
 
 We recommend a score of higher then 9.5 to be approved.
 
+
+## Database
+
+Before running the application you should prepare the database that the application
+use. To do that you should have sqlite installed. If you haven't it you can run:
+
+    $ pip install sqlite3
+
+After that:
+
+    $ sqlite
+
+    $ .read quiz.sql
+
+This will create the database for you.
+
+## Running the application
+
+To run the application you need to have all dependencies installed. The project does not
+have a "requirements.txt" file yet. The main libraries required can be found in the top
+of the softdes.py file. After installing them, run the main file:
+
+    $ python softdes.py
+
+Some seconds later you should have the server running on https://localhost:80
+
 ### Happy coding!
