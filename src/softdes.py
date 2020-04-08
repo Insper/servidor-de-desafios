@@ -18,6 +18,7 @@ def lambda_handler(event):
     Returns:
         response: A string with a feedback from the test that was ran or not
     '''
+    print("EVENT: ", event)
     try:
         def not_equals(first, second):
             if isinstance(first, numbers.Number) and isinstance(second, numbers.Number):

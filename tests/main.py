@@ -2,9 +2,9 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
+from softdes import lambda_handler
 
 CHROME_DRIVER_PATH = "C:/Users/hugos/Downloads/chromedriver_win32/chromedriver.exe"
-
 
 class SoftDesLogout(unittest.TestCase):
     
@@ -82,6 +82,30 @@ class SoftDesUploadWrongFile(unittest.TestCase):
     def tearDown(self):
         self.driver.close()
 
+
+class SoftDesTestLambdaHandler(unittest.TestCase):
+    
+    def test_lambda_handler_right_case(self):
+        with open("../src/desafio.py", 'r') as f_p:
+            code_file = f_p.read()
+        obj = {}
+        obj['ndes'] = 1
+        obj['code'] = code_file
+        obj['args'] = [[1],[2],[3]]
+        obj['resp'] = [0,0,0]
+        obj['diag'] = ['a','b','c']
+        assert len(lambda_handler(obj)) == 0
+
+    def test_lambda_handler_wrong_case(self):
+        with open("../src/desafio.py", 'r') as f_p:
+            code_file = f_p.read()
+        obj = {}
+        obj['ndes'] = 1
+        obj['code'] = code_file
+        obj['args'] = [1,2,3]
+        obj['resp'] = [0,0,0]
+        obj['diag'] = ['a','b','c']
+        assert len(lambda_handler(obj)) > 0
 
 if __name__ == "__main__":
     unittest.main()
