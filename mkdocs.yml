@@ -11,5 +11,3 @@ plugins:
         python:
           rendering:
             show_source: true
-      watch:
-        - ../src/softdes.py

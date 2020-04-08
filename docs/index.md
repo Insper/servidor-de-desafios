@@ -1,6 +1,6 @@
 # SoftDes Docs
 
- Welcome to the documentation page of the SoftDes quiz delivery system.
+Welcome to the documentation page of the SoftDes quiz delivery system.
 
 ## Purpose
 
