@@ -71,6 +71,8 @@ def get_teste_de_mesa(request, teste_mesa, passo_atual_i, context):
                 clean_lines.append(i+1)
             
         context['passo_atual'] = passo_atual
+        context['passo_total'] = len(gabarito)
+        context['passo_atual_i']= passo_atual_i
         context['passo_anterior'] = passo_anterior
         context['memoria'] = monta_memoria(passo_anterior, passo_atual)
         context['linhas'] = clean_lines
