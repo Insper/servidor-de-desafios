@@ -1,12 +1,15 @@
 {% extends "base_generic.html" %}
 
+{% block extra-css %}
+{{ block.super }}
+<link rel="stylesheet" href="../../static/css/auth_pages.css">
+{% endblock %}
+
 {% block content %}
 
-<div class="container-fluid">
-
-<p>Logout concluído!</p>
-<a href="{% url 'login'%}">Clique aqui para efetuar o login.</a>
-
+<div class="auth-container-center">
+    <p>Logout concluído!</p>
+    <a href="{% url 'login'%}">Clique aqui para efetuar o login.</a>
 </div>
 
 {% endblock %}

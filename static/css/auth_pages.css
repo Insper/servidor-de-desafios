@@ -1,0 +1,84 @@
+.auth-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    margin: 30px 37.5%;
+    width: 25%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 10px;
+}
+
+#auth-title{
+    width: 100%;
+    height: 70px;
+    background-color: #DC3545;
+    color: white;
+    font-size: 1.5em;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px 10px 0px 0px;
+}
+
+.auth-wrapper-form{
+    width: 100%;
+    justify-content: center;
+}
+
+.auth-form-change-pass{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.auth-form-submit{
+    margin: 0 10%;
+    width: 80%;
+    padding: 5px 10px;
+    border-style: none;
+    border-radius: 6px;
+    background-color: #DC3545;
+    color: white;
+}
+
+.auth-container-center{
+    margin-top: 50px;
+    width: 100%;
+    text-align: center;
+}
+
+.auth-form-login{
+    margin: 0 5%;
+    width: 90%;
+}
+
+.auth-table-center{
+    width: 90%;
+    justify-content: center;
+}
+
+.auth-form-login-submit{
+    margin-top: 10px;
+    margin-right: 10%;
+    float: right;
+    width: 25%;
+    padding: 5px 10px;
+    border-style: none;
+    border-radius: 6px;
+    background-color: #DC3545;
+    color: white;
+}
+
+@media only screen and (max-width: 1100px) {
+    .auth-wrapper{
+        margin: 30px 32.5%;
+        width: 35%;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .auth-wrapper{
+        margin: 30px 27.5%;
+        width: 45%;
+    }
+}
