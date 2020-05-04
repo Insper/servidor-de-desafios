@@ -27,6 +27,7 @@ EXERCICIO = 'exercicio'
 EXERCICIOS_PROGRAMADOS = 'exercicios_programados'
 EXERCICIOS_PROGRAMADO = 'exercicios_programado'
 ULTIMA_SUBMISSAO = 'ultima_submissao'
+RESPOSTA_ULTIMA_SUBMISSAO = 'resposta_ultima_submissao'
 RESPOSTAS = 'respostas'
 SHOW_NAV = 'show_nav'
 SUB_POR_EX = 'submissoes_por_exercicio'
@@ -261,12 +262,9 @@ def exercicio_de_programacao(request, exercicio, ctx):
             submissao.resultado = Resultado.OK if resultado.success else Resultado.ERRO
             submissao.save()
             submissao.codigo.save(caminho_submissoes_usuario(submissao, ''),
-                                  codigo_arquivo)
-
-            messages.success(
-                request, submissao.data_submissao.strftime("%d/%m/%Y %H:%M"))
-            messages.success(request, submissao.feedback)
-
+                                  codigo_arquivo)    
+            messages.success(request, 'mostrar ultimo envio',
+                             extra_tags='show_last')
             return redirect('exercicio', c_id=exercicio.id)
 
     ctx[EXERCICIO] = exercicio
@@ -280,6 +278,11 @@ def exercicio_de_programacao(request, exercicio, ctx):
     ctx[ULTIMA_SUBMISSAO] = RespostaExProgramacao.objects.por(
         usuario).ultima_submissao(ctx[EXERCICIO])
     ctx[ERROR_COUNTER] = Counter()
+    if ctx[RESPOSTAS]:
+        ctx[RESPOSTA_ULTIMA_SUBMISSAO] = [ctx[RESPOSTAS][0]]
+    else:
+        ctx[RESPOSTA_ULTIMA_SUBMISSAO] = []
+
     return render(request, 'core/exercicio.html', context=ctx)
 
 
@@ -368,3 +371,4 @@ def sandbox(request):
     return render(request,
                   'core/sandbox.html',
                   context=cria_contexto(request.user))
+                  
