@@ -88,8 +88,13 @@ try:
         aws_credentials = json.load(f)
     AWS_ACCESS_KEY = aws_credentials['AWS_ACCESS_KEY']
     AWS_SECRET_KEY = aws_credentials['AWS_SECRET_KEY']
+    print('Utilizando credenciais local para aws lambda', file=sys.stderr)
 except:
-    print('Utilizando configuração padrão para aws lambda', file=sys.stderr)
+    try:
+        AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
+        AWS_SECRET_KEY = os.environ['AWS_SECRET_KEY']
+    except:
+        print('Utilizando credenciais do .env para aws lambda', file=sys.stderr)
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
