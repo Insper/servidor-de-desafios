@@ -80,8 +80,23 @@ Para isso, vá até a pasta `ChallengeTestRunner` e instale a biblioteca:
 
 Para utilizar as configurações de produção modifique o arquivo `servidor_dessoft/settings/production.py`.
 
-Para atualizar o servidor de produção basta executar um `git pull` e reiniciar o
-Apache.
+Crie um arquivo `.env` para as variáveis de ambiente do PostgreSQL:
+```
+POSTGRES_HOST=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=servidordesafios
+```
+
+Para subir os containers execute o seguinte comando:
+```
+$ docker-compose up -d --build
+```
+
+Para criar um Super Usuário:
+```
+$ docker-compose exec web python manage.py createsuperuser
+```
 
 ### Configuração do lambda
 

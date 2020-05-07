@@ -96,14 +96,12 @@ except:
 
 DATABASES = {}
 try:
-    with open(str(Path(BASE_DIR) / '.db_credentials')) as f:
-        db_credentials = json.load(f)
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': db_credentials['db'],
-        'USER': db_credentials['user'],
-        'PASSWORD': db_credentials['password'],
-        'HOST': 'localhost',
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['POSTGRES_HOST'],
         'PORT': '5432',
     }
 except Exception as e:
