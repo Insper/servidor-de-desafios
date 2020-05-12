@@ -257,6 +257,7 @@ class Prova(models.Model):
     exercicios = models.ManyToManyField(Exercicio, blank=True)
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
     slug = models.SlugField()
+    password = models.CharField(max_length=1024, blank=True)
 
     objects = ProvaManager()
 

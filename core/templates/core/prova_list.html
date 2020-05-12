@@ -2,9 +2,24 @@
 
 {% block pagecontent %}
 <h1>Provas</h1>
+<input id='password' type="password">
 
 {% for prova in object_list %}
-<a href="{% url 'prova' slug=prova.slug %}">{{ prova }}</a>
+<div><a class='prova' href="{% url 'prova' slug=prova.slug %}">{{ prova }}</a></div>
 {% endfor %}
-
+<script>
+    document.getElementById('password').onkeypress = (e) => {
+        if(e.keyCode == '13'){
+            password_mode()
+            return false
+        }
+    }
+    function password_mode(){
+        let password = document.getElementById('password').value
+        let vet = document.getElementsByClassName('prova')
+        for(element of vet){
+            element.href = element.href + '?password=' + password
+        }
+    }
+</script>
 {% endblock %}

@@ -296,10 +296,11 @@ class ProvasListView(ListView):
 
 class ProvaDetailView(DetailView):
     model = Prova
-
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
+        prova = Prova.objects.get(slug=kwargs['slug'])
+        if self.request.GET["password"] == prova.password:
+            return super().dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
