@@ -12,6 +12,17 @@ from .choices import Resultado
 
 
 class Usuario(AbstractUser):
+    def authenticate(self, username=None, password=None):
+        kwargs = {'username': username}
+        print('BELLAAAAAAAAAAAAAAAA')
+        try:
+            user = User.objects.get(**kwargs)
+            print('ISAAAAAAAAAAAAAAAAA')
+            if user.check_password(password):
+                return user
+        except User.DoesNotExist:
+            return None
+
     def todas_turmas(self):
         return Turma.objects.do_aluno(self)
 

@@ -30,9 +30,16 @@ BASE_DIR = os.path.dirname(
 SECRET_KEY = 'r*gl!)m0t=x##wt##w#4t=fl6-^kk8(smd547w*oi#77=*$69a'
 
 # LOGIN
+MODO_PROVA = False
+SENHA_PROVA = '0000'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+AUTHENTICATION_BACKENDS = [
+    'core.backend.CustomerBackend',
+]
+
 
 # Application definition
 
