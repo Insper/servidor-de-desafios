@@ -87,3 +87,13 @@ Apache.
 
 Execute o script `prepare_lambda_code.sh`. Faça o upload do arquivo
 `lambda_code.zip` na função `testRunner` na Amazon.
+
+## Agradecimentos
+
+Ao fazer um pull request inclua também uma descrição curta da sua contribuição nos agradecimentos. A partir de agora só aceitaremos os PRs que já tiverem os agradecimentos preenchidos.
+
+Para isso, adicione seus dados em [`core/templates/core/thanks.html`](core/templates/core/thanks.html) utilizando a template tag `student_author`:
+
+    {% student_author "SEU NOME" "SUA TURMA" "DESCRIÇÃO CURTA DA SUA CONTRIBUIÇÃO" "sua_foto" %}
+
+Lembre-se de adicionar sua foto em [`static/assets/img/authors/`](static/assets/img/authors/). **Importante**: envie uma imagem quadrada.
