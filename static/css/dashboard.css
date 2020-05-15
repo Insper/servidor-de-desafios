@@ -66,7 +66,7 @@ label {
 }
 
 .CodeMirror {
-  border-top: 1px solid #cccccc; border-bottom: 1px solid #cccccc;
+  border-top: 1px solid #cccccc; border-bottom: 1px solid #cccccc; resize: both;
 }
 
 /*
