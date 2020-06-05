@@ -63,10 +63,19 @@ def get_teste_de_mesa(request, teste_mesa, passo_atual_i, context):
         stdout += [
             i for i in passo_atual.stdout[len(stdout):] if i[1] is not None
         ]
+
+        clean_lines = []
+        for i,v in enumerate(teste_mesa.codigo.split('\n')):
+            newv = v.strip()
+            if ((not newv.startswith("#")) and (newv)):
+                clean_lines.append(i+1)
+            
         context['passo_atual'] = passo_atual
+        context['passo_total'] = len(gabarito)
+        context['passo_atual_i']= passo_atual_i
         context['passo_anterior'] = passo_anterior
         context['memoria'] = monta_memoria(passo_anterior, passo_atual)
-        context['linhas'] = range(1, len(teste_mesa.codigo.split('\n')) + 1)
+        context['linhas'] = clean_lines
         context['proxima_linha'] = passo_atual.line_i + 2
         context['stdout'] = stdout
         context['n_prev_out_lines'] = len(stdout)
