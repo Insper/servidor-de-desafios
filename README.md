@@ -14,9 +14,9 @@ comando no servidor, via SSH:
 
 ### Criando novos exercícios
 
-Entre no Django admin (`/admin/challenges/challenge`) e clique
-em `ADICIONAR CHALLENGE`. A data limite não é obrigatória. A opção
-`Function name` define qual deve ser o nome da função enviada pelo aluno.
+No Django admin (`/admin`), na seção **CORE**, clique no botão `+ Adicionar` na linha do *Exercícios
+de programação*. A data limite não é obrigatória. A opção `Nome funcao` define qual deve ser o nome
+ da função enviada pelo aluno.
 
 O arquivo de testes define a bateria de testes pelos quais a função enviada pelo
 aluno passará. Ele deve seguir o seguinte exemplo:
@@ -80,8 +80,28 @@ Para isso, vá até a pasta `ChallengeTestRunner` e instale a biblioteca:
 
 Para utilizar as configurações de produção modifique o arquivo `servidor_dessoft/settings/production.py`.
 
-Para atualizar o servidor de produção basta executar um `git pull` e reiniciar o
-Apache.
+
+Crie um arquivo `.env` para as variáveis de ambiente do PostgreSQL:
+```
+POSTGRES_HOST=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=servidordesafios
+```
+
+## Produção com Docker e Gunicorn
+Para subir os containers execute o seguinte comando:
+```
+$ docker-compose up -d --build
+```
+
+Para criar um Super Usuário:
+```
+$ docker-compose exec web python manage.py createsuperuser
+```
+
+## Produção com Apache Server
+Para atualizar o servidor de produção basta executar um `git pull` e reiniciar o Apache.
 
 ### Configuração do lambda
 

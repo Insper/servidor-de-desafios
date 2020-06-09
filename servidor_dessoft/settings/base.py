@@ -88,22 +88,25 @@ try:
         aws_credentials = json.load(f)
     AWS_ACCESS_KEY = aws_credentials['AWS_ACCESS_KEY']
     AWS_SECRET_KEY = aws_credentials['AWS_SECRET_KEY']
+    print('Utilizando credenciais do .aws_credentials para invocar as Lambdas', file=sys.stderr)
 except:
-    print('Utilizando configuração padrão para aws lambda', file=sys.stderr)
+    try:
+        AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
+        AWS_SECRET_KEY = os.environ['AWS_SECRET_KEY']
+    except:
+        print('Utilizando credenciais do .env para invocar as Lambdas', file=sys.stderr)
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {}
 try:
-    with open(str(Path(BASE_DIR) / '.db_credentials')) as f:
-        db_credentials = json.load(f)
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': db_credentials['db'],
-        'USER': db_credentials['user'],
-        'PASSWORD': db_credentials['password'],
-        'HOST': 'localhost',
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['POSTGRES_HOST'],
         'PORT': '5432',
     }
 except Exception as e:

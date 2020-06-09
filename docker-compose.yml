@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    command: gunicorn servidor_dessoft.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/var/www/softdes/static
+      - media_volume:/var/www/softdes/media
+    expose:
+      - 8000
+    env_file:
+      - .env
+    depends_on:
+      - db
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+  nginx:
+    image: nginx:1.17.4-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - static_volume:/var/www/softdes/static
+      - media_volume:/var/www/softdes/media
+    depends_on:
+      - web
+volumes:
+  postgres_data:
+    external: true
+  static_volume:
+  media_volume:
+    external: true
