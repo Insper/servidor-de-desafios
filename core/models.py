@@ -95,6 +95,7 @@ class Exercicio(models.Model):
     descricao = models.TextField(blank=True)
     imagem = models.ImageField(upload_to=DIR_EXERCICIOS, blank=True)
     publicado = models.BooleanField(default=True)
+    saida_terminal = models.BooleanField(default=True)
     tags = models.ManyToManyField(Tag)
 
     objects = ExercicioManager()

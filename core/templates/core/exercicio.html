@@ -91,6 +91,70 @@
     <br/><br/>
     <h3>Envios:</h3>
     {% show_feedbacks respostas error_counter %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Tentativa</th>
+                <th>Feedback</th>
+            </tr>
+            </thead>    {% show_feedbacks respostas error_counter %}
+            <tbody>
+            {% for ans in respostas %}
+                {% if ans.sucesso %}
+                <tr class = "bg-success text-white">
+                {% else %}
+                <tr class = "bg-danger text-white">
+                {% endif %}
+                    <td>{{ ans.data_submissao|date:'d/m/Y H:i' }}</td>
+                    <td>
+                        <ul class="challenge-feedback-list">
+                        {% for feedback in ans.feedback_limpo %}
+                            <li>
+                                {% if not feedback.stacktrace or feedback.stacktrace == '-' %}
+                                {{ feedback.mensagem }}
+                                {% else %}
+                                <div class="challenge-feedback">
+                                    <span>{{ feedback.mensagem }}</span>
+                                    <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#error{{ error_counter.cur }}" aria-expanded="false" aria-controls="error{{ error_counter.cur }}">
+                                        Stack trace
+                                    </button>
+                                    {% if exercicio.saida_terminal %}
+                                        <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#stdout{{ error_counter.cur }}" aria-expanded="false" aria-controls="stdout{{ error_counter.cur }}">
+                                            Saída no terminal
+                                        </button>
+                                    {% endif %}
+                                    <div class="output stacktrace collapse" id="error{{ error_counter.cur }}">
+                                        <div class="card card-body">
+                                            {{ feedback.stacktrace|safe }}
+                                        </div>
+                                    </div>
+                                    {% if exercicio.saida_terminal %}
+                                    <div class="output terminal collapse" id="stdout{{ error_counter.cur }}">
+                                        <div class="card card-body terminal">
+                                            {% for term_out, term_in in feedback.stdout %}
+                                            <div class="term-linha">
+                                                <span>{{ term_out }}</span>
+                                                {% if term_in %}
+                                                <span class="term-input">{{ term_in }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {{ error_counter.next }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
     <p>O exercício não existe... :(</p>
 {% endif %}
