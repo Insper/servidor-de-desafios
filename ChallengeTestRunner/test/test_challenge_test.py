@@ -591,6 +591,21 @@ class TestCaseWrapperTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.test_case_wrapper.assert_printed('Ora', 1)
 
+    def test_assert_similar_errors(self):
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_similar('yare yara Dake', 'yars yari daze', 3, True)
+        
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_similar('yare yara Dake', 'yars yari daze', 2, True)
+
+        with self.assertRaises(AssertionError):
+            self.test_case_wrapper.assert_similar('omae mou shindeiru nani', 'Nani', 5, True)
+
+    def test_assert_similar_correctly(self):
+        self.test_case_wrapper.assert_similar('yare yara Dake', 'yars yari daze', 3, False)
+        self.test_case_wrapper.assert_similar('yare kene Dake', 'yars yari daze', 7, True)
+        self.test_case_wrapper.assert_similar('omae mou shinDeiru nani', 'omae mou shindeiru', 5, False)
+
 
 if __name__ == '__main__':
     unittest.main()

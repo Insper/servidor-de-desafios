@@ -6,6 +6,7 @@ from contextlib import contextmanager
 import builtins
 from itertools import cycle
 import traceback
+import functools
 import imp
 from challenge_test_lib.mock_import import register_module, deactivate_custom_imports
 
@@ -380,6 +381,35 @@ class TestCaseWrapper(unittest.TestCase):
             raise err
         return self.__class__.CHALLENGE_FUN(*args, **kwargs)
 
+    @functools.lru_cache()
+    def str_dist(self, s, t):
+        # http://rosettacode.org/wiki/Levenshtein_distance#Memoized_recursion
+        if not s:
+            return len(t)
+        if not t:
+            return len(s)
+        if s[0] == t[0]:
+            return self.str_dist(s[1:], t[1:])
+        l1 = self.str_dist(s, t[1:])
+        l2 = self.str_dist(s[1:], t)
+        l3 = self.str_dist(s[1:], t[1:])
+        return 1 + min(l1, l2, l3)
+
+    def assert_similar(self, string1, string2, dist_max=1, case_sensitive=False, msg=None):
+        if not string1:
+            return len(string2)
+        if not string2:
+            return len(string1)
+        if not case_sensitive:
+            string1 = string1.lower()
+            string2 = string2.lower()
+        dist = self.str_dist(string1,string2)
+        if(dist > dist_max):
+            if not msg:
+                msg = self._formatMessage("Strings não são similares.")
+            msg = self._formatMessage(msg)
+            self.fail(msg)
+            
     def assert_printed(self, value, index=None, msg=None):
         if index is not None:
             if not msg:
