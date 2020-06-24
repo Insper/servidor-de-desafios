@@ -12,3 +12,9 @@ $(function() {
         }
     });
 });
+
+function focusFunction() {
+    document.getElementById('terminal').focus()
+};
+
+
