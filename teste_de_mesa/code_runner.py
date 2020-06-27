@@ -51,16 +51,17 @@ def compara_memorias(recebido_json, esperado_json):
         elif v_esperado and (not v_recebido):
             mensagens.append('A memória desativada ainda está ativa.')
         else:
-            try:
-                v_recebido = {
-                    r_k: eval(r_v) if r_v else None
-                    for r_k, r_v in v_recebido.items()
-                }
-                if v_esperado != v_recebido:
+            for e_k, e_v in v_esperado.items():
+                if type(e_v) == int or type(e_v) == float:
+                    v_esperado[e_k] = repr(e_v)
+
+                elif not ((v_recebido[e_k][1:-1].startswith('"') and v_recebido[e_k][1:-1].endswith('"')) or (v_recebido[e_k][1:-1].startswith("'") and v_recebido[e_k][1:-1].endswith("'")) or bool(v_recebido[e_k])):
                     mensagens.append(
-                        'Pelo menos um valor na memória está incorreto.')
-            except NameError:
+                        'Não consegui entender algum dos valores da memória. Você não esqueceu as aspas em alguma string?'
+                    )
+
+            if v_esperado != v_recebido:
                 mensagens.append(
-                    'Não consegui entender algum dos valores da memória. Você não esqueceu as aspas em alguma string?'
-                )
+                    'Pelo menos um valor na memória está incorreto.')
+    
     return ResultadoDeComparacao(len(mensagens) == 0, mensagens)
