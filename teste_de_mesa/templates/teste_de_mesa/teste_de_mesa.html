@@ -43,7 +43,7 @@ hljs.initHighlightLinesOnLoad([
         <div class="col-md-6 col-sm-12">
             <h3>Código</h3>
             <pre><code class="python">{{ teste_mesa.codigo }}</code></pre>
-            
+
         </div>
         <div class="col-md-6 col-sm-12">
             <h3>Teste de Mesa{% if not teste_concluido %} (atualize com os novos valores){% endif %}</h3>
@@ -140,14 +140,16 @@ hljs.initHighlightLinesOnLoad([
             </form>
             {% endif %}
         </div>
-    
+
     </section>
-<p>
-    <h3>Progresso</h3>
-    <div class="progress">
-        <div class="progress-bar" role="progressbar" style="width: {% widthratio passo_atual_i passo_total 100 %}%;"> {{passo_atual_i}} / {{passo_total}}</div>
-    </div>
-</p>
+    {% if not teste_concluido %}
+    <section>
+        <h3>Progresso</h3>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: {% widthratio passo_atual_i passo_total 100 %}%;"> {{passo_atual_i}} / {{passo_total}}</div>
+        </div>
+    </section>
+    {% endif %}
 {% else %}
     <p>O exercício não existe... :(</p>
 {% endif %}
