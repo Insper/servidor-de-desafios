@@ -8,6 +8,18 @@
 
 ### Setup
 
+#### Configurando um ambiente virtual
+
+Para não ter conflitos entre versões ou bibliotecas, podemos criar um ambiente virtual. Para isso, entre na pasta em que clonou o servidor e execute o seguinte comando no terminal:
+
+    $ python -m venv env
+    
+Depois, é preciso ativar o ambiente criado:
+
+    $ env\Scripts\activate
+    
+#### Instalando bibliotecas
+
 Primeiramente, é necessário instalar a biblioteca customizada de execução de testes.
 Para isso, vá até a pasta `ChallengeTestRunner` e instale a biblioteca:
 
@@ -43,11 +55,38 @@ comando no servidor, via SSH:
     $ source venv/bin/activate
     $ python manage.py batch_add_users ARQUIVO_BLACKBOARD.csv
 
+### Criando um cadastro
+Para criar um cadastro para administrar os exercícios, execute o comando:
+
+    $ python manage.py runserver
+    
+ Em seguida, basta definir um nome usuário e senha.
+
 ### Criando novos exercícios
 
-Entre no Django admin (`/admin/challenges/challenge`) e clique
-em `ADICIONAR CHALLENGE`. A data limite não é obrigatória. A opção
-`Function name` define qual deve ser o nome da função enviada pelo aluno.
+Se você tiver configurado um ambiente virtual, é necessário ativa-lo sempre que for realizar alguma alteração nos exercícios:
+
+        $ env\Scripts\activate
+
+Depois, execute o seguinte comando:
+
+        $ python manage.py runserver
+               
+Isso permite você a entrar no Django admin (pode digitar no seu navegador: 'localhost:8000/admin/')
+Para criar o exercício, clique em 'Adicionar', ao lado de 'Exercícios de programação'. Será necessário definir algumas características:
+
+
+    * Título: Nome que aparecerá para o exercício no servidor
+    * Descrição: Enunciado
+    * Imagem: (opcional)
+    * Testes: (Veja mais na seção de testes)
+    * Nome função define qual deve ser o nome da função enviada pelo aluno.
+    * Tag: Marca o conteúdo relacionado àquele exercício.
+            * Você pode criar novas tags clicando em `Adicionar outro tag`
+
+Na parte `Exercícios de programação`, você pode gerenciar os exercícios criados
+
+### Testes
 
 O arquivo de testes define a bateria de testes pelos quais a função enviada pelo
 aluno passará. Ele deve seguir o seguinte exemplo:
@@ -83,6 +122,10 @@ aluno passará. Ele deve seguir o seguinte exemplo:
 Para executar sua bateria de testes no terminal (durante o desenvolvimento),
 basta executar o script `insper_test.py`. Esse script é instalado no path do
 Python junto com a biblioteca `challenge_test_lib`.
+
+Você pode, por exemplo, criar um arquivo com respostas que deveriam passar no teste do exercício e um outro com algumas que deveriam falhar. Para executar, use o seguinte comando:
+
+    $ insper_test.py -f nome_da_funcao arquivo_com_resposta.py arquivo_com_funções_teste.py 
 
 ### Criando novos tutoriais
 
