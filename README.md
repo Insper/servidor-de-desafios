@@ -14,10 +14,18 @@ Para não ter conflitos entre versões ou bibliotecas, podemos criar um ambiente
 
     $ python -m venv env
     
-Depois, é preciso ativar o ambiente criado:
+#### Ativando o ambiente virtual
+
+Depois de criado, é preciso ativar o ambiente virtual.
+
+No Windows:
 
     $ env\Scripts\activate
-    
+
+No Linux/MacOS:
+
+    $ . env/bin/activate    
+
 #### Instalando bibliotecas
 
 Primeiramente, é necessário instalar a biblioteca customizada de execução de testes.
@@ -58,15 +66,13 @@ comando no servidor, via SSH:
 ### Criando um cadastro
 Para criar um cadastro para administrar os exercícios, execute o comando:
 
-    $ python manage.py runserver
+    $ python manage.py createsuperuser
     
  Em seguida, basta definir um nome usuário e senha.
 
 ### Criando novos exercícios
 
-Se você tiver configurado um ambiente virtual, é necessário ativa-lo sempre que for realizar alguma alteração nos exercícios:
-
-        $ env\Scripts\activate
+Se você tiver configurado um ambiente virtual, é necessário [ativá-lo](#ativando-o-ambiente-virtual) sempre que for realizar alguma alteração nos exercícios:
 
 Depois, execute o seguinte comando:
 
