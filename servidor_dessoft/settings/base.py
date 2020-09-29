@@ -58,7 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.LogIPMiddleware',
+    #'core.middleware.LogIPMiddleware',
 ]
 
 ROOT_URLCONF = 'servidor_dessoft.urls'
