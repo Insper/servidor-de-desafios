@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pygym"
+version = "0.1.0"
+description = "Python Gym - Python coding challenges"
+authors = ["Andrew Kurauchi <andrew.kurauchi@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+Django = "^3.1.3"
+django-extensions = "^3.1.0"
+requests = "^2.25.0"
+
+[tool.poetry.dev-dependencies]
+coverage = "^5.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
