@@ -38,6 +38,7 @@ LOGIN_URL = '/login'
 INSTALLED_APPS = [
     'core',
     'frontend',
+    'coding_challenge',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
