@@ -1,26 +1,49 @@
 import gitpy
 import json
+from pathlib import Path
 
 
-async def update_challenges(base_dir, repo_url, challenges_dir='challenges', details_file='details.json', question_file='question.md'):
-    git = gitpy.Git(base_dir)
-    if git.is_repo():
-        await git.pull()
-    else:
-        await git.clone(repo_url)
+class ChallengeManager:
+    def __init__(self, git, repo_url, last_commit=None):
+        self.repo_url = repo_url
+        self.last_commit = last_commit
+        self.git = git
 
-    all_challenges = []
-    for challenge_dir in (base_dir / challenges_dir).iterdir():
-        if not challenge_dir.is_dir():
-            continue
+    async def update(self):
+        if self.git.is_repo():
+            await self.git.pull()
+        else:
+            await self.git.clone(self.repo_url)
 
-        with open(challenge_dir / details_file) as f:
-            details = json.load(f)
-        with open(challenge_dir / question_file) as f:
-            question = f.read()
-        tests_file = challenge_dir / 'tests.py'
-        details['question'] = question
-        details['tests_file'] = str(tests_file)
-        all_challenges.append(details)
+    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md'):
+        if self.last_commit:
+            cdir = str(Path(self.git.base_dir / challenges_dir).absolute())
+            challenge_dirs = await self.git.changed_files(self.last_commit)
+            tmp = challenge_dirs
+            challenge_dirs = set()
+            for d in tmp:
+                if cdir not in str(d.absolute()):
+                    continue
+                while cdir != str(d.parent.absolute()):
+                    d = d.parent
+                challenge_dirs.add(d)
+            challenge_dirs = list(challenge_dirs)
+        else:
+            challenge_dirs = (self.git.base_dir / challenges_dir).iterdir()
+        challenge_dirs = [d for d in challenge_dirs if d.is_dir()]
 
-    # TODO ONLY UPDATE WHAT CHANGED SINCE LAST COMMIT (WILL PROBABLY NEED TO STORE COMMIT HASH)
+        all_challenges = {}
+        for challenge_dir in challenge_dirs:
+            try:
+                with open(challenge_dir / details_file) as f:
+                    details = json.load(f)
+                with open(challenge_dir / question_file) as f:
+                    question = f.read()
+                tests_file = challenge_dir / 'tests.py'
+                details['question'] = question
+                details['tests_file'] = str(tests_file)
+                all_challenges[challenge_dir.name] = details
+            except FileNotFoundError:
+                pass
+
+        return all_challenges

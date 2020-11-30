@@ -35,6 +35,9 @@ class Git:
         path = Path(self.base_dir)
         return path.exists() and (path / '.git').is_dir()
 
+    async def status(self):
+        return await self._git(f'status')
+
     async def pull(self, *pull_args):
         await self._git(f'pull', args=pull_args)
 
@@ -47,8 +50,10 @@ class Git:
     async def push(self, *push_args):
         await self._git(f'push', args=push_args)
 
-    async def log(self, *log_args):
-        _, entries_str, _ = await self._git(f'log', args=log_args)
+    async def log(self, *log_args, last=None):
+        if last:
+            log_args += ('-n', f'{last}')
+        _, entries_str, _ = await self._git('log', args=log_args)
 
         commit_pattern = 'commit '
         author_pattern = 'Author: '
@@ -85,3 +90,7 @@ class Git:
                 'message': msg.strip(),
             })
         return commits
+
+    async def changed_files(self, sha):
+        _, files, _ = await self._git(f'diff --name-only {sha}')
+        return [self.base_dir / f.strip() for f in files.split('\n') if f.strip()]
