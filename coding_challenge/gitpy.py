@@ -3,8 +3,9 @@ from pathlib import Path
 
 
 async def git_cmd(cmd, cwd=None):
+    full_cmd = f'git {cmd}'
     proc = await asyncio.create_subprocess_shell(
-        f'git {cmd}',
+        full_cmd,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
         cwd=cwd)
@@ -21,7 +22,12 @@ class Git:
     async def _git(self, cmd, args=None):
         if args is None:
             args = []
-        return await git_cmd(f'{cmd} {" ".join(str(arg) for arg in args)}', self.base_dir)
+        retcode, stdout, stderr = await git_cmd(f'{cmd} {" ".join(str(arg) for arg in args)}', self.base_dir)
+
+        if stderr:
+            raise RuntimeError(f'Error in command "git {cmd}\nERROR BELOW:\n{stderr}"')
+
+        return retcode, stdout, stderr
 
     async def init(self):
         await self._git(f'init')
@@ -49,6 +55,9 @@ class Git:
 
     async def push(self, *push_args):
         await self._git(f'push', args=push_args)
+
+    async def rm(self, *rm_args):
+        await self._git(f'rm', args=rm_args)
 
     async def log(self, *log_args, last=None):
         if last:

@@ -91,3 +91,17 @@ async def test_list_file_changes(tmp_path):
         changed = await git.changed_files(entry['commit'])
         assert len(changed) == n - i
         assert set(changed) == set(filenames[i:])
+
+
+@pytest.mark.asyncio
+async def test_list_file_changes_with_deleted_files(tmp_path):
+    filename = tmp_path / 'text.txt'
+
+    git = gitpy.Git(tmp_path)
+    await git.init()
+    await add_file(git, filename, 'Some text')
+    await git.commit(f'-m "Adding file"')
+    await git.rm(filename)
+    await git.commit(f'-m "Removing file"')
+    changed_files = await git.changed_files('HEAD^')
+    assert changed_files[0] == filename

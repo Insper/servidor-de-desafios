@@ -1,12 +1,10 @@
-import gitpy
 import json
 from pathlib import Path
 
 
 class ChallengeManager:
-    def __init__(self, git, repo_url, last_commit=None):
+    def __init__(self, git, repo_url):
         self.repo_url = repo_url
-        self.last_commit = last_commit
         self.git = git
 
     async def update(self):
@@ -15,10 +13,10 @@ class ChallengeManager:
         else:
             await self.git.clone(self.repo_url)
 
-    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md'):
-        if self.last_commit:
+    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md', last_commit=None):
+        if last_commit:
             cdir = str(Path(self.git.base_dir / challenges_dir).absolute())
-            challenge_dirs = await self.git.changed_files(self.last_commit)
+            challenge_dirs = await self.git.changed_files(last_commit)
             tmp = challenge_dirs
             challenge_dirs = set()
             for d in tmp:
@@ -30,7 +28,7 @@ class ChallengeManager:
             challenge_dirs = list(challenge_dirs)
         else:
             challenge_dirs = (self.git.base_dir / challenges_dir).iterdir()
-        challenge_dirs = [d for d in challenge_dirs if d.is_dir()]
+        challenge_dirs = [d for d in challenge_dirs if d.is_dir() or not d.exists()]
 
         all_challenges = {}
         for challenge_dir in challenge_dirs:
@@ -44,6 +42,7 @@ class ChallengeManager:
                 details['tests_file'] = str(tests_file)
                 all_challenges[challenge_dir.name] = details
             except FileNotFoundError:
-                pass
+                if not challenge_dir.is_dir():
+                    all_challenges[challenge_dir.name] = None
 
         return all_challenges

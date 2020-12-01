@@ -63,9 +63,9 @@ async def test_list_new_challenges(tmp_path):
     for entry in reversed(log):
         commits.append(entry['commit'])
 
+    cm = ChallengeManager(git, None)
     for c, commit in enumerate(commits):
-        cm = ChallengeManager(git, None, last_commit=commit)
-        challenges = await cm.changed_challenges()
+        challenges = await cm.changed_challenges(last_commit=commit)
         assert len(challenges) == n - c
         for challenge in challenges:
             got_details = challenges[challenge]
@@ -76,3 +76,35 @@ async def test_list_new_challenges(tmp_path):
             assert got_details['question'] == question
             assert got_details['tests_file'] == str(tmp_path / 'challenges' / challenge / 'tests.py')
 
+
+@pytest.mark.asyncio
+async def test_list_deleted_challenges(tmp_path):
+    git = gitpy.Git(tmp_path)
+    await git.init()
+    n = 5
+    challenge_paths = []
+    for i in range(1, n+1):
+        details = {
+            "title": f"Challenge {i}",
+            "tags": "function",
+            "terminal": True,
+            "published": True,
+            "function_name": f"solution_{i}",
+        }
+        question = f'Something about question {i}.'
+        challenge_name = f'challenge_{i}'
+        tests = f'def test_dummy():\n    pass'
+        files = save_challenge(tmp_path, challenge_name, details, question, tests)
+        for f in files:
+            await git.add(f)
+        challenge_paths.append(tmp_path / 'challenges' / challenge_name)
+    await git.commit(f'-m "Adding all files."')
+
+    cm = ChallengeManager(git, None)
+    for i in range(1, n+1):
+        challenge = challenge_paths.pop()
+        await git.rm('-rf', challenge)
+        await git.commit('-m', f'Removing {challenge}')
+        challenges = await cm.changed_challenges(last_commit='HEAD^')
+        assert len(challenges) == 1
+        assert list(challenges.keys())[0] == challenge.name
