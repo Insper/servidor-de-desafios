@@ -31,6 +31,10 @@ We use [React](https://reactjs.org/) to develop our frontend. To install it you 
     $ cd frontend
     $ npm install
 
+### Design
+
+The font used for the logo is [Gayathri](https://fonts.google.com/specimen/Gayathri?preview.text=python%20gym&preview.text_type=custom).
+
 ### Running server in dev mode
 
 Run the server with:

@@ -13,7 +13,7 @@ Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text
 let theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#4B8BBE',
+      main: '#306998',
     },
     secondary: {
       main: '#FFE873',
@@ -31,10 +31,7 @@ const customClasses = {
     flexGrow: 1
   },
   homeButton: {
-    color: "inherit",
-    "&:active": { textDecoration: "none" },
-    "&:hover": { textDecoration: "none" },
-    "&: visited": { textDecoration: "none" }
+    display: "flex"
   },
 }
 
