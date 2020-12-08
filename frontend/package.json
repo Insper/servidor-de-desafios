@@ -4,23 +4,48 @@
   "description": "Frontend for PyGym",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_ENV=test mocha --require @babel/register --require ignore-styles src/test/*.test.js src/test/**/*.test.js",
     "dev": "webpack --mode development ./src/index.js --output-path ./static/frontend",
-    "build": "webpack --mode production ./src/index.js --output-path ./static/frontend"
+    "build": "webpack --mode production ./src/index.js --output-path ./static/frontend",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "dev": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "js,jsx,css"
+    }
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "@babel/preset-env": "^7.12.7",
     "@babel/preset-react": "^7.12.7",
+    "@babel/register": "^7.12.1",
+    "@material-ui/icons": "^4.11.2",
     "babel-loader": "^8.2.2",
+    "babel-preset-react-app-babel-7": "^4.0.2-0",
+    "chai": "^4.2.0",
+    "css-loader": "^5.0.1",
+    "file-loader": "^6.2.0",
+    "fontsource-roboto": "^3.0.3",
+    "ignore-styles": "^5.0.1",
+    "mocha": "^8.2.1",
+    "npm-watch": "^0.7.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "webpack": "^5.8.0",
     "webpack-cli": "^4.2.0"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.2",
+    "i18next": "^19.8.4",
+    "i18next-browser-languagedetector": "^6.0.1",
+    "i18next-xhr-backend": "^3.2.2",
+    "react-i18next": "^11.7.3",
     "react-scripts": "^4.0.1"
   }
 }

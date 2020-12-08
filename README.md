@@ -42,6 +42,10 @@ To update the react frontend, run:
     $ cd frontend
     $ npm run dev
 
+If you are developing the frontend, the following will probably be useful:
+
+    $ cd frontend
+    $ npm run watch
 
 
 

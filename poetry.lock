@@ -92,6 +92,17 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "djangorestframework"
+version = "3.12.2"
+description = "Web APIs for Django, made easy."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+django = ">=2.2"
+
+[[package]]
 name = "idna"
 version = "2.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -284,7 +295,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "ec829f0ebb9168d75276825ed6d4bca32a4f08688e696f2460f73827a9f27803"
+content-hash = "c9cce931014d2c204d242d1fc4aa8ac305650a6bd7113c088e6631b93b3f0876"
 
 [metadata.files]
 asgiref = [
@@ -354,6 +365,9 @@ django = [
 django-extensions = [
     {file = "django-extensions-3.1.0.tar.gz", hash = "sha256:7cd002495ff0a0e5eb6cdd6be759600905b4e4079232ea27618fc46bdd853651"},
     {file = "django_extensions-3.1.0-py3-none-any.whl", hash = "sha256:c7f88625a53f631745d4f2bef9ec4dcb999ed59476393bdbbe99db8596778846"},
+]
+djangorestframework = [
+    {file = "djangorestframework-3.12.2-py3-none-any.whl", hash = "sha256:0209bafcb7b5010fdfec784034f059d512256424de2a0f084cb82b096d6dd6a7"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
