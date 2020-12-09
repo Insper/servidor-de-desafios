@@ -2,5 +2,6 @@
   "Can't be empty": "Não pode ser vazio",
   "Username": "Usuário",
   "Password": "Senha",
-  "In case you haven't changed it, it is the same as your username": "Caso você não tenha mudado, a senha é igual ao seu usuário"
+  "In case you haven't changed it, it is the same as your username": "Caso você não tenha mudado, a senha é igual ao seu usuário",
+  "Logout": "Sair"
 }

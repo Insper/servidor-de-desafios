@@ -14,7 +14,7 @@ class CodingChallengeList extends Component {
   }
 
   componentDidMount() {
-    fetch('/api/coding')
+    fetch('/api/coding/', { credentials: 'include' })
       .then(res => res.json())
       .then((data) => {
         let tags = extractTags(data)

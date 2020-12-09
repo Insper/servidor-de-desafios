@@ -1,6 +1,8 @@
 from django.urls import include, path
+from . import views
 
 
 urlpatterns = [
-    path('coding', include('coding_challenge.urls')),
+    path('user/', views.get_user),
+    path('coding/', include('coding_challenge.urls')),
 ]

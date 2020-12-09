@@ -2592,7 +2592,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"customClasses\": () => /* binding */ customClasses,\n/* harmony export */   \"theme\": () => /* binding */ theme\n/* harmony export */ });\n/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @material-ui/core/styles */ \"./node_modules/@material-ui/core/esm/styles/createMuiTheme.js\");\n/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @material-ui/core/styles */ \"./node_modules/@material-ui/core/esm/styles/responsiveFontSizes.js\");\n // Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text=The%20Python%20Logo%20Colors%20with,and%20Granite%20Gray%20(%23646464).):\n\nvar BLUE1 = '#4B8BBE';\nvar BLUE2 = '#306998';\nvar YELLOW1 = '#FFE873';\nvar YELLOW2 = '#FFD43B';\nvar GRAY1 = '#646464';\nvar GRAY2 = '#E0E0E0';\nvar theme = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_0__.default)({\n  palette: {\n    primary: {\n      main: BLUE2,\n      light: BLUE1\n    },\n    secondary: {\n      main: YELLOW2,\n      light: YELLOW1\n    }\n  }\n});\ntheme = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_1__.default)(theme);\nvar customClasses = {\n  titleIcon: {\n    marginRight: \"10px\"\n  },\n  appTitle: {\n    flexGrow: 1\n  },\n  homeButton: {\n    display: \"flex\"\n  },\n  loginLogo: {\n    maxHeight: \"30vh\"\n  },\n  loginBack: {\n    backgroundColor: GRAY2,\n    display: \"flex\",\n    flexDirection: \"column\",\n    alignItems: \"center\"\n  },\n  centerVerticalContent: {\n    display: \"flex\",\n    flexDirection: \"column\",\n    alignItems: \"center\",\n    gap: \"2em\"\n  }\n};\n\n\n//# sourceURL=webpack://frontend/./src/styles.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"customClasses\": () => /* binding */ customClasses,\n/* harmony export */   \"theme\": () => /* binding */ theme\n/* harmony export */ });\n/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @material-ui/core/styles */ \"./node_modules/@material-ui/core/esm/styles/createMuiTheme.js\");\n/* harmony import */ var _material_ui_core_styles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @material-ui/core/styles */ \"./node_modules/@material-ui/core/esm/styles/responsiveFontSizes.js\");\n // Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text=The%20Python%20Logo%20Colors%20with,and%20Granite%20Gray%20(%23646464).):\n\nvar BLUE1 = '#4B8BBE';\nvar BLUE2 = '#306998';\nvar YELLOW1 = '#FFE873';\nvar YELLOW2 = '#FFD43B';\nvar GRAY1 = '#646464';\nvar GRAY2 = '#E0E0E0';\nvar theme = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_0__.default)({\n  palette: {\n    primary: {\n      main: BLUE2,\n      light: BLUE1\n    },\n    secondary: {\n      main: YELLOW2,\n      light: YELLOW1\n    }\n  }\n});\ntheme = (0,_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_1__.default)(theme);\nvar customClasses = {\n  titleIcon: {\n    marginRight: \"10px\"\n  },\n  appTitle: {\n    flexGrow: 1\n  },\n  homeButton: {\n    display: \"flex\"\n  },\n  loginLogo: {\n    maxHeight: \"30vh\"\n  },\n  loginBack: {\n    backgroundColor: GRAY2,\n    display: \"flex\",\n    flexDirection: \"column\",\n    alignItems: \"center\"\n  },\n  centerVerticalContent: {\n    display: \"flex\",\n    flexDirection: \"column\",\n    alignItems: \"center\",\n    gap: \"2em\"\n  },\n  blankLink: {\n    textDecoration: \"none\",\n    display: \"block\"\n  }\n};\n\n\n//# sourceURL=webpack://frontend/./src/styles.js?");
 
 /***/ }),
 
@@ -3555,6 +3555,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /*! default exports */
 /*! export Can't be empty [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export In case you haven't changed it, it is the same as your username [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Logout [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Username [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
@@ -3562,7 +3563,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((module) => {
 
 "use strict";
-eval("module.exports = JSON.parse(\"{\\\"Can't be empty\\\":\\\"Can't be empty\\\",\\\"Username\\\":\\\"Username\\\",\\\"Password\\\":\\\"Password\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"In case you haven't changed it, it is the same as your username\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/en/translation.json?");
+eval("module.exports = JSON.parse(\"{\\\"Can't be empty\\\":\\\"Can't be empty\\\",\\\"Username\\\":\\\"Username\\\",\\\"Password\\\":\\\"Password\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"In case you haven't changed it, it is the same as your username\\\",\\\"Logout\\\":\\\"Logout\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/en/translation.json?");
 
 /***/ }),
 
@@ -3573,6 +3574,7 @@ eval("module.exports = JSON.parse(\"{\\\"Can't be empty\\\":\\\"Can't be empty\\
 /*! default exports */
 /*! export Can't be empty [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export In case you haven't changed it, it is the same as your username [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Logout [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Username [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
@@ -3580,7 +3582,7 @@ eval("module.exports = JSON.parse(\"{\\\"Can't be empty\\\":\\\"Can't be empty\\
 /***/ ((module) => {
 
 "use strict";
-eval("module.exports = JSON.parse(\"{\\\"Can't be empty\\\":\\\"Não pode ser vazio\\\",\\\"Username\\\":\\\"Usuário\\\",\\\"Password\\\":\\\"Senha\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"Caso você não tenha mudado, a senha é igual ao seu usuário\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/pt/translation.json?");
+eval("module.exports = JSON.parse(\"{\\\"Can't be empty\\\":\\\"Não pode ser vazio\\\",\\\"Username\\\":\\\"Usuário\\\",\\\"Password\\\":\\\"Senha\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"Caso você não tenha mudado, a senha é igual ao seu usuário\\\",\\\"Logout\\\":\\\"Sair\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/pt/translation.json?");
 
 /***/ })
 

@@ -48,6 +48,10 @@ const customClasses = {
     flexDirection: "column",
     alignItems: "center",
     gap: "2em",
+  },
+  blankLink: {
+    textDecoration: "none",
+    display: "block",
   }
 }
 
