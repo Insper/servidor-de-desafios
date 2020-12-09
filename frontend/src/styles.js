@@ -1,22 +1,23 @@
 import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
 
-/*
-Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text=The%20Python%20Logo%20Colors%20with,and%20Granite%20Gray%20(%23646464).):
-  #4B8BBE - blue 1
-  #306998 - blue 2
-  #FFE873 - yellow 1
-  #FFD43B - yellow 2
-  #646464 - gray
-*/
+// Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text=The%20Python%20Logo%20Colors%20with,and%20Granite%20Gray%20(%23646464).):
+const BLUE1 = '#4B8BBE'
+const BLUE2 = '#306998'
+const YELLOW1 = '#FFE873'
+const YELLOW2 = '#FFD43B'
+const GRAY1 = '#646464'
+const GRAY2 = '#E0E0E0'
 
 
 let theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#306998',
+      main: BLUE2,
+      light: BLUE1,
     },
     secondary: {
-      main: '#FFE873',
+      main: YELLOW2,
+      light: YELLOW1,
     },
   },
 });
@@ -33,6 +34,21 @@ const customClasses = {
   homeButton: {
     display: "flex"
   },
+  loginLogo: {
+    maxHeight: "30vh"
+  },
+  loginBack: {
+    backgroundColor: GRAY2,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+  centerVerticalContent: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "2em",
+  }
 }
 
 

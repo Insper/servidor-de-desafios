@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { List, ListItem, Typography } from '@material-ui/core';
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import Typography from '@material-ui/core/Typography';
 import { extractTags, groupByTag } from "../models/challenge"
 
 class CodingChallengeList extends Component {

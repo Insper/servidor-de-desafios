@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   module: {
     rules: [
@@ -14,16 +16,24 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|ttf|eot)$/,
-        use: 'file-loader?name=fonts/[name].[ext]!static'
+        use: 'file-loader?name=./static/frontend/fonts/[name].[ext]!static'
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
         use: [
           {
-            loader: 'file-loader',
+            loader: 'file-loader?name=./static/frontend/img/[name].[ext]',
           },
         ],
       }
     ]
+  },
+  entry: {
+    main: './src/index.js',
+    auth: './src/auth.js'
+  },
+  output: {
+    filename: './static/frontend/[name].js',
+    path: path.resolve(__dirname)
   }
 };

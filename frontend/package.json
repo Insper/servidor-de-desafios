@@ -5,16 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require @babel/register --require ignore-styles src/test/*.test.js src/test/**/*.test.js",
-    "dev": "webpack --mode development ./src/index.js --output-path ./static/frontend",
-    "build": "webpack --mode production ./src/index.js --output-path ./static/frontend",
-    "watch": "npm-watch"
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production",
+    "watch": "npm-watch",
+    "translate": "npx i18next 'src/**/*.{js,hbs}'"
   },
   "watch": {
     "dev": {
       "patterns": [
         "src"
       ],
-      "extensions": "js,jsx,css"
+      "extensions": "js,jsx,css,json"
     }
   },
   "author": "",
@@ -32,6 +33,7 @@
     "css-loader": "^5.0.1",
     "file-loader": "^6.2.0",
     "fontsource-roboto": "^3.0.3",
+    "i18next-parser": "^3.4.0",
     "ignore-styles": "^5.0.1",
     "mocha": "^8.2.1",
     "npm-watch": "^0.7.0",
@@ -46,6 +48,7 @@
     "i18next-browser-languagedetector": "^6.0.1",
     "i18next-xhr-backend": "^3.2.2",
     "react-i18next": "^11.7.3",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.1"
   }
 }
