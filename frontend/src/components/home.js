@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { withTranslation } from 'react-i18next';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { CodingChallengeList } from './coding-challenge'
+import { CodingChallengeList } from './CodingChallengeList'
 import { customClasses } from '../styles'
 
 

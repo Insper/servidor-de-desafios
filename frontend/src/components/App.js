@@ -12,10 +12,10 @@ import Toolbar from '@material-ui/core/Toolbar'
 import 'fontsource-roboto';
 import { ThemeProvider, withStyles } from '@material-ui/core/styles';
 import { customClasses, theme } from '../styles'
-import Home from './home'
+import Home from './Home'
 import logoPt from '../img/logo-horizontal-small-pt.png'
 import logoDefault from '../img/logo-horizontal-small.png'
-import UserButton from './user-button'
+import UserButton from './UserButton'
 
 
 

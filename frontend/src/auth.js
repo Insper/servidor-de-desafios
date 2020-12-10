@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import { I18nextProvider } from "react-i18next";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
-import Login from "./components/login";
+import Login from "./components/Login";
 import i18n from "./i18n";
 import './App.css'
 import { theme } from './styles'

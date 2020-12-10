@@ -8,7 +8,7 @@ import Menu from '@material-ui/core/Menu';
 import { customClasses } from '../styles'
 import { withTranslation } from 'react-i18next';
 import { withStyles } from '@material-ui/core/styles';
-import ChangePasswordDialog from './change-password'
+import ChangePasswordDialog from './ChangePasswordDialog'
 
 
 class UserButton extends Component {
