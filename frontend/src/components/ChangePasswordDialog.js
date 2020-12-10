@@ -6,7 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { withTranslation } from 'react-i18next';
-import { csrftoken } from './django'
+import { postNewPassword } from '../api/pygym'
 
 
 class ChangePasswordDialog extends Component {
@@ -28,21 +28,7 @@ class ChangePasswordDialog extends Component {
         newPasswordError: "",
         repeatPasswordError: "",
       })
-      fetch('/api/change-password/', {
-        credentials: 'include',
-        method: 'POST',
-        mode: 'same-origin',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({
-          oldPassword: this.state.oldPassword,
-          newPassword: this.state.newPassword,
-          repeatPassword: this.state.repeatPassword
-        })
-      })
+      postNewPassword(this.state.oldPassword, this.state.newPassword, this.state.repeatPassword)
         .then(res => res.json())
         .then(data => {
           if (data.code === 0) handleClose()

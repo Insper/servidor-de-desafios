@@ -3,6 +3,7 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import Typography from '@material-ui/core/Typography';
 import { extractTags, groupByTag } from "../models/challenge"
+import { fetchChallengeList } from '../api/pygym'
 
 class CodingChallengeList extends Component {
   constructor(props) {
@@ -14,7 +15,7 @@ class CodingChallengeList extends Component {
   }
 
   componentDidMount() {
-    fetch('/api/coding/', { credentials: 'include' })
+    fetchChallengeList()
       .then(res => res.json())
       .then((data) => {
         let tags = extractTags(data)

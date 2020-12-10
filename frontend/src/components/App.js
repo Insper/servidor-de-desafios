@@ -16,8 +16,7 @@ import Home from './Home'
 import logoPt from '../img/logo-horizontal-small-pt.png'
 import logoDefault from '../img/logo-horizontal-small.png'
 import UserButton from './UserButton'
-
-
+import { fetchUserData } from '../api/pygym'
 
 class App extends Component {
   constructor(props) {
@@ -26,7 +25,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('/api/user/', { credentials: 'include' })
+    fetchUserData()
       .then(res => res.json())
       .then(data => {
         this.setState({ user: data })
