@@ -91,8 +91,6 @@ class Login extends Component {
               <FormHelperText error={true}>{this.state.loginError}</FormHelperText>
             </Box>
           </Box>
-
-          {/* < p > <a href="{% url 'password_reset' %}">Esqueceu a senha?</a></p> */}
         </Paper>
       </Box>
     )

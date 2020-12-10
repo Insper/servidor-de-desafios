@@ -3,11 +3,11 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Link,
 } from "react-router-dom";
 import { withTranslation } from 'react-i18next';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar'
-import Link from '@material-ui/core/Link'
 import Toolbar from '@material-ui/core/Toolbar'
 import 'fontsource-roboto';
 import { ThemeProvider, withStyles } from '@material-ui/core/styles';
@@ -48,7 +48,7 @@ class App extends Component {
             <AppBar position="static">
               <Toolbar disableGutters={true}>
                 <div className={classes.appTitle}>
-                  <Link href="/" className={classes.homeButton}>
+                  <Link to="/" className={classes.homeButton}>
                     <img src={logoImg} alt="Logo" className={classes.appLogo} />
                   </Link>
                 </div>

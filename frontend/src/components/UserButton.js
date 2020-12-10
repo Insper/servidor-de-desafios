@@ -9,6 +9,7 @@ import { customClasses } from '../styles'
 import { withTranslation } from 'react-i18next';
 import { withStyles } from '@material-ui/core/styles';
 import ChangePasswordDialog from './ChangePasswordDialog'
+import ROUTES from '../routes'
 
 
 class UserButton extends Component {
@@ -68,13 +69,13 @@ class UserButton extends Component {
         >
 
           <MenuItem onClick={handlePasswordChange}>{t("Change password")}</MenuItem>
-          <Link href="/logout/" className={classes.blankLink}><MenuItem>{t("Logout")}</MenuItem></Link>
+          <Link href={ROUTES.logout.link()} className={classes.blankLink}><MenuItem>{t("Logout")}</MenuItem></Link>
         </Menu>
         <ChangePasswordDialog opened={this.state.changePasswordOpened} onClose={handlePasswordChangeClose} />
       </div >
     }
     else {
-      button = <Button color="inherit" href="/login/">Login</Button>
+      button = <Button color="inherit" href={ROUTES.login.link()}>Login</Button>
     }
 
     return button

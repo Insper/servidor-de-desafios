@@ -4,6 +4,7 @@ import ListItem from '@material-ui/core/ListItem'
 import Typography from '@material-ui/core/Typography';
 import { extractTags, groupByTag } from "../models/challenge"
 import { fetchChallengeList } from '../api/pygym'
+import ROUTES from '../routes'
 
 class CodingChallengeList extends Component {
   constructor(props) {
@@ -32,7 +33,7 @@ class CodingChallengeList extends Component {
         <Typography variant="h1" component="h2">{tag.name}</Typography>
         <List component="nav">
           {this.state.challengeGroups[tag.slug].map((challenge) =>
-            <ListItem button component="a" key={`challenge-${challenge.slug}`} href={`/${challenge.slug}`}>
+            <ListItem button component="a" key={`challenge-${challenge.slug}`} href={ROUTES.challenge.link({ slug: challenge.slug })}>
               {challenge.title}
             </ListItem>
           )}
