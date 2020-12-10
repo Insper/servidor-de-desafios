@@ -8,12 +8,15 @@ import Menu from '@material-ui/core/Menu';
 import { customClasses } from '../styles'
 import { withTranslation } from 'react-i18next';
 import { withStyles } from '@material-ui/core/styles';
+import ChangePasswordDialog from './change-password'
 
 
 class UserButton extends Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      changePasswordOpened: false,
+    }
   }
 
   render() {
@@ -24,6 +27,14 @@ class UserButton extends Component {
     const handleClose = () => {
       this.setState({ anchorEl: null });
     };
+
+    const handlePasswordChange = () => {
+      this.setState({ changePasswordOpened: true })
+    }
+
+    const handlePasswordChangeClose = () => {
+      this.setState({ changePasswordOpened: false })
+    }
 
     const classes = this.props.classes
     const t = this.props.t
@@ -55,9 +66,12 @@ class UserButton extends Component {
           open={Boolean(this.state.anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem><Link href="/logout/" className={classes.blankLink}>{t("Logout")}</Link></MenuItem>
+
+          <MenuItem onClick={handlePasswordChange}>{t("Change password")}</MenuItem>
+          <Link href="/logout/" className={classes.blankLink}><MenuItem>{t("Logout")}</MenuItem></Link>
         </Menu>
-      </div>
+        <ChangePasswordDialog opened={this.state.changePasswordOpened} onClose={handlePasswordChangeClose} />
+      </div >
     }
     else {
       button = <Button color="inherit" href="/login/">Login</Button>

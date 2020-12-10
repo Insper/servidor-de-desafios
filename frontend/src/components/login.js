@@ -19,6 +19,8 @@ class Login extends Component {
     this.handlePasswordChanged = this.handlePasswordChanged.bind(this)
     const loginError = (formErrors["__all__"] && formErrors["__all__"][0].message) ? formErrors["__all__"][0].message : ""
     this.state = {
+      username: "",
+      password: "",
       usernameError: "",
       passwordError: "",
       loginError: loginError,
@@ -29,21 +31,23 @@ class Login extends Component {
     let username = event.target.value
     let error;
     if (!username) error = this.props.t("Can't be empty")
-    this.setState({ usernameError: error })
+    this.setState({ username: username, usernameError: error })
   }
 
   handlePasswordChanged(event) {
     let password = event.target.value
     let error;
     if (!password) error = this.props.t("Can't be empty")
-    this.setState({ passwordError: error })
+    this.setState({ password: password, passwordError: error })
   }
+
 
   render() {
     const t = this.props.t
     const i18n = this.props.i18n
     const classes = this.props.classes
     const logoImg = i18n.language === 'pt' ? logoPt : logoDefault
+    const hasEmptyFields = !(this.state.username && this.state.password)
 
     return (
       <Box height="100%" className={classes.centerVerticalContent}>
@@ -55,11 +59,35 @@ class Login extends Component {
             <Box component="form" method="post" action="/login/" m={2} className={classes.centerVerticalContent}>
               <CSRFToken />
 
-              <TextField id="id-username" onChange={this.handleUsernameChanged} label={t('Username')} variant="outlined" required={true} name="username" autoFocus={true} autoCapitalize="none" autoComplete="username" maxLength="150" helperText={this.state.usernameError} error={Boolean(this.state.usernameError)} fullWidth />
+              <TextField
+                id="id-username"
+                onChange={this.handleUsernameChanged}
+                label={t('Username')}
+                variant="outlined"
+                required={true}
+                name="username"
+                autoFocus={true}
+                autoCapitalize="none"
+                autoComplete="username"
+                maxLength="150"
+                helperText={this.state.usernameError}
+                error={Boolean(this.state.usernameError)}
+                fullWidth />
 
-              <TextField id="id-password" onChange={this.handlePasswordChanged} label={t('Password')} variant="outlined" type="password" required={true} name="password" autoComplete="current-password" helperText={this.state.passwordError ? this.state.passwordError : t("In case you haven't changed it, it is the same as your username")} error={Boolean(this.state.passwordError)} fullWidth />
+              <TextField
+                id="id-password"
+                onChange={this.handlePasswordChanged}
+                label={t('Password')}
+                variant="outlined"
+                type="password"
+                required={true}
+                name="password"
+                autoComplete="current-password"
+                helperText={this.state.passwordError ? this.state.passwordError : t("In case you haven't changed it, it is the same as your username")}
+                error={Boolean(this.state.passwordError)}
+                fullWidth />
 
-              <Button variant="contained" color="secondary" type="submit" fullWidth >Login</Button>
+              <Button variant="contained" color="secondary" type="submit" fullWidth disabled={hasEmptyFields}>Login</Button>
               <FormHelperText error={true}>{this.state.loginError}</FormHelperText>
             </Box>
           </Box>

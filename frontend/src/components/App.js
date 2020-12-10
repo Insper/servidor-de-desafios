@@ -50,7 +50,7 @@ class App extends Component {
               <Toolbar disableGutters={true}>
                 <div className={classes.appTitle}>
                   <Link href="/" className={classes.homeButton}>
-                    <img src={logoImg} alt="Logo" />
+                    <img src={logoImg} alt="Logo" className={classes.appLogo} />
                   </Link>
                 </div>
                 <UserButton user={this.state.user} />

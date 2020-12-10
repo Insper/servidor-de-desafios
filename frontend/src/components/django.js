@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-// CRSF code from: https://stackoverflow.com/a/50735730
+// CRSF code from: https://docs.djangoproject.com/en/3.1/ref/csrf/#ajax
 const getCookie = (name) => {
   let cookieValue = null
   if (document.cookie && document.cookie !== '') {
@@ -27,4 +27,4 @@ const CSRFToken = () => {
 
 const formErrors = window.formErrors
 
-export { CSRFToken, formErrors };
+export { csrftoken, CSRFToken, formErrors };

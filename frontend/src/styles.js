@@ -52,6 +52,9 @@ const customClasses = {
   blankLink: {
     textDecoration: "none",
     display: "block",
+  },
+  appLogo: {
+    maxWidth: "20em",
   }
 }
 
