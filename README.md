@@ -51,6 +51,15 @@ If you are developing the frontend, the following will probably be useful:
     $ cd frontend
     $ npm run watch
 
+### Translation
+
+Python Gym currently supports pt-BR and en-US. To translate the strings, run:
+
+    $ cd frontend
+    $ npm run translate
+
+This command will generate the files `frontend/src/locale/en/translation.json` and `frontend/src/locale/pt/translation.json`. Just fill the empty values.
+
 
 
 # ANTIGO
