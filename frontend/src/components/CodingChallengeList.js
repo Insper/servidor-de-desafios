@@ -30,7 +30,7 @@ class CodingChallengeList extends Component {
     let t = this.props.t;
     const challengeGroups = this.state.tags.map(tag =>
       <React.Fragment key={`tag-${tag.slug}`}>
-        <Typography variant="h1" component="h2">{tag.name}</Typography>
+        <Typography variant="h1" component="h2" gutterBottom={true}>{tag.name}</Typography>
         <List component="nav">
           {this.state.challengeGroups[tag.slug].map((challenge) =>
             <ListItem button component="a" key={`challenge-${challenge.slug}`} href={ROUTES.challenge.link({ slug: challenge.slug })}>
@@ -48,5 +48,5 @@ class CodingChallengeList extends Component {
   }
 }
 
-export { CodingChallengeList }
+export default CodingChallengeList
 

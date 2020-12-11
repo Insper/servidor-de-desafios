@@ -10,6 +10,10 @@ class Command(BaseCommand):
     help = 'Updates challenges from git repo'
 
     def get_choice(self, msg, choices):
+        if not choices:
+            raise RuntimeError('There are no repos available')
+        if len(choices) == 1:
+            return choices[0]
         ret = None
         while ret is None:
             print(msg)

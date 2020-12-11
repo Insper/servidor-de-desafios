@@ -31,4 +31,8 @@ const fetchChallengeList = () => {
   return fetch(API_CHALLENGES, { credentials: 'include' })
 }
 
-export { fetchUserData, postNewPassword, fetchChallengeList }
+const fetchChallenge = (slug) => {
+  return fetch(`${API_CHALLENGES}${slug}/`, { credentials: 'include' })
+}
+
+export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge }

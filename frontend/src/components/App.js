@@ -8,15 +8,19 @@ import {
 import { withTranslation } from 'react-i18next';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar'
+import Box from '@material-ui/core/Box'
 import Toolbar from '@material-ui/core/Toolbar'
+import Container from '@material-ui/core/Container';
 import 'fontsource-roboto';
 import { ThemeProvider, withStyles } from '@material-ui/core/styles';
 import { customClasses, theme } from '../styles'
-import Home from './Home'
+import CodingChallengeList from './CodingChallengeList'
+import CodingChallenge from './CodingChallenge'
 import logoPt from '../img/logo-horizontal-small-pt.png'
 import logoDefault from '../img/logo-horizontal-small.png'
 import UserButton from './UserButton'
 import { fetchUserData } from '../api/pygym'
+import ROUTES from '../routes'
 
 class App extends Component {
   constructor(props) {
@@ -48,7 +52,7 @@ class App extends Component {
             <AppBar position="static">
               <Toolbar disableGutters={true}>
                 <div className={classes.appTitle}>
-                  <Link to="/" className={classes.homeButton}>
+                  <Link to={ROUTES.home.link()} className={classes.homeButton}>
                     <img src={logoImg} alt="Logo" className={classes.appLogo} />
                   </Link>
                 </div>
@@ -56,11 +60,18 @@ class App extends Component {
               </Toolbar>
             </AppBar>
 
-            <Switch>
-              <Route path="/">
-                <Home maxContainer={maxContainer} />
-              </Route>
-            </Switch>
+            <Box mt={6}>
+              <Container maxWidth={maxContainer}>
+                <Switch>
+                  <Route exact path={ROUTES.home.path}>
+                    <CodingChallengeList />
+                  </Route>
+                  <Route path={ROUTES.challenge.path} render={(props) =>
+                    <CodingChallenge slug={props.match.params.slug} />
+                  } />
+                </Switch>
+              </Container>
+            </Box>
           </Router>
         </ThemeProvider>
       </React.Fragment>

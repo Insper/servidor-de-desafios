@@ -55,6 +55,16 @@ const customClasses = {
   },
   appLogo: {
     maxWidth: "20em",
+  },
+  loadingContainer: {
+    margin: "8em",
+    display: "flex",
+    justifyContent: "center",
+  },
+  centeredImg: {
+    display: "block",
+    marginLeft: "auto",
+    marginRight: "auto",
   }
 }
 

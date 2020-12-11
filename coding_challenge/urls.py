@@ -4,5 +4,6 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.CodingChallengeList.as_view(), name='index'),
+    path('', views.CodingChallengeListView.as_view(), name='index'),
+    path('<slug:slug>/', views.CodingChallengeView.as_view(), name='detail'),
 ]

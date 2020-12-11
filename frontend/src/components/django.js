@@ -1,5 +1,6 @@
 import React from 'react';
 
+const STATIC_URL = '/static/'
 
 // CRSF code from: https://docs.djangoproject.com/en/3.1/ref/csrf/#ajax
 const getCookie = (name) => {
@@ -27,4 +28,4 @@ const CSRFToken = () => {
 
 const formErrors = window.formErrors
 
-export { csrftoken, CSRFToken, formErrors };
+export { csrftoken, CSRFToken, formErrors, STATIC_URL };

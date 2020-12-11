@@ -15,13 +15,20 @@ import os
 import sys
 import json
 
+
+def create_dir(dirpath):
+    try:
+        dirpath.mkdir(parents=True)
+    except FileExistsError:
+        pass
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 CHALLENGES_DIR = BASE_DIR / 'raw' / 'challenge_files'
-try:
-    CHALLENGES_DIR.mkdir(parents=True)
-except FileExistsError:
-    pass
+CHALLENGES_RAW_DIR = BASE_DIR / 'coding_challenge' / 'static' / 'raw'
+create_dir(CHALLENGES_DIR)
+create_dir(CHALLENGES_RAW_DIR)
 
 
 # Quick-start development settings - unsuitable for production

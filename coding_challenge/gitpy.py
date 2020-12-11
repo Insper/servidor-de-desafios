@@ -24,9 +24,6 @@ class Git:
             args = []
         retcode, stdout, stderr = await git_cmd(f'{cmd} {" ".join(str(arg) for arg in args)}', self.base_dir)
 
-        if stderr:
-            raise RuntimeError(f'Error in command "git {cmd}\nERROR BELOW:\n{stderr}"')
-
         return retcode, stdout, stderr
 
     async def init(self):

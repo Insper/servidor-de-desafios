@@ -47,8 +47,11 @@
     "i18next": "^19.8.4",
     "i18next-browser-languagedetector": "^6.0.1",
     "i18next-xhr-backend": "^3.2.2",
+    "material-ui-image": "^3.3.1",
     "react-i18next": "^11.7.3",
+    "react-markdown": "^5.0.3",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.1"
+    "react-scripts": "^4.0.1",
+    "remark-gfm": "^1.0.0"
   }
 }

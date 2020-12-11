@@ -1,5 +1,7 @@
 import json
 from pathlib import Path
+import shutil
+from django.conf import settings
 
 
 class ChallengeManager:
@@ -13,7 +15,7 @@ class ChallengeManager:
         else:
             await self.git.clone(self.repo_url)
 
-    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md', last_commit=None):
+    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md', raw_dir='raw', last_commit=None):
         if last_commit:
             cdir = str(Path(self.git.base_dir / challenges_dir).absolute())
             challenge_dirs = await self.git.changed_files(last_commit)
@@ -41,6 +43,13 @@ class ChallengeManager:
                 details['question'] = question
                 details['tests_file'] = str(tests_file)
                 all_challenges[challenge_dir.name] = details
+                slug = challenge_dir.name
+                src = challenge_dir / raw_dir / slug
+                if src.is_dir():
+                    dst = settings.CHALLENGES_RAW_DIR / slug
+                    if (dst).exists():
+                        shutil.rmtree(dst, ignore_errors=True)
+                    shutil.copytree(src, dst)
             except FileNotFoundError:
                 if not challenge_dir.is_dir():
                     all_challenges[challenge_dir.name] = None
