@@ -1,4 +1,4 @@
-from .models import Tag, CodingChallenge
+from .models import Tag, CodingChallenge, CodingChallengeSubmission
 from rest_framework.serializers import ModelSerializer
 
 
@@ -9,16 +9,22 @@ class TagSerializer(ModelSerializer):
 
 
 class FullCodingChallengeSerializer(ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
+    tag = TagSerializer(read_only=True)
 
     class Meta:
         model = CodingChallenge
-        fields = ['title', 'slug', 'question', 'tags', 'function_name']
+        fields = ['title', 'slug', 'question', 'tag', 'function_name']
 
 
 class ShortCodingChallengeSerializer(ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
+    tag = TagSerializer(read_only=True)
 
     class Meta:
         model = CodingChallenge
-        fields = ['title', 'slug', 'tags']
+        fields = ['title', 'slug', 'tag']
+
+
+class CodingChallengeSubmissionSerializer(ModelSerializer):
+    class Meta:
+        model = CodingChallengeSubmission
+        fields = ['creation_date', 'code', 'success', 'safe_feedback', 'safe_stack_traces', 'safe_stdouts']

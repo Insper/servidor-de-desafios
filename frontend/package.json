@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.2",
+    "@monaco-editor/react": "^3.7.2",
     "i18next": "^19.8.4",
     "i18next-browser-languagedetector": "^6.0.1",
     "i18next-xhr-backend": "^3.2.2",
@@ -52,6 +53,8 @@
     "react-markdown": "^5.0.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.1",
+    "react-spinners-kit": "^1.9.1",
+    "react-syntax-highlighter": "^15.4.3",
     "remark-gfm": "^1.0.0"
   }
 }

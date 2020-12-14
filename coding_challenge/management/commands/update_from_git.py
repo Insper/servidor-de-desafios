@@ -26,15 +26,13 @@ class Command(BaseCommand):
         return ret
 
     def update_or_create(self, slug, data, repo):
-        tag_strs = [t.strip() for t in data['tags'].split(',') if t.strip()]
-        tags = Tag.objects.filter(slug__in=tag_strs)
+        tag = Tag.objects.get(slug=data['tag'])
         try:
             challenge = CodingChallenge.objects.get(slug=slug, repo=repo)
             challenge.title = data['title']
             challenge.question = data['question']
             challenge.published = data['published']
             challenge.show_stdout = data['terminal']
-            challenge.tags.set(tags)
             challenge.function_name = data['function_name']
             challenge.save()
         except CodingChallenge.DoesNotExist:
@@ -46,8 +44,8 @@ class Command(BaseCommand):
                 published=data['published'],
                 show_stdout=data['terminal'],
                 function_name=data['function_name'],
+                tag=tag,
             )
-            challenge.tags.set(tags)
             challenge.save()
         return challenge
 
@@ -62,11 +60,13 @@ class Command(BaseCommand):
     def create_tags(self, tags_file):
         with open(tags_file) as f:
             for tag in [t.strip() for t in f.read().split() if t.strip()]:
-                name, *slug = tag.split(',')
-                if slug:
-                    Tag.objects.get_or_create(name=name, slug=slug)
+                args = tag.split(',')
+                if len(args) > 2:
+                    Tag.objects.get_or_create(name=args[0], slug=args[1], order=int(args[2]))
+                elif len(args) > 1:
+                    Tag.objects.get_or_create(name=args[0], slug=args[1])
                 else:
-                    Tag.objects.get_or_create(name=name)
+                    Tag.objects.get_or_create(name=args[0])
 
     def handle(self, *args, **options):
         repos = ChallengeRepo.objects.all()

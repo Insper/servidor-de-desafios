@@ -62,6 +62,10 @@ This command will generate the files `frontend/src/locale/en/translation.json` a
 
 
 
+
+
+
+
 # ANTIGO
 
 #### Configurando um ambiente virtual

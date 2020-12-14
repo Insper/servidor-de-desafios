@@ -39,6 +39,7 @@ SECRET_KEY = 'hmlz0d9cw%_nu_a(*w==a8^u+ah=ni7ul3*-h$8q^u04ig&s!1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+PRODUCTION = False
 
 ALLOWED_HOSTS = []
 
@@ -101,6 +102,7 @@ try:
     AWS_SECRET_KEY = aws_credentials['AWS_SECRET_KEY']
 except:
     print('Using default configuration for aws lambda', file=sys.stderr)
+USE_AWS = AWS_ACCESS_KEY and AWS_SECRET_KEY
 
 
 # Database
@@ -155,3 +157,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_ROOT = 'media/'

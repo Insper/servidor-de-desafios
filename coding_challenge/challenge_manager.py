@@ -55,3 +55,13 @@ class ChallengeManager:
                     all_challenges[challenge_dir.name] = None
 
         return all_challenges
+
+
+def test_code_for(challenge):
+    challenges_dir = settings.CHALLENGES_DIR / challenge.repo.slug / 'challenges'
+    tests_file = challenges_dir / challenge.slug / 'tests.py'
+    try:
+        with open(tests_file) as f:
+            return f.read()
+    except FileNotFoundError:
+        return None

@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 const gfm = require('remark-gfm')
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography'
+import Link from '@material-ui/core/Link'
 import { STATIC_URL } from './django'
 import { customClasses } from '../styles'
 
@@ -41,6 +42,7 @@ class MaterialMarkdown extends Component {
     const renderers = {
       paragraph: MarkdownParagraph,
       image: MarkdownImage,
+      link: Link,
     }
     return <ReactMarkdown plugins={[gfm]} children={this.props.children} renderers={renderers} />
   }

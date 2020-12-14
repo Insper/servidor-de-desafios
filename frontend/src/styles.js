@@ -65,7 +65,18 @@ const customClasses = {
     display: "block",
     marginLeft: "auto",
     marginRight: "auto",
-  }
+  },
+  flexbox: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  fillParent: {
+    flexGrow: 1,
+  },
+  gridItem: {
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3),
+  },
 }
 
 

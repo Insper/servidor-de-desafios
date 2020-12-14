@@ -60,17 +60,17 @@ class App extends Component {
               </Toolbar>
             </AppBar>
 
-            <Box mt={6}>
-              <Container maxWidth={maxContainer}>
-                <Switch>
-                  <Route exact path={ROUTES.home.path}>
+            <Box mt={3}>
+              <Switch>
+                <Route exact path={ROUTES.home.path}>
+                  <Container maxWidth={maxContainer}>
                     <CodingChallengeList />
-                  </Route>
-                  <Route path={ROUTES.challenge.path} render={(props) =>
-                    <CodingChallenge slug={props.match.params.slug} />
-                  } />
-                </Switch>
-              </Container>
+                  </Container>
+                </Route>
+                <Route path={ROUTES.challenge.path} render={(props) =>
+                  <CodingChallenge slug={props.match.params.slug} />
+                } />
+              </Switch>
             </Box>
           </Router>
         </ThemeProvider>
