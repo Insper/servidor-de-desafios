@@ -60,7 +60,9 @@ Python Gym currently supports pt-BR and en-US. To translate the strings, run:
 
 This command will generate the files `frontend/src/locale/en/translation.json` and `frontend/src/locale/pt/translation.json`. Just fill the empty values.
 
+### Updating AWS lambda code
 
+Change directory to `aws_lambda` and run `update.sh` followed by `prepare_zip.sh`. Upload the generated zip file to AWS.
 
 
 

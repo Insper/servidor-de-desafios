@@ -102,7 +102,11 @@ try:
     AWS_SECRET_KEY = aws_credentials['AWS_SECRET_KEY']
 except:
     print('Using default configuration for aws lambda', file=sys.stderr)
-USE_AWS = AWS_ACCESS_KEY and AWS_SECRET_KEY
+USE_AWS = AWS_ACCESS_KEY and AWS_SECRET_KEY and False
+if USE_AWS:
+    print('Using AWS', file=sys.stderr)
+else:
+    print('Not using AWS', file=sys.stderr)
 
 
 # Database

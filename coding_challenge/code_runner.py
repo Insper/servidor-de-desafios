@@ -1,13 +1,21 @@
 import asyncio
-import functools
 from django.conf import settings
 from strtest import str_test
 import json
-from collections import namedtuple
+if settings.USE_AWS:
+    import aioboto3
+
+
+if settings.USE_AWS:
+    LAMBDA_KWARGS = {
+        'region_name': 'us-east-1',
+    }
+    LAMBDA_KWARGS['aws_access_key_id'] = settings.AWS_ACCESS_KEY
+    LAMBDA_KWARGS['aws_secret_access_key'] = settings.AWS_SECRET_KEY
 
 
 async def run_tests(solution_code, test_code, function_name=None):
-    if settings.PRODUCTION:
+    if settings.USE_AWS:
         return await run_tests_remote(solution_code, test_code, function_name)
     else:
         await asyncio.sleep(2)
@@ -19,10 +27,9 @@ def run_tests_local(solution_code, test_code, function_name=None):
 
 
 async def run_tests_remote(solution_code, test_code, function_name=None):
-    lamb = AWSLambda()
-    feedback = await lamb.run(solution_code, test_code, function_name)
+    feedback = await run_aws_lambda(solution_code, test_code, function_name)
 
-    if isinstance(feedback, dict) and 'Task timed out after' in feedback['errorMessage']:
+    if 'Task timed out after' in feedback.get('errorMessage', ''):
         msg = feedback['errorMessage']
         msg = msg[msg.index('Task timed out'):]
         feedback = {
@@ -33,31 +40,20 @@ async def run_tests_remote(solution_code, test_code, function_name=None):
             'total_tests': 1,
         }
     else:
-        feedback = json.loads(feedback)
+        feedback = json.loads(feedback['body'])
     return str_test.TestResults(None, **feedback)
 
 
-class AWSLambda:
-    def __init__(self):
-        import boto3
-
-        kwargs = {
-            'region_name': 'us-east-1',
-        }
-        if settings.USE_AWS:
-            kwargs['aws_access_key_id'] = settings.AWS_ACCESS_KEY
-            kwargs['aws_secret_access_key'] = settings.AWS_SECRET_KEY
-        self.client =  boto3.client('lambda', **kwargs)
-
-    async def run(self, solution_code, test_code, function_name=None):
-        args = {
-            'answer': solution_code,
-            'test_code': test_code,
-            'function_name': function_name,
-        }
-
-        loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(None, functools.partial(self.client.invoke, FunctionName="testRunner",
-                                InvocationType='RequestResponse',
-                                Payload=json.dumps(args)))
-        return json.loads(response['Payload'].read().decode('utf-8'))
+async def run_aws_lambda(solution_code, test_code, function_name):
+    async with aioboto3.client('lambda', **LAMBDA_KWARGS) as client:
+        response = await client.invoke(
+            FunctionName="str_test",
+            InvocationType='RequestResponse',
+            Payload=json.dumps({
+                'code': solution_code,
+                'test_code': test_code,
+                'function_name': function_name,
+            })
+        )
+        payload = await response['Payload'].read()
+        return json.loads(payload.decode('utf-8'))

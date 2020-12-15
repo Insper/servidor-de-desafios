@@ -55,7 +55,11 @@ class CodingChallenge extends Component {
         let submissions = [data].concat(this.state.submissions.slice(1))
         this.setState({ submissions: submissions })
       })
-      .catch(console.log)
+      .catch(data => {
+        let submissions = [{ id: "error" }].concat(this.state.submissions.slice(1))
+        this.setState({ submissions: submissions })
+        console.log(data)
+      })
   }
 
   render() {

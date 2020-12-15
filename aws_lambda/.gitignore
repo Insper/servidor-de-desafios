@@ -1,0 +1,4 @@
+str_test_lambda.zip
+str_test_lambda/bin
+str_test_lambda/strtest
+str_test_lambda/*.dist-info
