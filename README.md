@@ -39,7 +39,7 @@ The font used for the logo is [Gayathri](https://fonts.google.com/specimen/Gayat
 
 Run the server with:
 
-    $ ./manage.py runserver
+    $ uvicorn pygym.asgi_dev:application --reload
 
 To update the react frontend, run:
 

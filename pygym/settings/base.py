@@ -33,9 +33,14 @@ create_dir(CHALLENGES_RAW_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+try:
+    with open(str(Path(BASE_DIR) / '.django_secret_key')) as f:
+        SECRET_KEY = f.read()
+        print(SECRET_KEY)
+except FileNotFoundError:
+    SECRET_KEY = 'r*gl!)m0t=x##wt##w#4t=fl6-^kk8(smd547w*oi#77=*$69a'
+    print('Using development secret key. If you are in the production server you should create a .django_secret_key file with the secret key.')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'hmlz0d9cw%_nu_a(*w==a8^u+ah=ni7ul3*-h$8q^u04ig&s!1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
