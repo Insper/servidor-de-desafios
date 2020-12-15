@@ -10,6 +10,7 @@ async def run_tests(solution_code, test_code, function_name=None):
     if settings.PRODUCTION:
         return await run_tests_remote(solution_code, test_code, function_name)
     else:
+        await asyncio.sleep(2)
         return run_tests_local(solution_code, test_code, function_name)
 
 

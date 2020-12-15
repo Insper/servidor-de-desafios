@@ -24,6 +24,16 @@ class CodingChallengeListView(APIView):
         return Response(serializer.data)
 
 
+def get_challenge_or_404(slug):
+    try:
+        challenge = CodingChallenge.objects.get(slug=slug)
+        if not challenge.deleted:
+            return challenge
+    except CodingChallenge.DoesNotExist:
+        pass
+    raise Http404(f'There is no challenge with slug {slug}')
+
+
 class CodingChallengeView(APIView):
     """
     Get challenge.
@@ -67,17 +77,8 @@ class CodingChallengeView(APIView):
         self.response = self.finalize_response(request, response, *args, **kwargs)
         return self.response
 
-    def get_or_404(self, slug):
-        try:
-            challenge = CodingChallenge.objects.get(slug=slug)
-            if not challenge.deleted:
-                return challenge
-        except CodingChallenge.DoesNotExist:
-            pass
-        raise Http404(f'There is no challenge with slug {slug}')
-
     def sync_get(self, request, slug, format=None):
-        challenge = self.get_or_404(slug)
+        challenge = get_challenge_or_404(slug)
         serializer = FullCodingChallengeSerializer(challenge)
         return Response(serializer.data)
 
@@ -97,9 +98,21 @@ class CodingChallengeView(APIView):
         return serializer.data
 
     async def post(self, request, slug, format=None):
-        challenge = await sync_to_async(self.get_or_404)(slug)
+        challenge = await sync_to_async(get_challenge_or_404)(slug)
         code = request.data.get('code')
         test_code = await sync_to_async(test_code_for)(challenge)
         result = await run_tests(code, test_code, challenge.function_name)
         data = await sync_to_async(self.create_submission_and_serialize)(request.user, challenge, result, code)
         return Response(data)
+
+
+class CodingChallengeSubmissionListView(APIView):
+    """
+    List all submissions.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, slug, format=None):
+        submissions = CodingChallengeSubmission.objects.filter(author=request.user, challenge__slug=slug).order_by('-creation_date')
+        serializer = CodingChallengeSubmissionSerializer(submissions, many=True)
+        return Response(serializer.data)

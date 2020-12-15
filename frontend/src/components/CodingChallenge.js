@@ -11,15 +11,18 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
-import { fetchChallenge, postChallenge } from '../api/pygym'
+import { fetchChallenge, postChallenge, fetchSubmissionList } from '../api/pygym'
 import MaterialMarkdown from './MaterialMarkdown'
 import Editor from "@monaco-editor/react";
 import { FillSpinner as Loader } from "react-spinners-kit";
+import CodingChallengeFeedbackList from "./CodingChallengeFeedbackList"
 
 class CodingChallenge extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      submissions: [],
+    }
     this.editorRef = React.createRef();
     this.handleEditorDidMount = this.handleEditorDidMount.bind(this)
     this.postSolution = this.postSolution.bind(this)
@@ -30,6 +33,11 @@ class CodingChallenge extends Component {
       .then(res => res.json())
       .then(data => this.setState({ challenge: data }))
       .catch(console.log)
+
+    fetchSubmissionList(this.props.slug)
+      .then(res => res.json())
+      .then(data => this.setState({ submissions: data }))
+      .catch(console.log)
   }
 
   handleEditorDidMount(_, editor) {
@@ -37,9 +45,17 @@ class CodingChallenge extends Component {
   }
 
   postSolution() {
+    this.setState({
+      submissions: [{ id: "running" }].concat(this.state.submissions)
+    })
+
     postChallenge(this.props.slug, this.editorRef.current.getValue())
       .then(res => res.json())
-      .then(data => console.log(data))
+      .then(data => {
+        let submissions = [data].concat(this.state.submissions.slice(1))
+        this.setState({ submissions: submissions })
+      })
+      .catch(console.log)
   }
 
   render() {
@@ -78,6 +94,12 @@ class CodingChallenge extends Component {
                   {t("Submit")}
                 </Button>
               </ButtonGroup>
+            </Box>
+          </Grid>
+
+          <Grid className={classes.gridItem} item md={12}>
+            <Box mt={2}>
+              <CodingChallengeFeedbackList submissions={this.state.submissions} />
             </Box>
           </Grid>
         </Grid>

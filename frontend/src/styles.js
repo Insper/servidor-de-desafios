@@ -1,4 +1,4 @@
-import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
+import { createMuiTheme, makeStyles, responsiveFontSizes } from '@material-ui/core/styles';
 
 // Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text=The%20Python%20Logo%20Colors%20with,and%20Granite%20Gray%20(%23646464).):
 const BLUE1 = '#4B8BBE'
@@ -7,6 +7,8 @@ const YELLOW1 = '#FFE873'
 const YELLOW2 = '#FFD43B'
 const GRAY1 = '#646464'
 const GRAY2 = '#E0E0E0'
+const SUCCESS = '#39C27C'
+const DANGER = '#FF665C'
 
 
 let theme = createMuiTheme({
@@ -77,7 +79,15 @@ const customClasses = {
     paddingLeft: theme.spacing(3),
     paddingRight: theme.spacing(3),
   },
+  success: {
+    color: SUCCESS,
+  },
+  danger: {
+    color: DANGER,
+  }
 }
 
+const useStyles = makeStyles(customClasses)
 
-export { customClasses, theme }
+
+export { customClasses, useStyles, theme }

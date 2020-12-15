@@ -10,6 +10,8 @@
   "Cancel": "Cancelar",
   "Submit": "Enviar",
   "The name of your function must be ": "O nome da sua função deve ser ",
+  "Feedback": "Feedback",
+  "fulldate": "{{date, relative}}",
   "Username": "Usuário",
   "Password": "Senha",
   "In case you haven't changed it, it is the same as your username": "Caso você não tenha mudado, a senha é igual ao seu usuário",

@@ -27,4 +27,4 @@ class ShortCodingChallengeSerializer(ModelSerializer):
 class CodingChallengeSubmissionSerializer(ModelSerializer):
     class Meta:
         model = CodingChallengeSubmission
-        fields = ['creation_date', 'code', 'success', 'safe_feedback', 'safe_stack_traces', 'safe_stdouts']
+        fields = ['id', 'creation_date', 'success', 'safe_feedback', 'safe_stack_traces', 'safe_stdouts']
