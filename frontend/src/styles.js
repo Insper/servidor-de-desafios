@@ -9,6 +9,7 @@ const GRAY1 = '#646464'
 const GRAY2 = '#E0E0E0'
 const SUCCESS = '#39C27C'
 const DANGER = '#FF665C'
+const TERMINAL_INPUT = '#27E427'
 
 
 let theme = createMuiTheme({
@@ -98,7 +99,16 @@ const customClasses = {
   },
   sourceCode: {
     fontFamily: 'source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace',
-  }
+  },
+  terminal: {
+    backgroundColor: "black",
+    color: "white",
+    padding: theme.spacing(2),
+    width: "100%",
+  },
+  terminalInput: {
+    color: TERMINAL_INPUT,
+  },
 }
 
 const useStyles = makeStyles(customClasses)
