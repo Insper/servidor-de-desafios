@@ -5,6 +5,7 @@ const API_CHANGE_PASS = '/api/change-password/'
 const API_CHALLENGES = '/api/coding/'
 const API_CHALLENGE = (slug) => `${API_CHALLENGES}${slug}/`
 const API_SUBMISSIONS = (slug) => `${API_CHALLENGE(slug)}submission`
+const API_SUBMISSION_CODE = (slug, submissionId) => `${API_CHALLENGE(slug)}submission/${submissionId}/code`
 
 
 const fetchUserData = () => {
@@ -51,4 +52,8 @@ const fetchSubmissionList = (slug) => {
   return fetch(API_SUBMISSIONS(slug), { credentials: 'include' })
 }
 
-export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge, postChallenge, fetchSubmissionList }
+const fetchSubmissionCode = (slug, submissionId) => {
+  return fetch(API_SUBMISSION_CODE(slug, submissionId), { credentials: 'include' })
+}
+
+export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode }

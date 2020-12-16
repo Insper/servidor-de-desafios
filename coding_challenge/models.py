@@ -113,7 +113,6 @@ class CodingChallengeSubmission(models.Model):
                 start = safe.rfind(STACKTRACE_FILE_PATTERN)
                 if start >= 0:
                     safe = safe[start + len(STACKTRACE_FILE_PATTERN):]
-            safe = safe.replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>').replace(' ', '&nbsp;')
             retval.append(safe)
         return retval
 
@@ -123,17 +122,6 @@ class CodingChallengeSubmission(models.Model):
             return tuple(tuple((tuple(t) + (None, None))[:2] for t in s) for s in eval(self.stdouts))
         else:
             return tuple()
-
-    @property
-    def safe_feedback(self):
-        msgs = self.failures
-        stacktraces = ['' for _ in msgs]
-        sts = self.stack_traces_limpos
-        stacktraces[:len(sts)] = sts
-        stdouts = ['' for _ in msgs]
-        sts = self.stdouts_limpos
-        stdouts[:len(sts)] = sts
-        return list(set(CodingChallengeSubmission.ErrorData(msg, st, stdout) for msg, st, stdout in zip(msgs, stacktraces, stdouts)))
 
 
 class UserChallengeInteraction(models.Model):

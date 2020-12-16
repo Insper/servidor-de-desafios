@@ -116,3 +116,23 @@ class CodingChallengeSubmissionListView(APIView):
         submissions = CodingChallengeSubmission.objects.filter(author=request.user, challenge__slug=slug).order_by('-creation_date')
         serializer = CodingChallengeSubmissionSerializer(submissions, many=True)
         return Response(serializer.data)
+
+
+class CodingChallengeSubmissionCodeView(APIView):
+    """
+    Get challenge submission code.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, slug, submission_id, format=None):
+        query_args = {
+            'id': submission_id,
+            'challenge__slug': slug,
+        }
+        if not request.user.is_superuser:
+            query_args['author__id'] = request.user.id
+        try:
+            submission = CodingChallengeSubmission.objects.get(**query_args)
+            return Response({'code': submission.code.read().decode('utf-8')})
+        except CodingChallengeSubmission.DoesNotExist:
+            raise Http404('This submission does not exist')

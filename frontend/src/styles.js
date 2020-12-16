@@ -84,6 +84,20 @@ const customClasses = {
   },
   danger: {
     color: DANGER,
+  },
+  centerContent: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contentHolder: {
+    padding: theme.spacing(3),
+  },
+  w100: {
+    width: "100%",
+  },
+  sourceCode: {
+    fontFamily: 'source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace',
   }
 }
 

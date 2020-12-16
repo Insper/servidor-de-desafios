@@ -1,5 +1,5 @@
 from .models import Tag, CodingChallenge, CodingChallengeSubmission
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 
 class TagSerializer(ModelSerializer):
@@ -25,6 +25,15 @@ class ShortCodingChallengeSerializer(ModelSerializer):
 
 
 class CodingChallengeSubmissionSerializer(ModelSerializer):
+    stacktraces = SerializerMethodField()
+    stdouts = SerializerMethodField()
+
+    def get_stacktraces(self, obj):
+        return obj.safe_stack_traces
+
+    def get_stdouts(self, obj):
+        return obj.safe_stdouts
+
     class Meta:
         model = CodingChallengeSubmission
-        fields = ['id', 'creation_date', 'success', 'safe_feedback', 'safe_stack_traces', 'safe_stdouts']
+        fields = ['id', 'creation_date', 'success', 'stacktraces', 'stdouts']

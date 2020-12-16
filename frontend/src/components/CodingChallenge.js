@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
-import { fetchChallenge, postChallenge, fetchSubmissionList } from '../api/pygym'
+import { fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode } from '../api/pygym'
 import MaterialMarkdown from './MaterialMarkdown'
 import Editor from "@monaco-editor/react";
 import { FillSpinner as Loader } from "react-spinners-kit";
@@ -21,7 +21,9 @@ function CodingChallenge(props) {
   const classes = useStyles()
   const [challenge, setChallenge] = useState({})
   const [submissions, setSubmissions] = useState([])
+  const [previousCode, setPreviousCode] = useState("")
   const editorRef = useRef()
+  const feedbackListRef = useRef()
 
   useEffect(() => {
     fetchChallenge(props.slug)
@@ -41,14 +43,31 @@ function CodingChallenge(props) {
 
   const postSolution = () => {
     setSubmissions([{ id: "running" }].concat(submissions))
+    feedbackListRef.current.scrollIntoView()
 
     postChallenge(props.slug, editorRef.current.getValue())
       .then(res => res.json())
-      .then(data => setSubmissions([data].concat(submissions.slice(1))))
+      .then(data => setSubmissions([data].concat(submissions)))
       .catch(data => {
-        setSubmissions([{ id: "error" }].concat(submissions.slice(1)))
+        setSubmissions([{ id: "error" }].concat(submissions))
         console.log(data)
       })
+  }
+
+  const loadSubmissionCode = (submissionId) => {
+    fetchSubmissionCode(props.slug, submissionId)
+      .then(res => res.json())
+      .then(data => {
+        if (data.code) {
+          setPreviousCode(data.code)
+          if (editorRef.current) editorRef.current.setValue(data.code)
+        }
+      })
+      .catch(console.log)
+  }
+
+  if (submissions && submissions[0] && !previousCode) {
+    loadSubmissionCode(submissions[0].id)
   }
 
   const functionName = (challenge && challenge.function_name) ? <Typography paragraph={true}>{t("The name of your function must be ")} <SyntaxHighlighter language="python" customStyle={{ padding: "0.1em" }} PreTag={"span"} style={prism}>{challenge.function_name}</SyntaxHighlighter></Typography> : ''
@@ -73,7 +92,7 @@ function CodingChallenge(props) {
                 editorDidMount={handleEditorDidMount}
                 language={"python"}
                 loading={<Loader />}
-                value={""}
+                value={previousCode}
                 options={{ lineNumbers: "on", wordWrap: "on" }}
               />
             </Box>
@@ -89,7 +108,7 @@ function CodingChallenge(props) {
 
         <Grid className={classes.gridItem} item md={12}>
           <Box mt={2}>
-            <CodingChallengeFeedbackList submissions={submissions} />
+            <CodingChallengeFeedbackList ref={feedbackListRef} submissions={submissions} onLoadButtonClick={loadSubmissionCode} />
           </Box>
         </Grid>
       </Grid>
