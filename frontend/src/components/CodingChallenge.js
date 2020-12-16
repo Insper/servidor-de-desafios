@@ -85,7 +85,7 @@ function CodingChallenge(props) {
 
         <Grid className={`${classes.flexbox} ${classes.gridItem}`} container item md={6}>
           <Paper className={`${classes.flexbox} ${classes.fillParent}`} elevation={3}>
-            <Box className={classes.fillParent} mt={2} mb={2}>
+            <Box className={classes.editor} mt={2} mb={2}>
               <Editor
                 // height="80vh" // By default, it fully fits with its parent
                 theme={"light"}
@@ -99,6 +99,7 @@ function CodingChallenge(props) {
           </Paper>
           <Box mt={2}>
             <ButtonGroup fullWidth={true}>
+              {/* TODO: Accept file input */}
               <Button variant="contained" color="primary" onClick={postSolution}>
                 {t("Submit")}
               </Button>

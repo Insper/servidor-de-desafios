@@ -109,6 +109,10 @@ const customClasses = {
   terminalInput: {
     color: TERMINAL_INPUT,
   },
+  editor: {
+    flexGrow: 1,
+    minHeight: "70vh",
+  }
 }
 
 const useStyles = makeStyles(customClasses)
