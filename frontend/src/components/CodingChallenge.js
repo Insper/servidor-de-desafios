@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
+import Snackbar from '@material-ui/core/Snackbar';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SendIcon from '@material-ui/icons/Send';
 import { DropzoneDialog } from 'material-ui-dropzone';
@@ -17,6 +18,7 @@ import MaterialMarkdown from './MaterialMarkdown'
 import Editor from "@monaco-editor/react";
 import { FillSpinner as Loader } from "react-spinners-kit";
 import CodingChallengeFeedbackList from "./CodingChallengeFeedbackList"
+import Alert from "./Alert"
 
 function CodingChallenge(props) {
   const { t } = useTranslation()
@@ -25,6 +27,9 @@ function CodingChallenge(props) {
   const [submissions, setSubmissions] = useState([])
   const [previousCode, setPreviousCode] = useState("")
   const [fileDialogOpen, setFileDialogOpen] = useState(false)
+  const [submitEnabled, setSubmitEnabled] = useState(false)
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [passedTests, setPassedTests] = useState(false)
   const editorRef = useRef()
   const feedbackListRef = useRef()
 
@@ -42,6 +47,7 @@ function CodingChallenge(props) {
 
   const handleEditorDidMount = (_, editor) => {
     editorRef.current = editor
+    setSubmitEnabled(true)
   }
 
   const handleCodeFileUpload = (file) => {
@@ -53,15 +59,24 @@ function CodingChallenge(props) {
   }
 
   const postSolution = () => {
+    setSubmitEnabled(false)
+    setPassedTests(false)
     setSubmissions([{ id: "running" }].concat(submissions))
     feedbackListRef.current.scrollIntoView()
 
     postChallenge(props.slug, editorRef.current.getValue())
       .then(res => res.json())
-      .then(data => setSubmissions([data].concat(submissions)))
+      .then(data => {
+        if (data.success) setPassedTests(true)
+        setSubmissions([data].concat(submissions))
+      })
       .catch(data => {
         setSubmissions([{ id: "error" }].concat(submissions))
         console.log(data)
+      })
+      .finally(() => {
+        setSnackbarOpen(true)
+        setSubmitEnabled(true)
       })
   }
 
@@ -81,6 +96,14 @@ function CodingChallenge(props) {
       .catch(console.log)
   }
 
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackbarOpen(false)
+  }
+
   if (submissions && submissions[0] && !previousCode) {
     loadSubmissionCode(submissions[0].id)
   }
@@ -90,8 +113,11 @@ function CodingChallenge(props) {
 
   return (
     <React.Fragment>
-
       <Grid container>
+        <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleCloseSnackbar}>
+          <Alert onClose={handleCloseSnackbar} severity={passedTests ? "success" : "error"}>{passedTests ? t("Passed all tests") : t("Failed some test")}!</Alert>
+        </Snackbar>
+
         <Grid item className={classes.gridItem} md={6}>
           <Typography variant="h2" component="h1" gutterBottom={true}>{challenge.title}</Typography>
           <MaterialMarkdown children={challenge.question} />
@@ -113,7 +139,7 @@ function CodingChallenge(props) {
             </Box>
           </Paper>
           <Box mt={2}>
-            <Button variant="contained" color="primary" enabled={editorRef.current} onClick={loadFile} fullWidth={true} startIcon={<InsertDriveFileIcon />}>
+            <Button variant="contained" color="primary" disabled={!submitEnabled} onClick={loadFile} fullWidth={true} startIcon={<InsertDriveFileIcon />}>
               {t("Load file")}
             </Button>
 
@@ -141,7 +167,7 @@ function CodingChallenge(props) {
 
           </Box>
           <Box mt={2}>
-            <Button variant="contained" color="primary" onClick={postSolution} fullWidth={true} endIcon={<SendIcon />}>
+            <Button variant="contained" disabled={!submitEnabled} color="primary" onClick={postSolution} fullWidth={true} endIcon={<SendIcon />}>
               {t("Submit")}
             </Button>
           </Box>
@@ -153,7 +179,6 @@ function CodingChallenge(props) {
           </Box>
         </Grid>
       </Grid >
-
     </React.Fragment >
   );
 }

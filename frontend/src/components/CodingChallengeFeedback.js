@@ -75,23 +75,33 @@ function CodingChallengeFeedbackList(props) {
   };
 
 
-  const resultIconSize = 30
+  const resultIconSize = 40
+  const rotateSpinnerSize = 20
   let result
-  let text
   let loadButton
   let details
+  let resultText
+  let submissionTimeText
+
   if (props.submission.id === "running") {
-    result = <RotateSpinner size={resultIconSize} color="#E0E0E0" />
-    text = <Typography>{t("Running tests")}</Typography>
+    result = <RotateSpinner size={rotateSpinnerSize} color="#E0E0E0" />
+    resultText = t("Running tests")
   }
   else if (props.submission.id === "error") {
     result = <SvgIcon><ErrorIcon /></SvgIcon>
-    text = <Typography>{t("An error occurred in the server")}</Typography>
+    resultText = t("An error occurred in the server")
   }
   else {
-    if (props.submission.success) result = <SvgIcon className={classes.success}><CheckCircleIcon /></SvgIcon>
-    else result = <SvgIcon className={classes.danger}><CancelIcon /></SvgIcon>
-    text = <Typography>{`${t("Submission sent")} ${t("fulldate", { date: new Date(props.submission.creation_date) })}`}</Typography>
+    if (props.submission.success) {
+      resultText = t("Success")
+      result = <SvgIcon className={classes.success}><CheckCircleIcon /></SvgIcon>
+    }
+    else {
+      resultText = t("Error")
+      result = <SvgIcon className={classes.danger}><CancelIcon /></SvgIcon>
+    }
+    submissionTimeText = `${t("Submission sent")} ${t("fulldate", { date: new Date(props.submission.creation_date) })}`
+
     loadButton = <Button size="small" color="primary" onClick={handleLoadButtonClick}>{t("Load this submission")}</Button>
     details = (
       <AccordionDetails>
@@ -108,7 +118,7 @@ function CodingChallengeFeedbackList(props) {
           </Tabs>
 
           <ListTabPanel className={classes.contentHolder} label="stacktraces" value={selectedTab} index={0}>
-            {props.submission.stacktraces.map((stacktrace, idx) => (
+            {props.submission.stacktraces && props.submission.stacktraces.map((stacktrace, idx) => (
               <ListItem key={`stacktrace-${props.submission.id}-${idx}`}>
                 <Box className={classes.fillParent}>
                   {stacktrace.split("\n").map((line, idx2) => (
@@ -121,7 +131,7 @@ function CodingChallengeFeedbackList(props) {
           </ListTabPanel>
 
           <ListTabPanel className={classes.contentHolder} label="stdouts" value={selectedTab} index={1}>
-            {props.submission.stdouts.map((stdout, idx) => (
+            {props.submission.stdouts && props.submission.stdouts.map((stdout, idx) => (
               <ListItem key={`stdout-${props.submission.id}-${idx}`}>
                 <Box className={classes.fillParent} className={classes.terminal}>
                   {stdout.map(([term_out, term_in], idx2) => (
@@ -148,13 +158,15 @@ function CodingChallengeFeedbackList(props) {
   return (
     <Accordion expanded={expanded} onChange={(event, isExpanded) => setExpanded(isExpanded)}>
       <AccordionSummary
+        classes={{ content: classes.centerContent }}
         expandIcon={<ExpandMoreIcon />}
         aria-controls={contendId}
         id={headerId}>
         <Box width={resultIconSize} height={resultIconSize} className={classes.centerContent}>
           {result}
         </Box>
-        {text}
+        <Typography className={classes.fillParent}>{resultText}</Typography>
+        <Typography color="textSecondary">{submissionTimeText}</Typography>
       </AccordionSummary>
       {details}
       <AccordionActions>
