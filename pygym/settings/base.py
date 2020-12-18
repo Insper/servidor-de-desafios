@@ -26,7 +26,7 @@ def create_dir(dirpath):
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 CHALLENGES_DIR = BASE_DIR / 'raw' / 'challenge_files'
-CHALLENGES_RAW_DIR = BASE_DIR / 'coding_challenge' / 'static' / 'raw'
+CHALLENGES_RAW_DIR = BASE_DIR / 'code_challenge' / 'static' / 'raw'
 create_dir(CHALLENGES_DIR)
 create_dir(CHALLENGES_RAW_DIR)
 
@@ -56,7 +56,7 @@ LOGOUT_REDIRECT_URL = '/login/'
 INSTALLED_APPS = [
     'core',
     'frontend',
-    'coding_challenge',
+    'code_challenge',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

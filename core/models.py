@@ -32,3 +32,12 @@ class UserConceptInteraction(models.Model):
     successful_attempts = models.IntegerField(default=0)
     total_challenges = models.IntegerField(default=0)
     successful_challenges = models.IntegerField(default=0)
+
+
+class ChallengeRepo(models.Model):
+    remote = models.URLField()
+    slug = models.SlugField()
+    last_commit = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.slug} ({self.remote})'
