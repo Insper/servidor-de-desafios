@@ -36,7 +36,6 @@ create_dir(CHALLENGES_RAW_DIR)
 try:
     with open(str(Path(BASE_DIR) / '.django_secret_key')) as f:
         SECRET_KEY = f.read()
-        print(SECRET_KEY)
 except FileNotFoundError:
     SECRET_KEY = 'r*gl!)m0t=x##wt##w#4t=fl6-^kk8(smd547w*oi#77=*$69a'
     print('Using development secret key. If you are in the production server you should create a .django_secret_key file with the secret key.')

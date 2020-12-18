@@ -1,32 +1,13 @@
 import os
 from collections import namedtuple
 from django.db import models
-from django.utils.text import slugify
 import markdown
 from django.conf import settings
+from core.models import Concept
 
 
 # Constants
-FEEDBACK_SEP = '|||'
-STACKTRACE_SEP = '<|>|<|>'
 STACKTRACE_FILE_PATTERN = 'File "<string>", '
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=128)
-    slug = models.CharField(max_length=128)
-    order = models.IntegerField(default=99)
-
-    class Meta:
-        ordering = ['order', 'slug']
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
 
 
 class ChallengeRepo(models.Model):
@@ -45,7 +26,7 @@ class CodingChallenge(models.Model):
     question = models.TextField()
     published = models.BooleanField(default=True)
     show_stdout = models.BooleanField(default=True)
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    concept = models.ForeignKey(Concept, on_delete=models.CASCADE)
     function_name = models.CharField(max_length=50, blank=True)
     deleted = models.BooleanField(default=False)
 
@@ -65,6 +46,10 @@ def user_challenge_path(instance, filename):
     return os.path.join('submissions/', filename)
 
 
+def empty_list():
+    return []
+
+
 class CodingChallengeSubmission(models.Model):
     ErrorData = namedtuple('ErrorData', 'message,stacktrace,stdout')
 
@@ -73,34 +58,12 @@ class CodingChallengeSubmission(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     code = models.FileField(upload_to=user_challenge_path)
     success = models.BooleanField(default=False)
-    feedback = models.TextField(blank=True)
-    errors = models.TextField(blank=True)
-    stdouts = models.TextField(blank=True)
+    failures = models.JSONField(default=empty_list)
+    stack_traces = models.JSONField(default=empty_list)
+    stdouts = models.JSONField(default=empty_list)
 
     def __str__(self):
         return f'{self.author.username}: {self.challenge.title}({self.creation_date}) success[{self.success}]'
-
-    @property
-    def failures(self):
-        return self.feedback.split(FEEDBACK_SEP)
-
-    @failures.setter
-    def failures(self, feedbacks):
-        feedback = FEEDBACK_SEP.join(feedbacks)
-        if not feedback:
-            feedback = 'Ok'
-        self.feedback = feedback
-
-    @property
-    def stack_traces(self):
-        return self.errors.split(STACKTRACE_SEP)
-
-    @stack_traces.setter
-    def stack_traces(self, errors):
-        errors = STACKTRACE_SEP.join(errors)
-        if not errors:
-            errors = '-'
-        self.errors = errors
 
     @property
     def safe_stack_traces(self):
@@ -116,25 +79,9 @@ class CodingChallengeSubmission(models.Model):
             retval.append(safe)
         return retval
 
-    @property
-    def safe_stdouts(self):
-        if self.stdouts:
-            return tuple(tuple((tuple(t) + (None, None))[:2] for t in s) for s in eval(self.stdouts))
-        else:
-            return tuple()
-
 
 class UserChallengeInteraction(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     challenge = models.ForeignKey(CodingChallenge, on_delete=models.CASCADE)
     attempts = models.IntegerField(default=0)
     successful_attempts = models.IntegerField(default=0)
-
-
-class UserTagInteraction(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    attempts = models.IntegerField(default=0)
-    successful_attempts = models.IntegerField(default=0)
-    total_challenges = models.IntegerField(default=0)
-    successful_challenges = models.IntegerField(default=0)

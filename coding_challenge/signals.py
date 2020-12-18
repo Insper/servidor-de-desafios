@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import CodingChallengeSubmission, UserChallengeInteraction, UserTagInteraction
+from .models import CodingChallengeSubmission, UserChallengeInteraction
+from core.models import Concept, UserConceptInteraction
 
 
 @receiver(post_save, sender=CodingChallengeSubmission, dispatch_uid="48182593106723498")
@@ -12,22 +13,22 @@ def post_submission_save(sender, instance, created, raw, using, update_fields, *
     challenge = instance.challenge
 
     try:
-        user_tag = UserTagInteraction.objects.get(user=author, tag=challenge.tag)
-    except UserTagInteraction.DoesNotExist:
-        user_tag = UserTagInteraction.objects.create(user=author, tag=challenge.tag)
+        user_concept = UserConceptInteraction.objects.get(user=author, concept=challenge.concept)
+    except UserConceptInteraction.DoesNotExist:
+        user_concept = UserConceptInteraction.objects.create(user=author, concept=challenge.concept)
     try:
         user_challenge = UserChallengeInteraction.objects.get(user=author, challenge=challenge)
     except UserChallengeInteraction.DoesNotExist:
         user_challenge = UserChallengeInteraction.objects.create(user=author, challenge=challenge)
-        user_tag.total_challenges += 1
+        user_concept.total_challenges += 1
 
     user_challenge.attempts += 1
-    user_tag.attempts += 1
+    user_concept.attempts += 1
     if instance.success:
         user_challenge.successful_attempts += 1
-        user_tag.successful_attempts += 1
+        user_concept.successful_attempts += 1
         if user_challenge.successful_attempts == 1:
-            user_tag.successful_challenges += 1
+            user_concept.successful_challenges += 1
 
     user_challenge.save()
-    user_tag.save()
+    user_concept.save()

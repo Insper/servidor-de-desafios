@@ -43,7 +43,7 @@ async def test_list_new_challenges(tmp_path):
         for i in range(c, n+1):
             details = {
                 "title": f"Challenge {i} v.{c}",
-                "tags": "function",
+                "concept": "function",
                 "terminal": True,
                 "published": True,
                 "function_name": f"solution_{i}",
@@ -86,7 +86,7 @@ async def test_list_deleted_challenges(tmp_path):
     for i in range(1, n+1):
         details = {
             "title": f"Challenge {i}",
-            "tags": "function",
+            "concept": "function",
             "terminal": True,
             "published": True,
             "function_name": f"solution_{i}",

@@ -1,9 +1,10 @@
 import asyncio
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
 from coding_challenge import gitpy
 from coding_challenge.challenge_manager import ChallengeManager
-from coding_challenge.models import CodingChallenge, ChallengeRepo, Tag
+from coding_challenge.models import CodingChallenge, ChallengeRepo
+from core.models import Concept
 
 
 class Command(BaseCommand):
@@ -26,7 +27,7 @@ class Command(BaseCommand):
         return ret
 
     def update_or_create(self, slug, data, repo):
-        tag = Tag.objects.get(slug=data['tag'])
+        concept = Concept.objects.get(slug=data['concept'])
         try:
             challenge = CodingChallenge.objects.get(slug=slug, repo=repo)
             challenge.title = data['title']
@@ -44,7 +45,7 @@ class Command(BaseCommand):
                 published=data['published'],
                 show_stdout=data['terminal'],
                 function_name=data['function_name'],
-                tag=tag,
+                concept=concept,
             )
             challenge.save()
         return challenge
@@ -57,16 +58,16 @@ class Command(BaseCommand):
         except CodingChallenge.DoesNotExist:
             return
 
-    def create_tags(self, tags_file):
-        with open(tags_file) as f:
-            for tag in [t.strip() for t in f.read().split() if t.strip()]:
-                args = tag.split(',')
+    def create_concepts(self, concepts_file):
+        with open(concepts_file) as f:
+            for concept in [t.strip() for t in f.read().split() if t.strip()]:
+                args = concept.split(',')
                 if len(args) > 2:
-                    Tag.objects.get_or_create(name=args[0], slug=args[1], order=int(args[2]))
+                    Concept.objects.get_or_create(name=args[0], slug=args[1], order=int(args[2]))
                 elif len(args) > 1:
-                    Tag.objects.get_or_create(name=args[0], slug=args[1])
+                    Concept.objects.get_or_create(name=args[0], slug=args[1])
                 else:
-                    Tag.objects.get_or_create(name=args[0])
+                    Concept.objects.get_or_create(name=args[0])
 
     def handle(self, *args, **options):
         repos = ChallengeRepo.objects.all()
@@ -82,7 +83,7 @@ class Command(BaseCommand):
         updated_challenges = loop.run_until_complete(cm.changed_challenges(last_commit=repo.last_commit))
         log = loop.run_until_complete(git.log(last=1))
 
-        self.create_tags(repo_dir / 'tags.txt')
+        self.create_concepts(repo_dir / 'concepts.txt')
 
         for slug, data in updated_challenges.items():
             if data:

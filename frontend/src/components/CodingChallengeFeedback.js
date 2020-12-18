@@ -134,10 +134,10 @@ function CodingChallengeFeedbackList(props) {
             {props.submission.stdouts && props.submission.stdouts.map((stdout, idx) => (
               <ListItem key={`stdout-${props.submission.id}-${idx}`}>
                 <Box className={classes.fillParent} className={classes.terminal}>
-                  {stdout.map(([term_out, term_in], idx2) => (
+                  {stdout.map((line, idx2) => (
                     <Box className={classes.terminalLine} key={`stacktrace-${props.submission.id}-${idx}-${idx2}`}>
-                      <Typography className={classes.sourceCode} component="code">{term_out}</Typography>
-                      <Typography className={`${classes.sourceCode} ${classes.terminalInput}`} component="code">{term_in}</Typography>
+                      <Typography className={classes.sourceCode} component="code">{line.output}</Typography>
+                      <Typography className={`${classes.sourceCode} ${classes.terminalInput}`} component="code">{line.input}</Typography>
                     </Box>
                   ))}
                   <Divider />

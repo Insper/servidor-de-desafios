@@ -89,7 +89,12 @@ class CodingChallengeView(APIView):
         submission = CodingChallengeSubmission.objects.create(author=author, challenge=challenge)
         submission.failures = result.failure_msgs
         submission.stack_traces = result.stack_traces
-        submission.stdouts = repr(result.stdouts)
+        submission.stdouts = [
+                [{
+                    'output': line[0] if len(line) else None,
+                    'input': line[1] if len(line) > 1 else None
+                } for line in test_case
+            ] for test_case in result.stdouts]
         submission.success = result.success
         submission.save()
         submission.code.save(user_challenge_path(submission, ''), ContentFile(code))
