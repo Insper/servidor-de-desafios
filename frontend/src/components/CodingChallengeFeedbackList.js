@@ -6,7 +6,7 @@ import CodingChallengeFeedback from './CodingChallengeFeedback'
 
 const CodingChallengeFeedbackList = forwardRef((props, ref) => {
   const { t } = useTranslation();
-  console.log("ASDASD", props.submissions)
+
   return (
     <React.Fragment>
       <Typography ref={ref} variant="h2" component="h1" gutterBottom={true}>{t("Feedback")}</Typography>

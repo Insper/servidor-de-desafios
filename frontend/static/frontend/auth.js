@@ -5236,13 +5236,19 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /*! export Cancel [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Change password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Console output [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Drag and drop a file here or click [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Feedback [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export File {{fileName}} removed [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export File {{rejectedFileName}} was rejected [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export In case you haven't changed it, it is the same as your username [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Load file [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Load this submission [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Logout [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Maximum allowed number of files exceeded [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export New password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export New password can't be the same as the old one [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Old password [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Only {{filesLimit}} allowed [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Repeat new password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Running tests [provided] [no usage info] [missing usage info prevents renaming] */
@@ -5252,15 +5258,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /*! export The name of your function must be  [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export The new passwords you typed don't match [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export The old password you typed is incorrect [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Upload code [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Username [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Waiting for your submission [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export fulldate [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export {{fileName}} successfully added [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: module */
 /***/ ((module) => {
 
 "use strict";
-eval("module.exports = JSON.parse(\"{\\\"The old password you typed is incorrect\\\":\\\"The old password you typed is incorrect\\\",\\\"The new passwords you typed don't match\\\":\\\"The new passwords you typed don't match\\\",\\\"New password can't be the same as the old one\\\":\\\"New password can't be the same as the old one\\\",\\\"Can't be empty\\\":\\\"Can't be empty\\\",\\\"Change password\\\":\\\"Change password\\\",\\\"Old password\\\":\\\"Old password\\\",\\\"New password\\\":\\\"New password\\\",\\\"Repeat new password\\\":\\\"Repeat new password\\\",\\\"Cancel\\\":\\\"Cancel\\\",\\\"Submit\\\":\\\"Submit\\\",\\\"The name of your function must be \\\":\\\"The name of your function must be \\\",\\\"Running tests\\\":\\\"Running tests\\\",\\\"An error occurred in the server\\\":\\\"An error occurred in the server\\\",\\\"Submission sent\\\":\\\"Submission sent\\\",\\\"fulldate\\\":\\\"{{date, relative}}\\\",\\\"Load this submission\\\":\\\"Load this submission\\\",\\\"Stacktraces\\\":\\\"Stacktraces\\\",\\\"Console output\\\":\\\"Console output\\\",\\\"Feedback\\\":\\\"Feedback\\\",\\\"Waiting for your submission\\\":\\\"Waiting for your submission\\\",\\\"Username\\\":\\\"Username\\\",\\\"Password\\\":\\\"Password\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"In case you haven't changed it, it is the same as your username\\\",\\\"Logout\\\":\\\"Logout\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/en/translation.json?");
+eval("module.exports = JSON.parse(\"{\\\"The old password you typed is incorrect\\\":\\\"The old password you typed is incorrect\\\",\\\"The new passwords you typed don't match\\\":\\\"The new passwords you typed don't match\\\",\\\"New password can't be the same as the old one\\\":\\\"New password can't be the same as the old one\\\",\\\"Can't be empty\\\":\\\"Can't be empty\\\",\\\"Change password\\\":\\\"Change password\\\",\\\"Old password\\\":\\\"Old password\\\",\\\"New password\\\":\\\"New password\\\",\\\"Repeat new password\\\":\\\"Repeat new password\\\",\\\"Cancel\\\":\\\"Cancel\\\",\\\"Submit\\\":\\\"Submit\\\",\\\"The name of your function must be \\\":\\\"The name of your function must be \\\",\\\"Load file\\\":\\\"Load file\\\",\\\"Upload code\\\":\\\"Upload code\\\",\\\"Drag and drop a file here or click\\\":\\\"Drag and drop a file here or click\\\",\\\"Maximum allowed number of files exceeded\\\":\\\"Maximum allowed number of files exceeded\\\",\\\"Only {{filesLimit}} allowed\\\":\\\"Only {{filesLimit}} allowed\\\",\\\"{{fileName}} successfully added\\\":\\\"{{fileName}} successfully added\\\",\\\"File {{fileName}} removed\\\":\\\"File {{fileName}} removed\\\",\\\"File {{rejectedFileName}} was rejected\\\":\\\"File {{rejectedFileName}} was rejected\\\",\\\"Running tests\\\":\\\"Running tests\\\",\\\"An error occurred in the server\\\":\\\"An error occurred in the server\\\",\\\"Submission sent\\\":\\\"Submission sent\\\",\\\"fulldate\\\":\\\"{{date, relative}}\\\",\\\"Load this submission\\\":\\\"Load this submission\\\",\\\"Stacktraces\\\":\\\"Stacktraces\\\",\\\"Console output\\\":\\\"Console output\\\",\\\"Feedback\\\":\\\"Feedback\\\",\\\"Waiting for your submission\\\":\\\"Waiting for your submission\\\",\\\"Username\\\":\\\"Username\\\",\\\"Password\\\":\\\"Password\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"In case you haven't changed it, it is the same as your username\\\",\\\"Logout\\\":\\\"Logout\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/en/translation.json?");
 
 /***/ }),
 
@@ -5274,13 +5282,19 @@ eval("module.exports = JSON.parse(\"{\\\"The old password you typed is incorrect
 /*! export Cancel [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Change password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Console output [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Drag and drop a file here or click [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Feedback [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export File {{fileName}} removed [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export File {{rejectedFileName}} was rejected [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export In case you haven't changed it, it is the same as your username [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Load file [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Load this submission [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Logout [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Maximum allowed number of files exceeded [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export New password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export New password can't be the same as the old one [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Old password [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Only {{filesLimit}} allowed [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Repeat new password [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Running tests [provided] [no usage info] [missing usage info prevents renaming] */
@@ -5290,15 +5304,17 @@ eval("module.exports = JSON.parse(\"{\\\"The old password you typed is incorrect
 /*! export The name of your function must be  [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export The new passwords you typed don't match [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export The old password you typed is incorrect [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export Upload code [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Username [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export Waiting for your submission [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export fulldate [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export {{fileName}} successfully added [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: module */
 /***/ ((module) => {
 
 "use strict";
-eval("module.exports = JSON.parse(\"{\\\"The old password you typed is incorrect\\\":\\\"A senha antiga está incorreta\\\",\\\"The new passwords you typed don't match\\\":\\\"As novas senhas digitadas não são iguais\\\",\\\"New password can't be the same as the old one\\\":\\\"A nova senha deve ser diferente da anterior\\\",\\\"Can't be empty\\\":\\\"Não pode ser vazio\\\",\\\"Change password\\\":\\\"Mudar a senha\\\",\\\"Old password\\\":\\\"Senha antiga\\\",\\\"New password\\\":\\\"Nova senha\\\",\\\"Repeat new password\\\":\\\"Repetir nova senha\\\",\\\"Cancel\\\":\\\"Cancelar\\\",\\\"Submit\\\":\\\"Enviar\\\",\\\"The name of your function must be \\\":\\\"O nome da sua função deve ser \\\",\\\"Running tests\\\":\\\"Executando testes\\\",\\\"An error occurred in the server\\\":\\\"Ocorreu um erro no servidor\\\",\\\"Submission sent\\\":\\\"Submissão enviada\\\",\\\"fulldate\\\":\\\"{{date, relative}}\\\",\\\"Load this submission\\\":\\\"Carregar esta submissão\\\",\\\"Stacktraces\\\":\\\"Stacktraces\\\",\\\"Console output\\\":\\\"Saída no terminal\\\",\\\"Feedback\\\":\\\"Feedback\\\",\\\"Waiting for your submission\\\":\\\"Aguardando a sua submissão\\\",\\\"Username\\\":\\\"Usuário\\\",\\\"Password\\\":\\\"Senha\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"Caso você não tenha mudado, a senha é igual ao seu usuário\\\",\\\"Logout\\\":\\\"Sair\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/pt/translation.json?");
+eval("module.exports = JSON.parse(\"{\\\"The old password you typed is incorrect\\\":\\\"A senha antiga está incorreta\\\",\\\"The new passwords you typed don't match\\\":\\\"As novas senhas digitadas não são iguais\\\",\\\"New password can't be the same as the old one\\\":\\\"A nova senha deve ser diferente da anterior\\\",\\\"Can't be empty\\\":\\\"Não pode ser vazio\\\",\\\"Change password\\\":\\\"Mudar a senha\\\",\\\"Old password\\\":\\\"Senha antiga\\\",\\\"New password\\\":\\\"Nova senha\\\",\\\"Repeat new password\\\":\\\"Repetir nova senha\\\",\\\"Cancel\\\":\\\"Cancelar\\\",\\\"Submit\\\":\\\"Enviar\\\",\\\"The name of your function must be \\\":\\\"O nome da sua função deve ser \\\",\\\"Load file\\\":\\\"Carregar arquivo\\\",\\\"Upload code\\\":\\\"Carregar código\\\",\\\"Drag and drop a file here or click\\\":\\\"Arraste um arquivo ou clique aqui\\\",\\\"Maximum allowed number of files exceeded\\\":\\\"Limite de arquivos excedido\\\",\\\"Only {{filesLimit}} allowed\\\":\\\"Limite permitido: {{filesLimit}} arquivo(s)\\\",\\\"{{fileName}} successfully added\\\":\\\"Arquivo {{fileName}} adicionado com sucesso\\\",\\\"File {{fileName}} removed\\\":\\\"O arquivo {{fileName}} removido\\\",\\\"File {{rejectedFileName}} was rejected\\\":\\\"O arquivo {{rejectedFileName}} foi rejeitado\\\",\\\"Running tests\\\":\\\"Executando testes\\\",\\\"An error occurred in the server\\\":\\\"Ocorreu um erro no servidor\\\",\\\"Submission sent\\\":\\\"Submissão enviada\\\",\\\"fulldate\\\":\\\"{{date, relative}}\\\",\\\"Load this submission\\\":\\\"Carregar esta submissão\\\",\\\"Stacktraces\\\":\\\"Stacktraces\\\",\\\"Console output\\\":\\\"Saída no terminal\\\",\\\"Feedback\\\":\\\"Feedback\\\",\\\"Waiting for your submission\\\":\\\"Aguardando a sua submissão\\\",\\\"Username\\\":\\\"Usuário\\\",\\\"Password\\\":\\\"Senha\\\",\\\"In case you haven't changed it, it is the same as your username\\\":\\\"Caso você não tenha mudado, a senha é igual ao seu usuário\\\",\\\"Logout\\\":\\\"Sair\\\"}\");\n\n//# sourceURL=webpack://frontend/./src/locales/pt/translation.json?");
 
 /***/ })
 

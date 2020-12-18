@@ -1,4 +1,8 @@
 {
   "Python Gym": "Python Gym",
-  "Enter your new password": "Enter your new password"
+  "Enter your new password": "Enter your new password",
+  "Maximum allowed number of files exceeded": {
+    " Only {{filesLimit}} allowed": ""
+  },
+  "File {{fileName}} successfully added": ""
 }

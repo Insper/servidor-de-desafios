@@ -5,11 +5,13 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import CircularProgress from '@material-ui/core/CircularProgress'
 import Box from '@material-ui/core/Box';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import SendIcon from '@material-ui/icons/Send';
+import { DropzoneDialog } from 'material-ui-dropzone';
 import { fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode } from '../api/pygym'
 import MaterialMarkdown from './MaterialMarkdown'
 import Editor from "@monaco-editor/react";
@@ -22,6 +24,7 @@ function CodingChallenge(props) {
   const [challenge, setChallenge] = useState({})
   const [submissions, setSubmissions] = useState([])
   const [previousCode, setPreviousCode] = useState("")
+  const [fileDialogOpen, setFileDialogOpen] = useState(false)
   const editorRef = useRef()
   const feedbackListRef = useRef()
 
@@ -41,6 +44,14 @@ function CodingChallenge(props) {
     editorRef.current = editor
   }
 
+  const handleCodeFileUpload = (file) => {
+    const reader = new FileReader()
+    reader.addEventListener('load', (event) => {
+      editorRef.current.setValue(event.target.result)
+    })
+    reader.readAsText(file)
+  }
+
   const postSolution = () => {
     setSubmissions([{ id: "running" }].concat(submissions))
     feedbackListRef.current.scrollIntoView()
@@ -52,6 +63,10 @@ function CodingChallenge(props) {
         setSubmissions([{ id: "error" }].concat(submissions))
         console.log(data)
       })
+  }
+
+  const loadFile = () => {
+    setFileDialogOpen(true)
   }
 
   const loadSubmissionCode = (submissionId) => {
@@ -98,12 +113,37 @@ function CodingChallenge(props) {
             </Box>
           </Paper>
           <Box mt={2}>
-            <ButtonGroup fullWidth={true}>
-              {/* TODO: Accept file input */}
-              <Button variant="contained" color="primary" onClick={postSolution}>
-                {t("Submit")}
-              </Button>
-            </ButtonGroup>
+            <Button variant="contained" color="primary" enabled={editorRef.current} onClick={loadFile} fullWidth={true} startIcon={<InsertDriveFileIcon />}>
+              {t("Load file")}
+            </Button>
+
+            <DropzoneDialog
+              acceptedFiles={['.py']}
+              dialogTitle={t("Upload code")}
+              dropzoneText={t("Drag and drop a file here or click")}
+              cancelButtonText={t("Cancel")}
+              submitButtonText={t("Submit")}
+              getFileLimitExceedMessage={(filesLimit) => `${t("Maximum allowed number of files exceeded")} .${t("Only {{filesLimit}} allowed", { filesLimit: filesLimit })}`}
+              getFileAddedMessage={(fileName) => t("{{fileName}} successfully added", { fileName: fileName })}
+              getFileRemovedMessage={(fileName) => t("File {{fileName}} removed", { fileName: fileName })}
+              getDropRejectMessage={(rejectedFile) => t("File {{rejectedFileName}} was rejected", { rejectedFileName: rejectedFile.name })}
+              maxFileSize={1000000}
+              filesLimit={1}
+              multiple={false}
+              open={fileDialogOpen}
+              onClose={() => setFileDialogOpen(false)}
+              onSave={(files) => {
+                files.map(handleCodeFileUpload)
+                setFileDialogOpen(false);
+              }}
+              showPreviews={false}
+            />
+
+          </Box>
+          <Box mt={2}>
+            <Button variant="contained" color="primary" onClick={postSolution} fullWidth={true} endIcon={<SendIcon />}>
+              {t("Submit")}
+            </Button>
           </Box>
         </Grid>
 
@@ -112,9 +152,9 @@ function CodingChallenge(props) {
             <CodingChallengeFeedbackList ref={feedbackListRef} submissions={submissions} onLoadButtonClick={loadSubmissionCode} />
           </Box>
         </Grid>
-      </Grid>
+      </Grid >
 
-    </React.Fragment>
+    </React.Fragment >
   );
 }
 

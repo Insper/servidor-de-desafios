@@ -1,4 +1,8 @@
 {
   "Python Gym": "Academia Python",
-  "Enter your new password": "Digite sua nova senha"
+  "Enter your new password": "Digite sua nova senha",
+  "Maximum allowed number of files exceeded": {
+    " Only {{filesLimit}} allowed": ""
+  },
+  "File {{fileName}} successfully added": ""
 }

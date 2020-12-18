@@ -1,19 +1,19 @@
-exports.extractTags = (challenges) => {
-  let tags = []
+exports.extractConcepts = (challenges) => {
+  let concepts = []
   for (let challenge of challenges) {
-    let tag = challenge.tag
-    if (!tags.some(t => t.slug === tag.slug)) tags.push(tag)
+    let concept = challenge.concept
+    if (!concepts.some(t => t.slug === concept.slug)) concepts.push(concept)
   }
-  tags.sort((t1, t2) => t1.order - t2.order)
-  return tags
+  concepts.sort((t1, t2) => t1.order - t2.order)
+  return concepts
 }
 
 
-exports.groupByTag = (challenges) => {
+exports.groupByConcept = (challenges) => {
   let groups = {}
   for (let challenge of challenges) {
-    let tag = challenge.tag
-    let slug = tag.slug
+    let concept = challenge.concept
+    let slug = concept.slug
     !(slug in groups) && (groups[slug] = [])
     groups[slug].push(challenge)
   }

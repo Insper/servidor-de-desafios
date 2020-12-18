@@ -1,61 +1,61 @@
 import chai, { expect } from "chai";
-import { extractTags, groupByTag } from "../../models/challenge"
+import { extractConcepts, groupByConcept } from "../../models/challenge"
 
 
-const Tag = (name, slug, order) => {
+const Concept = (name, slug, order) => {
   return { name: name, slug: slug, order: order }
 }
 
 
-describe("Tag functions", () => {
+describe("Concept functions", () => {
 
-  it("Empty tag list from empty challenge list", () => {
-    let extracted = extractTags([])
+  it("Empty concept list from empty challenge list", () => {
+    let extracted = extractConcepts([])
     expect(extracted).to.deep.equal([]);
   });
 
-  it("Extracts one tag from challenge list", () => {
-    let tag = Tag('Ultimate Tag', 'ultimate-tag', 1)
-    let extracted = extractTags([
-      { title: 'Challenge #1', slug: 'challenge1', tag: tag },
-      { title: 'Challenge #2', slug: 'challenge2', tag: tag },
+  it("Extracts one concept from challenge list", () => {
+    let concept = Concept('Ultimate Concept', 'ultimate-concept', 1)
+    let extracted = extractConcepts([
+      { title: 'Challenge #1', slug: 'challenge1', concept: concept },
+      { title: 'Challenge #2', slug: 'challenge2', concept: concept },
     ])
-    expect(extracted).to.deep.equal([tag]);
+    expect(extracted).to.deep.equal([concept]);
   });
 
-  it("Extracts multiple tags from challenge list and sort by order", () => {
-    let tags = [
-      Tag('First Tag', 'first-tag', 1),
-      Tag('Second Tag', 'second-tag', 2),
-      Tag('Third Tag', 'third-tag', 3),
-      Tag('Fourth Tag', 'fourth-tag', 4),
+  it("Extracts multiple concepts from challenge list and sort by order", () => {
+    let concepts = [
+      Concept('First Concept', 'first-concept', 1),
+      Concept('Second Concept', 'second-concept', 2),
+      Concept('Third Concept', 'third-concept', 3),
+      Concept('Fourth Concept', 'fourth-concept', 4),
     ]
-    let extracted = extractTags([
-      { title: 'Challenge #1', slug: 'challenge1', tag: Tag('Fourth Tag', 'fourth-tag', 4) },
-      { title: 'Challenge #2', slug: 'challenge2', tag: Tag('Second Tag', 'second-tag', 2) },
-      { title: 'Challenge #3', slug: 'challenge3', tag: Tag('Fourth Tag', 'fourth-tag', 4) },
-      { title: 'Challenge #4', slug: 'challenge4', tag: Tag('First Tag', 'first-tag', 1) },
-      { title: 'Challenge #5', slug: 'challenge5', tag: Tag('Third Tag', 'third-tag', 3) },
-      { title: 'Challenge #6', slug: 'challenge6', tag: Tag('Fourth Tag', 'fourth-tag', 4) },
+    let extracted = extractConcepts([
+      { title: 'Challenge #1', slug: 'challenge1', concept: Concept('Fourth Concept', 'fourth-concept', 4) },
+      { title: 'Challenge #2', slug: 'challenge2', concept: Concept('Second Concept', 'second-concept', 2) },
+      { title: 'Challenge #3', slug: 'challenge3', concept: Concept('Fourth Concept', 'fourth-concept', 4) },
+      { title: 'Challenge #4', slug: 'challenge4', concept: Concept('First Concept', 'first-concept', 1) },
+      { title: 'Challenge #5', slug: 'challenge5', concept: Concept('Third Concept', 'third-concept', 3) },
+      { title: 'Challenge #6', slug: 'challenge6', concept: Concept('Fourth Concept', 'fourth-concept', 4) },
     ])
-    expect(extracted).to.deep.equal(tags);
+    expect(extracted).to.deep.equal(concepts);
   });
 
-  it("Groups challenges by tag with highest order", () => {
+  it("Groups challenges by concept with highest order", () => {
     let challenges = [
-      { title: 'Challenge #1', slug: 'challenge1', tag: Tag('Fourth Tag', 'fourth-tag', 4) },
-      { title: 'Challenge #2', slug: 'challenge2', tag: Tag('Second Tag', 'second-tag', 2) },
-      { title: 'Challenge #3', slug: 'challenge3', tag: Tag('Third Tag', 'third-tag', 3) },
-      { title: 'Challenge #4', slug: 'challenge4', tag: Tag('Third Tag', 'third-tag', 3) },
-      { title: 'Challenge #5', slug: 'challenge5', tag: Tag('First Tag', 'first-tag', 1) },
-      { title: 'Challenge #6', slug: 'challenge6', tag: Tag('Fourth Tag', 'fourth-tag', 4) },
+      { title: 'Challenge #1', slug: 'challenge1', concept: Concept('Fourth Concept', 'fourth-concept', 4) },
+      { title: 'Challenge #2', slug: 'challenge2', concept: Concept('Second Concept', 'second-concept', 2) },
+      { title: 'Challenge #3', slug: 'challenge3', concept: Concept('Third Concept', 'third-concept', 3) },
+      { title: 'Challenge #4', slug: 'challenge4', concept: Concept('Third Concept', 'third-concept', 3) },
+      { title: 'Challenge #5', slug: 'challenge5', concept: Concept('First Concept', 'first-concept', 1) },
+      { title: 'Challenge #6', slug: 'challenge6', concept: Concept('Fourth Concept', 'fourth-concept', 4) },
     ]
-    let groups = groupByTag(challenges)
+    let groups = groupByConcept(challenges)
     let expected = {
-      'first-tag': [challenges[4]],
-      'second-tag': [challenges[1]],
-      'third-tag': [challenges[2], challenges[3]],
-      'fourth-tag': [challenges[0], challenges[5]],
+      'first-concept': [challenges[4]],
+      'second-concept': [challenges[1]],
+      'third-concept': [challenges[2], challenges[3]],
+      'fourth-concept': [challenges[0], challenges[5]],
     }
     expect(groups).to.deep.equal(expected);
   });
