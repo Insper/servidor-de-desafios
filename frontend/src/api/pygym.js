@@ -2,7 +2,7 @@ import { csrftoken } from '../components/django'
 
 const API_USER = '/api/user/'
 const API_CHANGE_PASS = '/api/change-password/'
-const API_CHALLENGES = '/api/coding/'
+const API_CHALLENGES = '/api/code/'
 const API_CHALLENGE = (slug) => `${API_CHALLENGES}${slug}/`
 const API_SUBMISSIONS = (slug) => `${API_CHALLENGE(slug)}submission`
 const API_SUBMISSION_CODE = (slug, submissionId) => `${API_CHALLENGE(slug)}submission/${submissionId}/code`

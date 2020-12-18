@@ -13,8 +13,8 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Container from '@material-ui/core/Container';
 import 'fontsource-roboto';
 import { ThemeProvider } from '@material-ui/core/styles';
-import CodingChallengeList from './CodingChallengeList'
-import CodingChallenge from './CodingChallenge'
+import CodeChallengeList from './CodeChallengeList'
+import CodeChallenge from './CodeChallenge'
 import logoPt from '../img/logo-horizontal-small-pt.png'
 import logoDefault from '../img/logo-horizontal-small.png'
 import UserButton from './UserButton'
@@ -57,11 +57,11 @@ function App(props) {
             <Switch>
               <Route exact path={ROUTES.home.path}>
                 <Container maxWidth={maxContainer}>
-                  <CodingChallengeList />
+                  <CodeChallengeList />
                 </Container>
               </Route>
               <Route path={ROUTES.challenge.path} render={(props) =>
-                <CodingChallenge slug={props.match.params.slug} />
+                <CodeChallenge slug={props.match.params.slug} />
               } />
             </Switch>
           </Box>
