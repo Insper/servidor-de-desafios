@@ -4,6 +4,7 @@ from django.conf import settings
 from code_challenge import gitpy
 from code_challenge.challenge_manager import ChallengeManager
 from code_challenge.models import CodeChallenge
+from trace_challenge.models import TraceChallenge
 from core.models import Concept, ChallengeRepo
 
 
@@ -26,12 +27,13 @@ class Command(BaseCommand):
                 print('Invalid index.')
         return ret
 
-    def update_or_create(self, slug, data, repo):
+    def update_or_create_code_challenge(self, slug, data, repo):
         concept = Concept.objects.get(slug=data['concept'])
         try:
             challenge = CodeChallenge.objects.get(slug=slug, repo=repo)
             challenge.title = data['title']
             challenge.question = data['question']
+            challenge.concept = concept
             challenge.published = data['published']
             challenge.show_stdout = data['terminal']
             challenge.function_name = data['function_name']
@@ -47,15 +49,40 @@ class Command(BaseCommand):
                 function_name=data['function_name'],
                 concept=concept,
             )
-            challenge.save()
         return challenge
 
-    def delete(self, slug, repo):
+    def delete_code_challenge(self, slug, repo):
         try:
             challenge = CodeChallenge.objects.get(slug=slug, repo=repo)
             challenge.deleted = True
             challenge.save()
         except CodeChallenge.DoesNotExist:
+            return
+
+    def update_or_create_trace_challenge(self, slug, data, repo):
+        concept = Concept.objects.get(slug=data['concept'])
+        try:
+            challenge = TraceChallenge.objects.get(slug=slug, repo=repo)
+            challenge.title = data['title']
+            challenge.concept = concept
+            challenge.published = data['published']
+            challenge.save()
+        except TraceChallenge.DoesNotExist:
+            challenge = TraceChallenge.objects.create(
+                title=data['title'],
+                concept=concept,
+                slug=slug,
+                repo=repo,
+                published=data['published'],
+            )
+        return challenge
+
+    def delete_trace_challenge(self, slug, repo):
+        try:
+            challenge = TraceChallenge.objects.get(slug=slug, repo=repo)
+            challenge.deleted = True
+            challenge.save()
+        except TraceChallenge.DoesNotExist:
             return
 
     def create_concepts(self, concepts_file):
@@ -81,15 +108,22 @@ class Command(BaseCommand):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(cm.update())
         updated_challenges = loop.run_until_complete(cm.changed_challenges(last_commit=repo.last_commit))
+        updated_traces = loop.run_until_complete(cm.changed_trace_challenges(last_commit=repo.last_commit))
         log = loop.run_until_complete(git.log(last=1))
 
         self.create_concepts(repo_dir / 'concepts.txt')
 
         for slug, data in updated_challenges.items():
             if data:
-                self.update_or_create(slug, data, repo)
+                self.update_or_create_code_challenge(slug, data, repo)
             else:
-                self.delete(slug, repo)
+                self.delete_code_challenge(slug, repo)
+
+        for slug, data in updated_traces.items():
+            if data:
+                self.update_or_create_trace_challenge(slug, data, repo)
+            else:
+                self.delte_trace_challenge(slug, repo)
 
         repo.last_commit = log[0]['commit']
         repo.save()

@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'core',
     'frontend',
     'code_challenge',
+    'trace_challenge',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

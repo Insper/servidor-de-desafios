@@ -15,9 +15,9 @@ class ChallengeManager:
         else:
             await self.git.clone(self.repo_url)
 
-    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md', raw_dir='raw', last_commit=None):
+    async def list_changed_dirs(self, root_dir, last_commit=None):
         if last_commit:
-            cdir = str(Path(self.git.base_dir / challenges_dir).absolute())
+            cdir = str(Path(self.git.base_dir / root_dir).absolute())
             challenge_dirs = await self.git.changed_files(last_commit)
             tmp = challenge_dirs
             challenge_dirs = set()
@@ -29,8 +29,11 @@ class ChallengeManager:
                 challenge_dirs.add(d)
             challenge_dirs = list(challenge_dirs)
         else:
-            challenge_dirs = (self.git.base_dir / challenges_dir).iterdir()
-        challenge_dirs = [d for d in challenge_dirs if d.is_dir() or not d.exists()]
+            challenge_dirs = (self.git.base_dir / root_dir).iterdir()
+        return [d for d in challenge_dirs if d.is_dir() or not d.exists()]
+
+    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md', raw_dir='raw', last_commit=None):
+        challenge_dirs = await self.list_changed_dirs(challenges_dir, last_commit)
 
         all_challenges = {}
         for challenge_dir in challenge_dirs:
@@ -55,6 +58,21 @@ class ChallengeManager:
                     all_challenges[challenge_dir.name] = None
 
         return all_challenges
+
+    async def changed_trace_challenges(self, root_dir='traces', details_file='details.json', last_commit=None):
+        trace_dirs = await self.list_changed_dirs(root_dir, last_commit)
+
+        all_traces = {}
+        for trace_dir in trace_dirs:
+            try:
+                with open(trace_dir / details_file) as f:
+                    details = json.load(f)
+                all_traces[trace_dir.name] = details
+            except FileNotFoundError:
+                if not trace_dir.is_dir():
+                    all_traces[trace_dir.name] = None
+
+        return all_traces
 
 
 def test_code_for(challenge):
