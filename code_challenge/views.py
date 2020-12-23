@@ -6,7 +6,7 @@ from django.utils.decorators import classonlymethod
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .challenge_manager import test_code_for
+from .challenge_controller import test_code_for
 from .serializers import FullCodeChallengeSerializer, ShortCodeChallengeSerializer, CodeChallengeSubmissionSerializer
 from .models import CodeChallenge, CodeChallengeSubmission, user_challenge_path
 from .code_runner import run_tests
@@ -19,7 +19,7 @@ class CodeChallengeListView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        challenges = CodeChallenge.objects.filter(deleted=False)
+        challenges = CodeChallenge.objects.filter(deleted=False, published=True)
         serializer = ShortCodeChallengeSerializer(challenges, many=True)
         return Response(serializer.data)
 
@@ -27,7 +27,7 @@ class CodeChallengeListView(APIView):
 def get_challenge_or_404(slug):
     try:
         challenge = CodeChallenge.objects.get(slug=slug)
-        if not challenge.deleted:
+        if not challenge.deleted and challenge.published:
             return challenge
     except CodeChallenge.DoesNotExist:
         pass

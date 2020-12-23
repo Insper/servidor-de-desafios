@@ -2,7 +2,7 @@ import asyncio
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from code_challenge import gitpy
-from code_challenge.challenge_manager import ChallengeManager
+from code_challenge.challenge_controller import ChallengeController
 from code_challenge.models import CodeChallenge
 from trace_challenge.models import TraceChallenge
 from core.models import Concept, ChallengeRepo
@@ -102,13 +102,13 @@ class Command(BaseCommand):
 
         repo_dir = settings.CHALLENGES_DIR / repo.slug
         git = gitpy.Git(repo_dir)
-        cm = ChallengeManager(git, repo.remote)
+        controller = ChallengeController(git, repo.remote)
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(cm.update())
-        updated_challenges = loop.run_until_complete(cm.changed_challenges(last_commit=repo.last_commit))
-        updated_traces = loop.run_until_complete(cm.changed_trace_challenges(last_commit=repo.last_commit))
+        loop.run_until_complete(controller.update())
+        updated_challenges = loop.run_until_complete(controller.changed_challenges(last_commit=repo.last_commit))
+        updated_traces = loop.run_until_complete(controller.changed_trace_challenges(last_commit=repo.last_commit))
         log = loop.run_until_complete(git.log(last=1))
 
         self.create_concepts(repo_dir / 'concepts.txt')

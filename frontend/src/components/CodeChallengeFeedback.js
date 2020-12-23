@@ -21,6 +21,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import ErrorIcon from '@material-ui/icons/Error';
 import { useStyles } from '../styles'
 import { RotateSpinner } from "react-spinners-kit";
+import Terminal from './Terminal'
 
 
 function ListTabPanel(props) {
@@ -133,15 +134,14 @@ function CodeChallengeFeedbackList(props) {
           <ListTabPanel className={classes.contentHolder} label="stdouts" value={selectedTab} index={1}>
             {props.submission.stdouts && props.submission.stdouts.map((stdout, idx) => (
               <ListItem key={`stdout-${props.submission.id}-${idx}`}>
-                <Box className={classes.fillParent} className={classes.terminal}>
-                  {stdout.map((line, idx2) => (
-                    <Box className={classes.terminalLine} key={`stacktrace-${props.submission.id}-${idx}-${idx2}`}>
-                      <Typography className={classes.sourceCode} component="code">{line.output}</Typography>
-                      <Typography className={`${classes.sourceCode} ${classes.terminalInput}`} component="code">{line.input}</Typography>
-                    </Box>
-                  ))}
-                  <Divider />
-                </Box>
+                <Terminal
+                  lines={stdout}
+                  className={classes.fillParent}
+                  keyPrefix={`stacktrace-${props.submission.id}-${idx}-`}
+                  getOutput={(line) => line.output}
+                  getInput={(line) => line.input}
+                />
+                <Divider />
               </ListItem>)
             )}
           </ListTabPanel>

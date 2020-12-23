@@ -6,6 +6,9 @@ const API_CHALLENGES = '/api/code/'
 const API_CHALLENGE = (slug) => `${API_CHALLENGES}${slug}/`
 const API_SUBMISSIONS = (slug) => `${API_CHALLENGE(slug)}submission`
 const API_SUBMISSION_CODE = (slug, submissionId) => `${API_CHALLENGE(slug)}submission/${submissionId}/code`
+const API_TRACES = '/api/trace/'
+const API_TRACE = (slug) => `${API_TRACES}${slug}/`
+const API_TRACE_STATES = (slug) => `${API_TRACE(slug)}state/`
 
 
 const fetchUserData = () => {
@@ -56,4 +59,16 @@ const fetchSubmissionCode = (slug, submissionId) => {
   return fetch(API_SUBMISSION_CODE(slug, submissionId), { credentials: 'include' })
 }
 
-export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode }
+const fetchTraceList = () => {
+  return fetch(API_TRACES, { credentials: 'include' })
+}
+
+const fetchTrace = (slug) => {
+  return fetch(API_TRACE(slug), { credentials: 'include' })
+}
+
+const fetchTraceStateList = (slug) => {
+  return fetch(API_TRACE_STATES(slug), { credentials: 'include' })
+}
+
+export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode, fetchTraceList, fetchTrace, fetchTraceStateList }

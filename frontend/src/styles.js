@@ -76,6 +76,9 @@ const customClasses = {
   fillParent: {
     flexGrow: 1,
   },
+  inlineSiblings: {
+    display: "inline-flex",
+  },
   gridItem: {
     paddingLeft: theme.spacing(3),
     paddingRight: theme.spacing(3),
@@ -98,7 +101,7 @@ const customClasses = {
     width: "100%",
   },
   sourceCode: {
-    fontFamily: 'source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace',
+    fontFamily: 'source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace !important',
   },
   terminal: {
     backgroundColor: "black",
@@ -112,7 +115,15 @@ const customClasses = {
   editor: {
     flexGrow: 1,
     minHeight: "70vh",
-  }
+  },
+  fullHeight: {
+    minHeight: "100vh",
+  },
+  fixedBottom: {
+    position: "fixed",
+    bottom: 0,
+    minWidth: "100%",
+  },
 }
 
 const useStyles = makeStyles(customClasses)

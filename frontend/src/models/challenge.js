@@ -1,5 +1,6 @@
-exports.extractConcepts = (challenges) => {
+exports.extractConcepts = (challenges, oldConcepts) => {
   let concepts = []
+  if (oldConcepts) concepts = oldConcepts
   for (let challenge of challenges) {
     let concept = challenge.concept
     if (!concepts.some(t => t.slug === concept.slug)) concepts.push(concept)
