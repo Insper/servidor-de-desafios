@@ -9,6 +9,7 @@ const GRAY1 = '#646464'
 const GRAY2 = '#E0E0E0'
 const SUCCESS = '#39C27C'
 const DANGER = '#FF665C'
+const DISABLED = '#CCCCCC'
 const TERMINAL_INPUT = '#27E427'
 
 
@@ -123,6 +124,22 @@ const customClasses = {
     position: "fixed",
     bottom: 0,
     minWidth: "100%",
+  },
+  tightTextField: {
+    padding: "0.7em !important",
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)',
+  },
+  cardDisabled: {
+    backgroundColor: DISABLED,
   },
 }
 

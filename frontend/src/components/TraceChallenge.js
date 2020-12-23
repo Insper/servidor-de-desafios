@@ -30,6 +30,7 @@ function TraceChallenge(props) {
   const [totalStates, setTotalStates] = useState(0)
   const [nextLine, setNextLine] = useState(null)
   const [linesWithCode, setLinesWithCode] = useState(null)
+  const [showRetval, setShowRetval] = useState(false)
 
   const updateNextLine = (curIdx, stateList) => {
     const nextState = stateList && stateList.length > curIdx + 1 ? stateList[curIdx + 1] : {}
@@ -70,16 +71,20 @@ function TraceChallenge(props) {
   }
 
   const handleBack = () => {
-    const newIdx = newIndex = Math.max(0, currentStateIndex - 1)
+    const newIdx = Math.max(0, currentStateIndex - 1)
     setCurrentStateIndex(newIdx)
     updateNextLine(newIdx, states)
   }
 
   const currentState = states && states.length ? states[currentStateIndex] : {}
   const nextState = states && states.length > currentStateIndex + 1 ? states[currentStateIndex + 1] : {}
+  const prevState = states && states.length > 0 && currentStateIndex > 0 ? states[currentStateIndex - 1] : {}
   const currentMemory = currentState.name_dicts ? currentState.name_dicts : { '<module>': {} }
   const stdout = currentState.stdout ? currentState.stdout : []
-  const marginBottom = 3
+  const marginBottom = 10
+  const hasRetval = currentState.retval !== null
+  const prevRetVal = prevState ? prevState.retval : null
+  const hasPrevRetval = prevRetVal !== null
 
   if (!trace) return <div className={classes.loadingContainer}><CircularProgress color="secondary" size="10vw" /></div>
 
@@ -119,7 +124,26 @@ function TraceChallenge(props) {
         <Grid className={`${classes.flexbox} ${classes.gridItem} ${classes.fullHeight}`} container item md={6}>
           <Box mb={marginBottom}>
             <Typography variant="h3">{t("Memory")}</Typography>
-            <TraceMemory memory={currentMemory} />
+            <TraceMemory
+              memory={currentMemory}
+              onDisabledChanged={setShowRetval}
+              forceDisable={hasRetval}
+            />
+
+            {showRetval || hasRetval || hasPrevRetval ?
+              <Box mt={2}>
+                <TextField
+                  id="retval"
+                  label={t("Return value")}
+                  helperText={t("Enter the value returned by the function (leave empty if nothing is returned)")}
+                  variant="outlined"
+                  defaultValue={currentState.retval ? currentState.retval : (hasPrevRetval ? prevRetVal : "")}
+                  InputProps={{
+                    readOnly: hasRetval || hasPrevRetval,
+                    classes: { root: classes.sourceCode },
+                  }}
+                />
+              </Box> : null}
 
             <Box mt={2} minHeight="10em" className={classes.flexbox}>
               <Typography variant="h3">{t("Terminal")}</Typography>
@@ -141,6 +165,7 @@ function TraceChallenge(props) {
                 variant="outlined"
                 InputProps={{
                   readOnly: true,
+                  classes: { root: classes.sourceCode, input: classes.tightTextField },
                 }}
               />
             </Box>
@@ -151,7 +176,7 @@ function TraceChallenge(props) {
       <MobileStepper
         variant="progress"
         className={classes.fixedBottom}
-        steps={totalStates}
+        steps={totalStates + 1}
         position="static"
         LinearProgressProps={{ className: classes.fillParent }}
         activeStep={currentStateIndex}
