@@ -42,8 +42,6 @@ def empty_list():
 
 
 class CodeChallengeSubmission(models.Model):
-    ErrorData = namedtuple('ErrorData', 'message,stacktrace,stdout')
-
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     challenge = models.ForeignKey(CodeChallenge, on_delete=models.CASCADE)
     creation_date = models.DateTimeField(auto_now_add=True)
