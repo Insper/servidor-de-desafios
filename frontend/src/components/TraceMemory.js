@@ -19,7 +19,7 @@ function TraceMemory(props) {
   const classes = useStyles()
   const [expanded, setExpanded] = useState(true);
   const [disabled, setDisabled] = useState(false);
-  const { memory, prefix, isFunction, onDisabledChanged, forceDisable, ...other } = props
+  const { memory, prefix, isFunction, onDisabledChanged, forceDisable, stateEditable, ...other } = props
 
   const names = Object.keys(memory)
   names.sort()
@@ -61,7 +61,7 @@ function TraceMemory(props) {
           >
             <ExpandMoreIcon />
           </IconButton>
-          : (isFunction && !forceDisable ?
+          : (isFunction && !forceDisable && stateEditable &&
             <IconButton
               className={clsx(classes.expand, {
                 [classes.expandOpen]: disabled,
@@ -70,8 +70,7 @@ function TraceMemory(props) {
               aria-label="Disable memory"
             >
               <EjectIcon />
-            </IconButton>
-            : null)}
+            </IconButton>)}
       />
       <Collapse in={(expanded || !canExpand) && !actuallyDisabled} timeout="auto" unmountOnExit>
         <CardContent>
@@ -86,8 +85,9 @@ function TraceMemory(props) {
                 InputLabelProps={{ classes: { root: classes.sourceCode } }}
                 label={varName}
                 defaultValue={curContext[varName]}
+                disabled={!stateEditable}
                 InputProps={{
-                  readOnly: true,
+                  readOnly: !stateEditable,
                   classes: { root: classes.sourceCode, input: classes.tightTextField },
                 }}
                 variant="outlined"
@@ -96,11 +96,18 @@ function TraceMemory(props) {
           )}
         </CardContent>
       </Collapse>
-      {hasChildren ?
+      {hasChildren &&
         <CardContent>
-          {!expanded && canExpand ? <MoreHorizIcon /> : null}
-          <TraceMemory memory={childMemory} prefix={`${validPrefix}${name}`} isFunction={true} onDisabledChanged={onDisabledChanged} forceDisable={forceDisable} {...other} />
-        </CardContent> : null}
+          {!expanded && canExpand && <MoreHorizIcon />}
+          <TraceMemory
+            memory={childMemory}
+            prefix={`${validPrefix}${name}`}
+            isFunction={true}
+            onDisabledChanged={onDisabledChanged}
+            forceDisable={forceDisable}
+            stateEditable={stateEditable}
+            {...other} />
+        </CardContent>}
     </Card>
   )
 }
@@ -111,11 +118,13 @@ TraceMemory.propTypes = {
   prefix: PropTypes.string,
   onDisabledChanged: PropTypes.func,
   forceDisable: PropTypes.bool,
+  stateEditable: PropTypes.bool,
 }
 
 TraceMemory.defaultProps = {
   isFunction: false,
   forceDisable: false,
+  stateEditable: true,
 }
 
 export default TraceMemory

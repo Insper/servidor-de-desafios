@@ -16,7 +16,7 @@ import { DropzoneDialog } from 'material-ui-dropzone';
 import { fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode } from '../api/pygym'
 import MaterialMarkdown from './MaterialMarkdown'
 import Editor from "@monaco-editor/react";
-import { FillSpinner as Loader } from "react-spinners-kit";
+import LoadingResultsProgress from './LoadingResultsProgress'
 import CodeChallengeFeedbackList from "./CodeChallengeFeedbackList"
 import Alert from "./Alert"
 
@@ -132,7 +132,7 @@ function CodeChallenge(props) {
                 theme={"light"}
                 editorDidMount={handleEditorDidMount}
                 language={"python"}
-                loading={<Loader />}
+                loading={<LoadingResultsProgress />}
                 value={previousCode}
                 options={{ lineNumbers: "on", wordWrap: "on" }}
               />

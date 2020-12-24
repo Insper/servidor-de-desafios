@@ -1,27 +1,29 @@
 import { createMuiTheme, makeStyles, responsiveFontSizes } from '@material-ui/core/styles';
 
 // Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text=The%20Python%20Logo%20Colors%20with,and%20Granite%20Gray%20(%23646464).):
-const BLUE1 = '#4B8BBE'
-const BLUE2 = '#306998'
-const YELLOW1 = '#FFE873'
-const YELLOW2 = '#FFD43B'
-const GRAY1 = '#646464'
-const GRAY2 = '#E0E0E0'
-const SUCCESS = '#39C27C'
-const DANGER = '#FF665C'
-const DISABLED = '#CCCCCC'
-const TERMINAL_INPUT = '#27E427'
+const Colors = {
+  BLUE1: '#4B8BBE',
+  BLUE2: '#306998',
+  YELLOW1: '#FFE873',
+  YELLOW2: '#FFD43B',
+  GRAY1: '#646464',
+  GRAY2: '#E0E0E0',
+  SUCCESS: '#39C27C',
+  DANGER: '#FF665C',
+  DISABLED: '#CCCCCC',
+  TERMINAL_INPUT: '#27E427',
+}
 
 
 let theme = createMuiTheme({
   palette: {
     primary: {
-      main: BLUE2,
-      light: BLUE1,
+      main: Colors.BLUE2,
+      light: Colors.BLUE1,
     },
     secondary: {
-      main: YELLOW2,
-      light: YELLOW1,
+      main: Colors.YELLOW2,
+      light: Colors.YELLOW1,
     },
   },
 });
@@ -42,7 +44,7 @@ const customClasses = {
     maxHeight: "30vh"
   },
   loginBack: {
-    backgroundColor: GRAY2,
+    backgroundColor: Colors.GRAY2,
     display: "flex",
     flexDirection: "column",
     alignItems: "center"
@@ -85,10 +87,10 @@ const customClasses = {
     paddingRight: theme.spacing(3),
   },
   success: {
-    color: SUCCESS,
+    color: Colors.SUCCESS,
   },
   danger: {
-    color: DANGER,
+    color: Colors.DANGER,
   },
   centerContent: {
     display: "flex",
@@ -111,7 +113,7 @@ const customClasses = {
     width: "100%",
   },
   terminalInput: {
-    color: TERMINAL_INPUT,
+    color: Colors.TERMINAL_INPUT,
   },
   editor: {
     flexGrow: 1,
@@ -139,11 +141,11 @@ const customClasses = {
     transform: 'rotate(180deg)',
   },
   cardDisabled: {
-    backgroundColor: DISABLED,
+    backgroundColor: Colors.DISABLED,
   },
 }
 
 const useStyles = makeStyles(customClasses)
 
 
-export { customClasses, useStyles, theme }
+export { customClasses, useStyles, theme, Colors }

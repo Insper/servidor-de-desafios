@@ -20,7 +20,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 import ErrorIcon from '@material-ui/icons/Error';
 import { useStyles } from '../styles'
-import { RotateSpinner } from "react-spinners-kit";
+import LoadingResultsProgress from './LoadingResultsProgress'
 import Terminal from './Terminal'
 
 
@@ -85,7 +85,7 @@ function CodeChallengeFeedbackList(props) {
   let submissionTimeText
 
   if (props.submission.id === "running") {
-    result = <RotateSpinner size={rotateSpinnerSize} color="#E0E0E0" />
+    result = <LoadingResultsProgress size={rotateSpinnerSize} color="#E0E0E0" />
     resultText = t("Running tests")
   }
   else if (props.submission.id === "error") {
