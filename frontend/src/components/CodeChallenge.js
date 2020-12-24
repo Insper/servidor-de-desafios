@@ -112,7 +112,7 @@ function CodeChallenge(props) {
   if (!challenge) return <div className={classes.loadingContainer}><CircularProgress color="secondary" size="10vw" /></div>
 
   return (
-    <React.Fragment>
+    <Box mb={3}>
       <Grid container>
         <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleCloseSnackbar}>
           <Alert onClose={handleCloseSnackbar} severity={passedTests ? "success" : "error"}>{passedTests ? t("Passed all tests") : t("Failed some test")}!</Alert>
@@ -178,8 +178,8 @@ function CodeChallenge(props) {
             <CodeChallengeFeedbackList ref={feedbackListRef} submissions={submissions} onLoadButtonClick={loadSubmissionCode} />
           </Box>
         </Grid>
-      </Grid >
-    </React.Fragment >
+      </Grid>
+    </Box>
   );
 }
 

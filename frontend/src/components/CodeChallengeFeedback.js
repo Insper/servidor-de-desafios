@@ -78,6 +78,7 @@ function CodeChallengeFeedbackList(props) {
 
   const resultIconSize = 40
   const rotateSpinnerSize = 20
+  const loaderStrokeWeight = 2
   let result
   let loadButton
   let details
@@ -85,7 +86,7 @@ function CodeChallengeFeedbackList(props) {
   let submissionTimeText
 
   if (props.submission.id === "running") {
-    result = <LoadingResultsProgress size={rotateSpinnerSize} color="#E0E0E0" />
+    result = <LoadingResultsProgress size={rotateSpinnerSize} strokeWeight={loaderStrokeWeight} />
     resultText = t("Running tests")
   }
   else if (props.submission.id === "error") {
@@ -95,11 +96,11 @@ function CodeChallengeFeedbackList(props) {
   else {
     if (props.submission.success) {
       resultText = t("Success")
-      result = <SvgIcon className={classes.success}><CheckCircleIcon /></SvgIcon>
+      result = <LoadingResultsProgress size={rotateSpinnerSize} state="success" strokeWeight={loaderStrokeWeight} />
     }
     else {
       resultText = t("Error")
-      result = <SvgIcon className={classes.danger}><CancelIcon /></SvgIcon>
+      result = <LoadingResultsProgress size={rotateSpinnerSize} state="error" strokeWeight={loaderStrokeWeight} />
     }
     submissionTimeText = `${t("Submission sent")} ${t("fulldate", { date: new Date(props.submission.creation_date) })}`
 

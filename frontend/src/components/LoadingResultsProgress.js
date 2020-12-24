@@ -104,7 +104,7 @@ const Wrapper = styled.svg`
 
 function LoadingResultsProgress(props) {
   const side = 256;
-  const sw = 10;
+  const sw = 10 * props.strokeWeight;
   const r = 100;
   const length = Math.floor(2 * Math.PI * r);
   const animDur = "1.4s";
@@ -144,10 +144,10 @@ function LoadingResultsProgress(props) {
           strokeWidth={sw}
           d={`M ${side / 2.7} ${side / 2} l ${side / 10} ${side / 11} ${side / 5
             } ${-side / 5}`}
-        />)) || (props.state === ProgressState.ERROR && (
+        />)) || (state === ProgressState.ERROR && (
           <Cross
             fill="none"
-            length={side / 2}
+            length={0.9 * side}
             strokeWidth={sw}
             d={`M ${side / 3} ${side / 3} l ${side / 3} ${side / 3} M ${side / 3} ${2 * side / 3} l  ${side / 3} ${-side / 3}`}
           />))
@@ -157,13 +157,15 @@ function LoadingResultsProgress(props) {
 }
 
 LoadingResultsProgress.propTypes = {
-  state: PropTypes.oneOf(PropTypes.number, PropTypes.string),
-  size: PropTypes.number,
+  state: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  strokeWeight: PropTypes.number,
 }
 
 LoadingResultsProgress.defaultProps = {
   state: ProgressState.RUNNING,
   size: 82,
+  strokeWeight: 1,
 }
 
 export default LoadingResultsProgress

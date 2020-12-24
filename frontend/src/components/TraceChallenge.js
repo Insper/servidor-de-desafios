@@ -131,7 +131,7 @@ function TraceChallenge(props) {
           <Box mb={marginBottom}>
             {isLast ?
               <Box className={clsx(classes.flexbox, classes.centerContent)}>
-                <LoadingResultsProgress size="200" state="success" />
+                <LoadingResultsProgress size={200} state="success" />
               </Box> :
               <>
                 <Typography variant="h3">{t("Memory")}</Typography>
