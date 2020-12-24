@@ -10,6 +10,12 @@ const ProgressState = {
   SUCCESS: 2
 };
 
+ProgressState.resolve = state => {
+  if (typeof state === 'number') return state
+  if (typeof state !== 'string') throw "State must be either a string or a number"
+  return ProgressState[state.toUpperCase()]
+}
+
 const Rotate = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -102,9 +108,11 @@ function LoadingResultsProgress(props) {
   const r = 100;
   const length = Math.floor(2 * Math.PI * r);
   const animDur = "1.4s";
+  const state = ProgressState.resolve(props.state)
+
   return (
     <Wrapper
-      state={props.state}
+      state={state}
       width={props.size}
       height={props.size}
       viewBox={`0 0 ${side} ${side}`}
@@ -112,7 +120,7 @@ function LoadingResultsProgress(props) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <BackgroundCircle
-        state={props.state}
+        state={state}
         fill="none"
         strokeWidth={sw}
         cx={Math.floor(side / 2)}
@@ -120,7 +128,7 @@ function LoadingResultsProgress(props) {
         r={r}
       />
       <Circle
-        state={props.state}
+        state={state}
         fill="none"
         strokeWidth={sw}
         cx={Math.floor(side / 2)}
@@ -129,7 +137,7 @@ function LoadingResultsProgress(props) {
         length={length}
         animDur={animDur}
       />
-      {(props.state === ProgressState.SUCCESS && (
+      {(state === ProgressState.SUCCESS && (
         <Check
           fill="none"
           length={side / 2}
@@ -149,7 +157,7 @@ function LoadingResultsProgress(props) {
 }
 
 LoadingResultsProgress.propTypes = {
-  state: PropTypes.number,
+  state: PropTypes.oneOf(PropTypes.number, PropTypes.string),
   size: PropTypes.number,
 }
 

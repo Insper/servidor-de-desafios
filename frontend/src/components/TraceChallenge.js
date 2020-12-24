@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useTranslation } from 'react-i18next'
 import { useStyles } from '../styles'
+import clsx from 'clsx'
 import { fetchTrace, fetchTraceStateList } from '../api/pygym'
 import StaticCodeHighlight from './StaticCodeHighlight'
 import { vs } from 'react-syntax-highlighter/dist/esm/styles/prism'
@@ -103,7 +104,6 @@ function TraceChallenge(props) {
 
         <Grid item className={classes.gridItem} sm={12}>
           <Box mb={3}>
-            <LoadingResultsProgress />
             <Typography variant="h2" component="h1" gutterBottom={true}>{trace.title}</Typography>
             <Typography>{t("What will be the state of the program after the following line is executed? Update the memory and terminal output, and select the next line that will be evaluated by the Python interpreter")}.</Typography>
           </Box>
@@ -129,56 +129,62 @@ function TraceChallenge(props) {
 
         <Grid className={`${classes.flexbox} ${classes.gridItem} ${classes.fullHeight}`} container item md={6}>
           <Box mb={marginBottom}>
-            <Typography variant="h3">{t("Memory")}</Typography>
-            <TraceMemory
-              memory={currentMemory}
-              onDisabledChanged={setShowRetval}
-              forceDisable={hasRetval}
-              stateEditable={stateEditable}
-            />
-
-            {(showRetval || hasRetval || hasPrevRetval) &&
-              <Box mt={2}>
-                <TextField
-                  id="retval"
-                  label={t("Return value")}
-                  helperText={t("Enter the value returned by the function (leave empty if nothing is returned)")}
-                  variant="outlined"
-                  defaultValue={currentState.retval ? currentState.retval : (hasPrevRetval ? prevRetVal : "")}
-                  disabled={hasRetval || hasPrevRetval}
-                  InputProps={{
-                    readOnly: hasRetval || hasPrevRetval,
-                    classes: { root: classes.sourceCode },
-                  }}
+            {isLast ?
+              <Box className={clsx(classes.flexbox, classes.centerContent)}>
+                <LoadingResultsProgress size="200" state="success" />
+              </Box> :
+              <>
+                <Typography variant="h3">{t("Memory")}</Typography>
+                <TraceMemory
+                  memory={currentMemory}
+                  onDisabledChanged={setShowRetval}
+                  forceDisable={hasRetval}
+                  stateEditable={stateEditable}
                 />
-              </Box>}
 
-            <Box mt={2} minHeight="10em" className={classes.flexbox}>
-              <Typography variant="h3">{t("Terminal")}</Typography>
-              <Terminal
-                lines={stdout}
-                className={classes.fillParent}
-                getOutput={(line) => line.out}
-                getInput={(line) => line.in}
-              />
-            </Box>
+                {(showRetval || hasRetval || hasPrevRetval) &&
+                  <Box mt={2}>
+                    <TextField
+                      id="retval"
+                      label={t("Return value")}
+                      helperText={t("Enter the value returned by the function (leave empty if nothing is returned)")}
+                      variant="outlined"
+                      defaultValue={currentState.retval ? currentState.retval : (hasPrevRetval ? prevRetVal : "")}
+                      disabled={hasRetval || hasPrevRetval}
+                      InputProps={{
+                        readOnly: hasRetval || hasPrevRetval,
+                        classes: { root: classes.sourceCode },
+                      }}
+                    />
+                  </Box>}
 
-            {currentStateIndex < totalStates - 1 &&
-              <Box mt={2}>
-                <Typography variant="h3">{t("Next line")}</Typography>
-                <TextField
-                  error={nextLine === null}
-                  id="next-line"
-                  value={nextLine ? nextLine : ""}
-                  helperText={nextLine !== null ? "" : t("Select the next line that will be executed by the Python interpreter by clicking in the code")}
-                  variant="outlined"
-                  disabled={true}
-                  InputProps={{
-                    readOnly: true,
-                    classes: { root: classes.sourceCode, input: classes.tightTextField },
-                  }}
-                />
-              </Box>}
+                <Box mt={2} minHeight="10em" className={classes.flexbox}>
+                  <Typography variant="h3">{t("Terminal")}</Typography>
+                  <Terminal
+                    lines={stdout}
+                    className={classes.fillParent}
+                    getOutput={(line) => line.out}
+                    getInput={(line) => line.in}
+                  />
+                </Box>
+
+                {currentStateIndex < totalStates - 1 &&
+                  <Box mt={2}>
+                    <Typography variant="h3">{t("Next line")}</Typography>
+                    <TextField
+                      error={nextLine === null}
+                      id="next-line"
+                      value={nextLine ? nextLine : ""}
+                      helperText={nextLine !== null ? "" : t("Select the next line that will be executed by the Python interpreter by clicking in the code")}
+                      variant="outlined"
+                      disabled={true}
+                      InputProps={{
+                        readOnly: true,
+                        classes: { root: classes.sourceCode, input: classes.tightTextField },
+                      }}
+                    />
+                  </Box>}
+              </>}
           </Box>
         </Grid>
       </Grid >
