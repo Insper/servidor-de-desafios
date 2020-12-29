@@ -98,6 +98,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pygym.wsgi.application'
 
+# Set to True/False to enable/disable aws (to run tests and memory comparisons in trace challenges)
+AWS_WANTED = False
 AWS_ACCESS_KEY = None
 AWS_SECRET_KEY = None
 try:
@@ -107,7 +109,7 @@ try:
     AWS_SECRET_KEY = aws_credentials['AWS_SECRET_KEY']
 except:
     print('Using default configuration for aws lambda', file=sys.stderr)
-USE_AWS = AWS_ACCESS_KEY and AWS_SECRET_KEY and False
+USE_AWS = AWS_ACCESS_KEY and AWS_SECRET_KEY and AWS_WANTED
 if USE_AWS:
     print('Using AWS', file=sys.stderr)
 else:

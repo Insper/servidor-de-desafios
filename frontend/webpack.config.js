@@ -35,5 +35,8 @@ module.exports = {
   output: {
     filename: './static/frontend/[name].js',
     path: path.resolve(__dirname)
-  }
+  },
+  devServer: {
+    writeToDisk: true, // Write files to disk in dev mode, so Django can serve the assets
+  },
 };

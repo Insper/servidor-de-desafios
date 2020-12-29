@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import { useTranslation } from 'react-i18next'
 import { useStyles } from '../styles'
 import clsx from 'clsx'
-import { fetchTrace, fetchTraceStateList } from '../api/pygym'
+import _ from 'lodash'
+import { fetchTrace, postTrace, fetchTraceStateList } from '../api/pygym'
 import StaticCodeHighlight from './StaticCodeHighlight'
 import { vs } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import Grid from '@material-ui/core/Grid'
@@ -20,9 +21,11 @@ import TraceMemory from './TraceMemory'
 import Terminal from './Terminal'
 import LoadingResultsProgress from './LoadingResultsProgress'
 import { findLinesWithCode } from "../models/trace"
+import { traceMessages } from "../api/messages"
 
 function TraceChallenge(props) {
   const { t } = useTranslation()
+  const m = traceMessages(t)
   const classes = useStyles()
   const [trace, setTrace] = useState({})
   const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -33,11 +36,37 @@ function TraceChallenge(props) {
   const [nextLine, setNextLine] = useState(null)
   const [linesWithCode, setLinesWithCode] = useState(null)
   const [showRetval, setShowRetval] = useState(false)
+  const [retval, setRetval] = useState()
+  const [latestStateIndex, setLatestStateIndex] = useState(-1)
+  const [fillableMemory, setFillableMemory] = useState({})
+  const [terminalText, setTerminalText] = useState('')
+
+  // Error messages
+  const [memoryErrorMsg, setMemoryErrorMsg] = useState('')
+  const [memoryActivateErrors, setMemoryActivateErrors] = useState()
+  const [memoryValueErrors, setMemoryValueErrors] = useState()
+  const [nextLineErrorMsg, setNextLineErrorMsg] = useState('')
+  const [retvalErrorMsg, setRetvalErrorMsg] = useState('')
+  const [terminalErrorMsg, setTerminalErrorMsg] = useState('')
+  const [hasEmptyMemory, setHasEmptyMemory] = useState(false)
 
   const updateNextLine = (curIdx, stateList) => {
     const nextState = stateList && stateList.length > curIdx + 1 ? stateList[curIdx + 1] : {}
     if (typeof nextState.line_i === 'number') setNextLine(nextState.line_i + 1)
-    else setNextLine(-1)
+    else setNextLine(null)
+  }
+
+  const updateStates = () => {
+    fetchTraceStateList(props.slug)
+      .then(res => res.json())
+      .then(result => {
+        setStates(result.states)
+        setTotalStates(result.totalStates)
+        setLatestStateIndex(result.latestState)
+        setCurrentStateIndex(result.states.length - 1)
+        updateNextLine(result.states.length - 1, result.states)
+      })
+      .catch(console.log)
   }
 
   useEffect(() => {
@@ -48,16 +77,11 @@ function TraceChallenge(props) {
         setLinesWithCode(findLinesWithCode(traceData.code))
       })
       .catch(console.log)
-    fetchTraceStateList(props.slug)
-      .then(res => res.json())
-      .then(result => {
-        setStates(result.states)
-        setTotalStates(result.totalStates)
-        setCurrentStateIndex(0)
-        updateNextLine(0, result.states)
-      })
-      .catch(console.log)
+
+    updateStates()
   }, []);
+
+  const stateEditable = currentStateIndex === latestStateIndex + 1
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') {
@@ -67,11 +91,48 @@ function TraceChallenge(props) {
     setSnackbarOpen(false)
   }
 
+  const replaceMessages = errors => {
+    let replaced = {}
+    _.entries(errors).forEach(([name, ctx]) => {
+      if (typeof (ctx) === "number") {
+        replaced[name] = m(ctx)
+      }
+      else {
+        replaced[name] = {}
+        _.entries(ctx).forEach(([varName, errCode]) => {
+          replaced[name][varName] = m(errCode)
+        })
+      }
+    })
+    return replaced
+  }
+
   const handleNext = () => {
-    // TODO SUBMIT CODE AND TEST RESULT
-    const newIdx = Math.min(totalStates, currentStateIndex + 1)
-    setCurrentStateIndex(newIdx)
-    updateNextLine(newIdx, states)
+    if (stateEditable) {
+      postTrace(props.slug, currentStateIndex, fillableMemory, terminalText, nextLine, retval)
+        .then(res => res.json())
+        .then(result => {
+          setMemoryErrorMsg(m(result.memory_code.code))
+          setMemoryActivateErrors(replaceMessages(result.memory_code.activate_errors))
+          setMemoryValueErrors(replaceMessages(result.memory_code.value_errors))
+          setNextLineErrorMsg(m(result.next_line_code))
+          setRetvalErrorMsg(m(result.retval_code))
+          setTerminalErrorMsg(m(result.terminal_code))
+
+          const passedAll = result.memory_code.code === 0 && result.next_line_code === 0 && result.retval_code === 0 && result.terminal_code === 0
+          if (passedAll) {
+            updateStates()
+          }
+          setPassedTests(passedAll)
+          setSnackbarOpen(true)
+        })
+        .catch(console.log)
+    }
+    else {
+      const newIdx = Math.min(totalStates, currentStateIndex + 1)
+      setCurrentStateIndex(newIdx)
+      updateNextLine(newIdx, states)
+    }
   }
 
   const handleBack = () => {
@@ -80,18 +141,27 @@ function TraceChallenge(props) {
     updateNextLine(newIdx, states)
   }
 
+  const handleMemoryFilled = memory => {
+    console.log(memory)
+    setFillableMemory(memory)
+  }
+
   const isLast = totalStates > 0 && currentStateIndex >= totalStates
   const idx = isLast ? totalStates - 1 : currentStateIndex
   const currentState = states && states.length > idx ? states[idx] : {}
   const nextState = states && states.length > idx + 1 ? states[idx + 1] : {}
+  const hasNextState = idx + 1 < totalStates
+  const linesSelectable = Object.entries(nextState).length === 0 && hasNextState
   const prevState = states && states.length > 0 && idx > 0 ? states[idx - 1] : {}
-  const currentMemory = currentState.name_dicts ? currentState.name_dicts : { '<module>': {} }
-  const stdout = currentState.stdout ? currentState.stdout : []
-  const marginBottom = 10
+
   const hasRetval = currentState.retval !== null
   const prevRetVal = prevState && Object.entries(prevState).length ? prevState.retval : null
   const hasPrevRetval = prevRetVal !== null
-  const stateEditable = false // TODO consider islast
+
+  const stdout = currentState.stdout ? currentState.stdout : []
+  const currentMemory = currentState.name_dicts ? currentState.name_dicts : { '<module>': {} }
+
+  const marginBottom = 10
 
   if (!trace) return <div className={classes.loadingContainer}><CircularProgress color="secondary" size="10vw" /></div>
 
@@ -119,7 +189,7 @@ function TraceChallenge(props) {
                   highlightLinesPrimary={typeof currentState.line_i === 'number' ? [currentState.line_i + 1] : []}
                   highlightLinesSecondary={typeof currentState.call_line_i === 'number' ? [currentState.call_line_i + 1] : []}
                   highlightLineNumbers={nextLine ? [nextLine] : []}
-                  clickableLines={nextState ? [] : linesWithCode}
+                  clickableLines={linesSelectable ? linesWithCode : []}
                   onClick={setNextLine}>
                   {trace.code}
                 </StaticCodeHighlight>}
@@ -135,9 +205,14 @@ function TraceChallenge(props) {
               </Box> :
               <>
                 <Typography variant="h3">{t("Memory")}</Typography>
+                {memoryErrorMsg && <Typography color="error" variant="body2">{memoryErrorMsg}</Typography>}
                 <TraceMemory
                   memory={currentMemory}
+                  activateErrors={memoryActivateErrors}
+                  valueErrors={memoryValueErrors}
                   onDisabledChanged={setShowRetval}
+                  onMemoryChanged={handleMemoryFilled}
+                  onHasEmptyFieldsChanged={setHasEmptyMemory}
                   forceDisable={hasRetval}
                   stateEditable={stateEditable}
                 />
@@ -160,21 +235,26 @@ function TraceChallenge(props) {
 
                 <Box mt={2} minHeight="10em" className={classes.flexbox}>
                   <Typography variant="h3">{t("Terminal")}</Typography>
+                  {terminalErrorMsg && <Typography color="error" variant="body2">{terminalErrorMsg}</Typography>}
                   <Terminal
                     lines={stdout}
+                    onChange={setTerminalText}
                     className={classes.fillParent}
                     getOutput={(line) => line.out}
                     getInput={(line) => line.in}
+                    editable={stateEditable}
                   />
                 </Box>
 
                 {currentStateIndex < totalStates - 1 &&
-                  <Box mt={2}>
+                  <Box mt={2} className={classes.flexbox}>
                     <Typography variant="h3">{t("Next line")}</Typography>
+                    {nextLineErrorMsg && <Typography color="error" variant="body2">{nextLineErrorMsg}</Typography>}
                     <TextField
+                      className={classes.fillParent}
                       error={nextLine === null}
                       id="next-line"
-                      value={nextLine ? nextLine : ""}
+                      value={nextLine !== null ? nextLine : ""}
                       helperText={nextLine !== null ? "" : t("Select the next line that will be executed by the Python interpreter by clicking in the code")}
                       variant="outlined"
                       disabled={true}
@@ -197,7 +277,7 @@ function TraceChallenge(props) {
         LinearProgressProps={{ className: classes.fillParent }}
         activeStep={currentStateIndex}
         nextButton={
-          <Button size="small" onClick={handleNext} disabled={currentStateIndex > totalStates}>
+          <Button size="small" onClick={handleNext} disabled={currentStateIndex >= totalStates || hasEmptyMemory || (hasNextState && !nextLine)}>
             {t("Next")}
             <KeyboardArrowRight />
           </Button>

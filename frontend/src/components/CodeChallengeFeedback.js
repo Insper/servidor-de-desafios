@@ -78,7 +78,7 @@ function CodeChallengeFeedbackList(props) {
 
   const resultIconSize = 40
   const rotateSpinnerSize = 20
-  const loaderStrokeWeight = 2
+  const loaderStrokeWeight = 3
   let result
   let loadButton
   let details

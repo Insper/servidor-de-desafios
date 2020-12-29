@@ -4,5 +4,9 @@
   "Maximum allowed number of files exceeded": {
     " Only {{filesLimit}} allowed": ""
   },
-  "File {{fileName}} successfully added": ""
+  "File {{fileName}} successfully added": "",
+  "Shouldn't be empty": "Não deveria estar vazio",
+  "Difference in whitespaces": {
+    " There shouldn't be any additional or missing spaces or new lines": ""
+  }
 }

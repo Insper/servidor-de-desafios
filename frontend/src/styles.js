@@ -105,6 +105,7 @@ const customClasses = {
   },
   sourceCode: {
     fontFamily: 'source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace !important',
+    letterSpacing: "0.01em",
   },
   terminal: {
     backgroundColor: "black",

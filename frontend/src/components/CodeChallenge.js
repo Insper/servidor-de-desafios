@@ -132,7 +132,7 @@ function CodeChallenge(props) {
                 theme={"light"}
                 editorDidMount={handleEditorDidMount}
                 language={"python"}
-                loading={<LoadingResultsProgress />}
+                loading={<LoadingResultsProgress strokeWeight={3} />}
                 value={previousCode}
                 options={{ lineNumbers: "on", wordWrap: "on" }}
               />

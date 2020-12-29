@@ -1,5 +1,4 @@
 import os
-from collections import namedtuple
 from django.db import models
 import markdown
 from django.conf import settings

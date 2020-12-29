@@ -67,8 +67,18 @@ const fetchTrace = (slug) => {
   return fetch(API_TRACE(slug), { credentials: 'include' })
 }
 
+const postTrace = (slug, stateIndex, memory, terminal, nextLine, retval) => {
+  return doPost(API_TRACE(slug), {
+    state_index: stateIndex,
+    memory: memory,
+    terminal: terminal,
+    next_line: nextLine,
+    retval: retval,
+  })
+}
+
 const fetchTraceStateList = (slug) => {
   return fetch(API_TRACE_STATES(slug), { credentials: 'include' })
 }
 
-export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode, fetchTraceList, fetchTrace, fetchTraceStateList }
+export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode, fetchTraceList, fetchTrace, postTrace, fetchTraceStateList }

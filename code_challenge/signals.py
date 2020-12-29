@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import CodeChallengeSubmission, UserChallengeInteraction
-from core.models import Concept, UserConceptInteraction
+from core.models import UserConceptInteraction
 
 
 @receiver(post_save, sender=CodeChallengeSubmission, dispatch_uid="48182593106723498")
