@@ -18,7 +18,14 @@ class CodeChallengeListView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        challenges = CodeChallenge.objects.filter(deleted=False, published=True)
+        concept_slug = request.query_params.get('concept')
+        query = {
+            'deleted': False,
+            'published': True,
+        }
+        if concept_slug:
+            query['concept__slug'] = concept_slug
+        challenges = CodeChallenge.objects.filter(**query)
         serializer = ShortCodeChallengeSerializer(challenges, many=True)
         return Response(serializer.data)
 

@@ -26,11 +26,18 @@ let theme = createMuiTheme({
       light: Colors.YELLOW1,
     },
   },
+  typography: {
+    fontSize: 12,
+  },
 });
 theme = responsiveFontSizes(theme);
 
+const drawerWidth = 240
 
 const customClasses = {
+  root: {
+    display: 'flex',
+  },
   titleIcon: {
     marginRight: "10px"
   },
@@ -76,6 +83,10 @@ const customClasses = {
   flexbox: {
     display: "flex",
     flexDirection: "column",
+  },
+  horizontalFlexbox: {
+    display: "flex",
+    flexDirection: "row",
   },
   fillParent: {
     flexGrow: 1,
@@ -127,7 +138,10 @@ const customClasses = {
   fixedBottom: {
     position: "fixed",
     bottom: 0,
-    minWidth: "100%",
+    width: "100%",
+    [theme.breakpoints.up('sm')]: {
+      width: `calc(100% - ${drawerWidth}px - 2*${theme.spacing(3)}px)`,
+    },
   },
   tightTextField: {
     padding: "0.7em !important",
@@ -144,6 +158,26 @@ const customClasses = {
   },
   cardDisabled: {
     backgroundColor: Colors.DISABLED,
+  },
+  drawer: {
+    [theme.breakpoints.up('sm')]: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up('sm')]: {
+      display: 'none',
+    },
+  },
+  // necessary for content to be below app bar
+  toolbar: theme.mixins.toolbar,
+  drawerPaper: {
+    width: drawerWidth,
   },
 }
 

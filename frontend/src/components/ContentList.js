@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from "react"
+import { useTranslation } from 'react-i18next'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
-import Typography from '@material-ui/core/Typography';
+import Typography from '@material-ui/core/Typography'
 import { extractConcepts, groupByConcept } from "../models/challenge"
 import { getChallengeList, getTraceList } from '../api/pygym'
 import ROUTES from '../routes'

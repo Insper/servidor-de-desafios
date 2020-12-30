@@ -2,11 +2,15 @@ import { csrftoken } from '../components/django'
 
 const API_USER = '/api/user/'
 const API_CHANGE_PASS = '/api/change-password/'
+const API_CONCEPTS = '/api/concept/'
+const API_CONCEPT = (slug) => `${API_CONCEPTS}${slug}/`
 const API_CHALLENGES = '/api/code/'
+const API_CONCEPT_CHALLENGES = (slug) => `${API_CHALLENGES}?concept=${slug}`
 const API_CHALLENGE = (slug) => `${API_CHALLENGES}${slug}/`
 const API_SUBMISSIONS = (slug) => `${API_CHALLENGE(slug)}submission`
 const API_SUBMISSION_CODE = (slug, submissionId) => `${API_CHALLENGE(slug)}submission/${submissionId}/code`
 const API_TRACES = '/api/trace/'
+const API_CONCEPT_TRACES = (slug) => `${API_TRACES}?concept=${slug}`
 const API_TRACE = (slug) => `${API_TRACES}${slug}/`
 const API_TRACE_STATES = (slug) => `${API_TRACE(slug)}state/`
 
@@ -43,7 +47,16 @@ const postNewPassword = (oldPassword, newPassword, repeatPassword) => {
   })
 }
 
-const getChallengeList = () => {
+const getConceptList = () => {
+  return getJSON(API_CONCEPTS)
+}
+
+const getConcept = (slug) => {
+  return getJSON(API_CONCEPT(slug))
+}
+
+const getChallengeList = (concept) => {
+  if (concept) return getJSON(API_CONCEPT_CHALLENGES(concept))
   return getJSON(API_CHALLENGES)
 }
 
@@ -65,7 +78,8 @@ const getSubmissionCode = (slug, submissionId) => {
   return getJSON(API_SUBMISSION_CODE(slug, submissionId))
 }
 
-const getTraceList = () => {
+const getTraceList = (concept) => {
+  if (concept) return getJSON(API_CONCEPT_TRACES(concept))
   return getJSON(API_TRACES)
 }
 
@@ -90,6 +104,8 @@ const getTraceStateList = (slug) => {
 export {
   getUserData,
   postNewPassword,
+  getConceptList,
+  getConcept,
   getChallengeList,
   getChallenge,
   postChallenge,

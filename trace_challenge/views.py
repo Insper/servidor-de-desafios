@@ -19,7 +19,14 @@ class TraceChallengeListView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        challenges = TraceChallenge.objects.filter(deleted=False, published=True)
+        concept_slug = request.query_params.get('concept')
+        query = {
+            'deleted': False,
+            'published': True,
+        }
+        if concept_slug:
+            query['concept__slug'] = concept_slug
+        challenges = TraceChallenge.objects.filter(**query)
         serializer = ShortTraceChallengeSerializer(challenges, many=True)
         return Response(serializer.data)
 
