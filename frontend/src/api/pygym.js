@@ -11,11 +11,12 @@ const API_TRACE = (slug) => `${API_TRACES}${slug}/`
 const API_TRACE_STATES = (slug) => `${API_TRACE(slug)}state/`
 
 
-const fetchUserData = () => {
-  return fetch(API_USER, { credentials: 'include' })
+const getJSON = (url, extraParams) => {
+  return fetch(url, { ...{ credentials: 'include' }, ...extraParams })
+    .then(res => res.json())
 }
 
-const doPost = (url, data) => {
+const postJSON = (url, data) => {
   return fetch(url, {
     credentials: 'include',
     method: 'POST',
@@ -27,48 +28,53 @@ const doPost = (url, data) => {
     },
     body: JSON.stringify(data)
   })
+    .then(res => res.json())
+}
+
+const getUserData = () => {
+  return getJSON(API_USER)
 }
 
 const postNewPassword = (oldPassword, newPassword, repeatPassword) => {
-  return doPost(API_CHANGE_PASS, {
+  return postJSON(API_CHANGE_PASS, {
     oldPassword: oldPassword,
     newPassword: newPassword,
     repeatPassword: repeatPassword
   })
 }
 
-const fetchChallengeList = () => {
-  return fetch(API_CHALLENGES, { credentials: 'include' })
+const getChallengeList = () => {
+  return getJSON(API_CHALLENGES)
 }
 
-const fetchChallenge = (slug) => {
-  return fetch(API_CHALLENGE(slug), { credentials: 'include' })
+const getChallenge = (slug) => {
+  return getJSON(API_CHALLENGE(slug))
 }
 
 const postChallenge = (slug, code) => {
-  return doPost(API_CHALLENGE(slug), {
+  return postJSON(API_CHALLENGE(slug), {
     code: code,
   })
 }
 
-const fetchSubmissionList = (slug) => {
-  return fetch(API_SUBMISSIONS(slug), { credentials: 'include' })
+const getSubmissionList = (slug) => {
+  return getJSON(API_SUBMISSIONS(slug))
 }
 
-const fetchSubmissionCode = (slug, submissionId) => {
-  return fetch(API_SUBMISSION_CODE(slug, submissionId), { credentials: 'include' })
+const getSubmissionCode = (slug, submissionId) => {
+  return getJSON(API_SUBMISSION_CODE(slug, submissionId))
 }
 
-const fetchTraceList = () => {
-  return fetch(API_TRACES, { credentials: 'include' })
+const getTraceList = () => {
+  return getJSON(API_TRACES)
 }
 
-const fetchTrace = (slug) => {
-  return fetch(API_TRACE(slug), { credentials: 'include' })
+const getTrace = (slug) => {
+  return getJSON(API_TRACE(slug))
 }
 
 const postTrace = (slug, stateIndex, memory, terminal, nextLine, retval) => {
-  return doPost(API_TRACE(slug), {
+  return postJSON(API_TRACE(slug), {
     state_index: stateIndex,
     memory: memory,
     terminal: terminal,
@@ -77,8 +83,20 @@ const postTrace = (slug, stateIndex, memory, terminal, nextLine, retval) => {
   })
 }
 
-const fetchTraceStateList = (slug) => {
-  return fetch(API_TRACE_STATES(slug), { credentials: 'include' })
+const getTraceStateList = (slug) => {
+  return getJSON(API_TRACE_STATES(slug))
 }
 
-export { fetchUserData, postNewPassword, fetchChallengeList, fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode, fetchTraceList, fetchTrace, postTrace, fetchTraceStateList }
+export {
+  getUserData,
+  postNewPassword,
+  getChallengeList,
+  getChallenge,
+  postChallenge,
+  getSubmissionList,
+  getSubmissionCode,
+  getTraceList,
+  getTrace,
+  postTrace,
+  getTraceStateList
+}

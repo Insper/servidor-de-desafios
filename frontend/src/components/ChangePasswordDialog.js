@@ -24,7 +24,6 @@ function ChangePasswordDialog(props) {
     setNewPasswordError("")
     setRepeatPasswordError("")
     postNewPassword(oldPassword, newPassword, repeatPassword)
-      .then(res => res.json())
       .then(data => {
         if (data.code === 0) handleClose()
         else if (data.code === 1) setOldPasswordError(t("The old password you typed is incorrect"))

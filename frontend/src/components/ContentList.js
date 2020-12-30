@@ -4,7 +4,7 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import Typography from '@material-ui/core/Typography';
 import { extractConcepts, groupByConcept } from "../models/challenge"
-import { fetchChallengeList, fetchTraceList } from '../api/pygym'
+import { getChallengeList, getTraceList } from '../api/pygym'
 import ROUTES from '../routes'
 
 function ContentList(props) {
@@ -14,8 +14,7 @@ function ContentList(props) {
   const { t } = useTranslation()
 
   useEffect(() => {
-    fetchChallengeList()
-      .then(res => res.json())
+    getChallengeList()
       .then((data) => {
         let updatedConcepts = extractConcepts(data, concepts)
         let groups = groupByConcept(data)
@@ -23,8 +22,7 @@ function ContentList(props) {
         setConcepts(updatedConcepts)
       })
       .catch(console.log)
-    fetchTraceList()
-      .then(res => res.json())
+    getTraceList()
       .then((data) => {
         let updatedConcepts = extractConcepts(data, concepts)
         let groups = groupByConcept(data)

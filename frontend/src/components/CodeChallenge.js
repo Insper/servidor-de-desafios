@@ -13,7 +13,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SendIcon from '@material-ui/icons/Send';
 import { DropzoneDialog } from 'material-ui-dropzone';
-import { fetchChallenge, postChallenge, fetchSubmissionList, fetchSubmissionCode } from '../api/pygym'
+import { getChallenge, postChallenge, getSubmissionList, getSubmissionCode } from '../api/pygym'
 import MaterialMarkdown from './MaterialMarkdown'
 import Editor from "@monaco-editor/react";
 import LoadingResultsProgress from './LoadingResultsProgress'
@@ -34,13 +34,11 @@ function CodeChallenge(props) {
   const feedbackListRef = useRef()
 
   useEffect(() => {
-    fetchChallenge(props.slug)
-      .then(res => res.json())
+    getChallenge(props.slug)
       .then(setChallenge)
       .catch(console.log)
 
-    fetchSubmissionList(props.slug)
-      .then(res => res.json())
+    getSubmissionList(props.slug)
       .then(setSubmissions)
       .catch(console.log)
   }, []);
@@ -65,7 +63,6 @@ function CodeChallenge(props) {
     feedbackListRef.current.scrollIntoView()
 
     postChallenge(props.slug, editorRef.current.getValue())
-      .then(res => res.json())
       .then(data => {
         if (data.success) setPassedTests(true)
         setSubmissions([data].concat(submissions))
@@ -85,8 +82,7 @@ function CodeChallenge(props) {
   }
 
   const loadSubmissionCode = (submissionId) => {
-    fetchSubmissionCode(props.slug, submissionId)
-      .then(res => res.json())
+    getSubmissionCode(props.slug, submissionId)
       .then(data => {
         if (data.code) {
           setPreviousCode(data.code)

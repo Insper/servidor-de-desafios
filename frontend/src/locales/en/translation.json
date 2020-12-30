@@ -54,6 +54,7 @@
   "Select the next line that will be executed by the Python interpreter by clicking in the code": "Select the next line that will be executed by the Python interpreter by clicking in the code",
   "Next": "Next",
   "Previous": "Previous",
+  "show more": "show more",
   "Program": "Program",
   "Logout": "Logout"
 }

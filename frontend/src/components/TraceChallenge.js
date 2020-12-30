@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useStyles } from '../styles'
 import clsx from 'clsx'
 import _ from 'lodash'
-import { fetchTrace, postTrace, fetchTraceStateList } from '../api/pygym'
+import { getTrace, postTrace, getTraceStateList } from '../api/pygym'
 import StaticCodeHighlight from './StaticCodeHighlight'
 import { vs } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import Grid from '@material-ui/core/Grid'
@@ -56,8 +56,7 @@ function TraceChallenge(props) {
   }
 
   const updateStates = () => {
-    fetchTraceStateList(props.slug)
-      .then(res => res.json())
+    getTraceStateList(props.slug)
       .then(result => {
         setStates(result.states)
         setTotalStates(result.totalStates)
@@ -69,8 +68,7 @@ function TraceChallenge(props) {
   }
 
   useEffect(() => {
-    fetchTrace(props.slug)
-      .then(res => res.json())
+    getTrace(props.slug)
       .then(traceData => {
         setTrace(traceData)
         setLinesWithCode(findLinesWithCode(traceData.code))
@@ -109,7 +107,6 @@ function TraceChallenge(props) {
   const handleNext = () => {
     if (stateEditable) {
       postTrace(props.slug, currentStateIndex, currentMemory, terminalText, nextLine, retval)
-        .then(res => res.json())
         .then(result => {
           setMemoryErrorMsg(m(result.memory_code.code))
           setMemoryActivateErrors(replaceMessages(result.memory_code.activate_errors))

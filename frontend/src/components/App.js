@@ -19,7 +19,7 @@ import TraceChallenge from './TraceChallenge'
 import logoPt from '../img/logo-horizontal-small-pt.png'
 import logoDefault from '../img/logo-horizontal-small.png'
 import UserButton from './UserButton'
-import { fetchUserData } from '../api/pygym'
+import { getUserData } from '../api/pygym'
 import { useStyles, theme } from '../styles'
 import ROUTES from '../routes'
 
@@ -27,8 +27,7 @@ function App(props) {
   const [user, setUser] = useState({})
 
   useEffect(() => {
-    fetchUserData()
-      .then(res => res.json())
+    getUserData()
       .then(setUser)
       .catch(console.log)
   }, []);
