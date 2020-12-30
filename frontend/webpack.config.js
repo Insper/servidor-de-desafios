@@ -19,13 +19,13 @@ module.exports = {
         use: 'file-loader?name=./static/frontend/fonts/[name].[ext]!static'
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(svg|png|jpe?g|gif)$/i,
         use: [
           {
             loader: 'file-loader?name=./static/frontend/img/[name].[ext]',
           },
         ],
-      }
+      },
     ]
   },
   entry: {

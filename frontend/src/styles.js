@@ -60,7 +60,8 @@ const customClasses = {
     display: "block",
   },
   appLogo: {
-    maxWidth: "20em",
+    maxHeight: "3rem",
+    margin: theme.spacing(1),
   },
   loadingContainer: {
     margin: "8em",

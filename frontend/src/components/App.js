@@ -16,8 +16,7 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import ContentList from './ContentList'
 import CodeChallenge from './CodeChallenge'
 import TraceChallenge from './TraceChallenge'
-import logoPt from '../img/logo-horizontal-small-pt.png'
-import logoDefault from '../img/logo-horizontal-small.png'
+import logo from '../img/logo.svg'
 import UserButton from './UserButton'
 import { getUserData } from '../api/pygym'
 import { useStyles, theme } from '../styles'
@@ -35,7 +34,6 @@ function App(props) {
   const maxContainer = "lg"
   const { i18n } = useTranslation()
   const classes = useStyles()
-  const logoImg = i18n.language === 'pt' ? logoPt : logoDefault
 
   return (
     <React.Fragment>
@@ -46,7 +44,7 @@ function App(props) {
             <Toolbar disableGutters={true}>
               <div className={classes.appTitle}>
                 <Link to={ROUTES.home.link()} className={classes.homeButton}>
-                  <img src={logoImg} alt="Logo" className={classes.appLogo} />
+                  <img src={logo} alt="Logo" className={classes.appLogo} />
                 </Link>
               </div>
               <UserButton user={user} />
