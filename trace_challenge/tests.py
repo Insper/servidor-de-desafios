@@ -1,10 +1,10 @@
 from django.test import TestCase
 import unittest
 from core.models import PyGymUser, Concept, UserConceptInteraction, ChallengeRepo
-from trace_challenge.trace_controller import extract_fillable_memory, extract_fillable_state, create_state, extract_fillable_stdout, compare_terminal
+from trace_challenge.trace_controller import extract_fillable_memory, extract_fillable_state, create_state, extract_fillable_stdout, compare_terminal, stringify_memory
 from trace_challenge.models import TraceChallenge, TraceStateSubmission, UserTraceChallengeInteraction
 from trace_challenge.error_code import RET_DIFF, RET_DIFF_WHITE, RET_OK, RET_SHOULD_BE_INACTIVE, RET_SHOULD_BE_ACTIVE, RET_MISSING_QUOTES, RET_WRONG_TYPE
-from trace_challenge.memory_compare import compare
+from trace_challenge.memory_compare import compare_repr_value, compare
 
 
 class SubmissionSignalTestCase(TestCase):
@@ -207,10 +207,6 @@ class TraceControllerTestCase(unittest.TestCase):
                 'a': 1,
                 'b': 2,
             },
-            'function': {
-                'x': 2,
-                'y': 1,
-            },
         }
         extracted = extract_fillable_memory(prev_state, cur_state)
         self.assertEqual(extracted, expected)
@@ -298,6 +294,88 @@ class TraceControllerTestCase(unittest.TestCase):
         self.assertEqual(RET_DIFF_WHITE, compare_terminal([o, o, io], ' ', prefix2=[o, o, io]))
         self.assertEqual(RET_DIFF_WHITE, compare_terminal([o, o, io, o], s + ' \n', prefix2=[o, o, io]))
 
+    def test_stringify_memory(self):
+        states = [
+            {
+                "line_i": 1,
+                "line": "y = 4",
+                "name_dicts": {
+                    "<module>": {
+                        "x": 3,
+                        "y": '4',
+                    },
+                    "<module>,crazy_function": {
+                        "z": [1,2,3],
+                        "w": ['1', '2', '3'],
+                        "m": {"1": "abc"},
+                    }
+                },
+                "call_line_i": 2,
+                "retval": 3,
+                "stdout": [{"out": "Output", "in": "Input"}]
+            },
+            {
+                "line_i": 2,
+                "line": "y = 5",
+                "name_dicts": {
+                    "<module>": {
+                        "x": 4,
+                        "y": '5',
+                    },
+                    "<module>,crazy_function": {
+                        "z": [4,5,6],
+                        "w": ['2', '3', '4'],
+                        "m": {"abc": "def"},
+                        "n": None,
+                    }
+                },
+                "call_line_i": 3,
+                "retval": 4,
+                "stdout": [{"out": "Output 2", "in": "Input 2"}]
+            },
+        ]
+        expected = [
+            {
+                "line_i": 1,
+                "line": "y = 4",
+                "name_dicts": {
+                    "<module>": {
+                        "x": '3',
+                        "y": "'4'",
+                    },
+                    "<module>,crazy_function": {
+                        "z": '[1, 2, 3]',
+                        "w": "['1', '2', '3']",
+                        "m": "{'1': 'abc'}",
+                    }
+                },
+                "call_line_i": 2,
+                "retval": 3,
+                "stdout": [{"out": "Output", "in": "Input"}]
+            },
+            {
+                "line_i": 2,
+                "line": "y = 5",
+                "name_dicts": {
+                    "<module>": {
+                        "x": '4',
+                        "y": "'5'",
+                    },
+                    "<module>,crazy_function": {
+                        "z": '[4, 5, 6]',
+                        "w": "['2', '3', '4']",
+                        "m": "{'abc': 'def'}",
+                        "n": '',
+                    }
+                },
+                "call_line_i": 3,
+                "retval": 4,
+                "stdout": [{"out": "Output 2", "in": "Input 2"}]
+            },
+        ]
+        self.assertEqual(expected, stringify_memory(states))
+
+
 
 class MemoryCompareTestCase(unittest.TestCase):
     def setUp(self):
@@ -317,6 +395,18 @@ class MemoryCompareTestCase(unittest.TestCase):
             'd': '{\'asd\': [1,"123",3.141592]}',
             'b': 'False',
         }
+
+    def test_compare_repr_value(self):
+        self.assertEqual(RET_OK, compare_repr_value(10, '10'))
+        self.assertEqual(RET_WRONG_TYPE, compare_repr_value(10, '10.0'))
+        self.assertEqual(RET_OK, compare_repr_value(10.0, '10'))
+        self.assertEqual(RET_OK, compare_repr_value(10.0, '10.0'))
+        self.assertEqual(RET_OK, compare_repr_value(3.14, '3.14'))
+        self.assertEqual(RET_OK, compare_repr_value('10', '"10"'))
+        self.assertEqual(RET_OK, compare_repr_value('10', "'10'"))
+        self.assertEqual(RET_DIFF, compare_repr_value('10', '10'))
+        self.assertEqual(RET_OK, compare_repr_value([0, 3.14, 'string', [[10]]], "[0, 3.14, 'string', [[10]]]"))
+        self.assertEqual(RET_MISSING_QUOTES, compare_repr_value([0, 3.14, 'string', [[10]]], "[0, 3.14, string, [[10]]]"))
 
     def test_compare_equal_memories(self):
         expected = {

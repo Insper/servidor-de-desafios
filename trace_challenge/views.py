@@ -6,9 +6,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import TraceChallenge, TraceStateSubmission, UserTraceChallengeInteraction
 from .serializers import ShortTraceChallengeSerializer, FullTraceChallengeSerializer
-from .trace_controller import compare_terminal, extract_fillable_memory, states_for, extract_fillable_state, extract_fillable_stdout, get_compare_code
+from .trace_controller import compare_terminal, states_for, extract_fillable_state, extract_fillable_stdout, get_compare_code, stringify_memory
 from core.django_custom import AsyncAPIView
 from .code_runner import compare_memories
+from .memory_compare import compare_repr_value
 
 
 class TraceChallengeListView(APIView):
@@ -62,7 +63,6 @@ class TraceChallengeView(AsyncAPIView):
 
         state_index = request.data.get('state_index')
         memory = request.data.get('memory')
-        print('ASASDASD', memory)
         terminal = request.data.get('terminal')
         next_line = request.data.get('next_line')
         retval = request.data.get('retval')
@@ -92,7 +92,7 @@ class TraceChallengeView(AsyncAPIView):
         errors = {
             'memory_code': await compare_memories(cur_state['name_dicts'], memory),
             'terminal_code': compare_terminal(cur_stdout, terminal, prefix2=fillable_stdout),
-            'retval_code': get_compare_code(cur_state.get('retval'), retval),
+            'retval_code': compare_repr_value(cur_state.get('retval'), retval),
             'next_line_code': get_compare_code(next_state.get('line_i'), next_line),
         }
         has_errors = errors['memory_code']['code'] != RET_OK or errors['terminal_code'] != RET_OK or errors['retval_code'] != RET_OK or errors['next_line_code'] != RET_OK
@@ -132,7 +132,7 @@ class TraceStateListView(APIView):
         completed_states.append(current_state)
 
         return Response({
-            'states': completed_states,
+            'states': stringify_memory(completed_states),
             'totalStates': len(states),
             'latestState': latest_state,
         })

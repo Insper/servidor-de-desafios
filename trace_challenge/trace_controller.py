@@ -24,7 +24,7 @@ def states_for(trace):
 
 
 def extract_fillable_memory(prev_memory, cur_memory):
-    fillable = {**prev_memory} if prev_memory else {}
+    fillable = {block: vars for block, vars in prev_memory.items() if block in cur_memory} if prev_memory else {}
 
     for name, memory in cur_memory.items():
         prev = fillable.setdefault(name, {})
@@ -100,3 +100,21 @@ def get_compare_code(expected, received):
     if expected == received:
         return RET_OK
     return RET_DIFF
+
+
+def stringify_memory(states):
+    new_states = []
+    for state in states:
+        new_state = {}
+        for key, val in state.items():
+            if key != 'name_dicts':
+                new_state[key] = val
+            else:
+                new_state['name_dicts'] = {}
+                for block_name, block in val.items():
+                    new_block = {}
+                    new_state['name_dicts'][block_name] = new_block
+                    for name, value in block.items():
+                        new_block[name] = repr(value) if value is not None else ''
+        new_states.append(new_state)
+    return new_states

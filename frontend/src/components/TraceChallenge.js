@@ -35,10 +35,9 @@ function TraceChallenge(props) {
   const [totalStates, setTotalStates] = useState(0)
   const [nextLine, setNextLine] = useState(null)
   const [linesWithCode, setLinesWithCode] = useState(null)
-  const [showRetval, setShowRetval] = useState(false)
   const [retval, setRetval] = useState()
   const [latestStateIndex, setLatestStateIndex] = useState(-1)
-  const [fillableMemory, setFillableMemory] = useState({})
+  const [currentMemory, setCurrentMemory] = useState({})
   const [terminalText, setTerminalText] = useState('')
 
   // Error messages
@@ -109,7 +108,7 @@ function TraceChallenge(props) {
 
   const handleNext = () => {
     if (stateEditable) {
-      postTrace(props.slug, currentStateIndex, fillableMemory, terminalText, nextLine, retval)
+      postTrace(props.slug, currentStateIndex, currentMemory, terminalText, nextLine, retval)
         .then(res => res.json())
         .then(result => {
           setMemoryErrorMsg(m(result.memory_code.code))
@@ -141,9 +140,29 @@ function TraceChallenge(props) {
     updateNextLine(newIdx, states)
   }
 
-  const handleMemoryFilled = memory => {
-    console.log(memory)
-    setFillableMemory(memory)
+  const handleMemoryChanged = (memory, blockName, varName, value) => {
+    setCurrentMemory(memory)
+
+    const hasEmptyEntries = _.values(memory).some(block => _.values(block).some(value => !value))
+    setHasEmptyMemory(hasEmptyEntries)
+
+    if (memoryValueErrors && blockName in memoryValueErrors) {
+      const newErrors = {}
+      _.entries(memoryValueErrors).forEach(([block, vars]) => {
+        if (block === blockName) {
+          let otherKeys = _.keys(vars)
+          _.remove(otherKeys, k => k === varName)
+          newErrors[block] = _.pick(vars, otherKeys)
+        }
+        else newErrors[block] = vars
+      })
+      setMemoryValueErrors(newErrors)
+    }
+  }
+
+  const handleRetvalChange = event => {
+    setRetvalErrorMsg("")
+    setRetval(event.target.value)
   }
 
   const isLast = totalStates > 0 && currentStateIndex >= totalStates
@@ -154,12 +173,23 @@ function TraceChallenge(props) {
   const linesSelectable = Object.entries(nextState).length === 0 && hasNextState
   const prevState = states && states.length > 0 && idx > 0 ? states[idx - 1] : {}
 
-  const hasRetval = currentState.retval !== null
-  const prevRetVal = prevState && Object.entries(prevState).length ? prevState.retval : null
-  const hasPrevRetval = prevRetVal !== null
+  const lineContainsReturn = line => _.first(_.split(_.trim(line, ' '))).startsWith('return')
+  let hasReturn = false
+  let currentRetval = ""
+  if (lineContainsReturn(currentState.line)) {
+    currentRetval = currentState.retval === null ? '' : currentState.retval
+    hasReturn = true
+  }
+  else if (lineContainsReturn(prevState.line)) {
+    currentRetval = prevState.retval === null ? '' : prevState.retval
+    hasReturn = true
+  }
 
   const stdout = currentState.stdout ? currentState.stdout : []
-  const currentMemory = currentState.name_dicts ? currentState.name_dicts : { '<module>': {} }
+
+  useEffect(() => {
+    setCurrentMemory(currentState.name_dicts ? currentState.name_dicts : { '<module>': {} })
+  }, [currentState])
 
   const marginBottom = 10
 
@@ -190,7 +220,7 @@ function TraceChallenge(props) {
                   highlightLinesSecondary={typeof currentState.call_line_i === 'number' ? [currentState.call_line_i + 1] : []}
                   highlightLineNumbers={nextLine ? [nextLine] : []}
                   clickableLines={linesSelectable ? linesWithCode : []}
-                  onClick={setNextLine}>
+                  onClick={line => { setNextLine(line); setNextLineErrorMsg("") }}>
                   {trace.code}
                 </StaticCodeHighlight>}
             </Paper>
@@ -210,24 +240,27 @@ function TraceChallenge(props) {
                   memory={currentMemory}
                   activateErrors={memoryActivateErrors}
                   valueErrors={memoryValueErrors}
-                  onDisabledChanged={setShowRetval}
-                  onMemoryChanged={handleMemoryFilled}
+                  onMemoryChanged={handleMemoryChanged}
                   onHasEmptyFieldsChanged={setHasEmptyMemory}
-                  forceDisable={hasRetval}
-                  stateEditable={stateEditable}
+                  readOnly={!stateEditable}
                 />
 
-                {(showRetval || hasRetval || hasPrevRetval) &&
-                  <Box mt={2}>
+                {hasReturn &&
+                  <Box mt={2} className={classes.flexbox}>
                     <TextField
                       id="retval"
+                      className={classes.fillParent}
+                      onChange={handleRetvalChange}
                       label={t("Return value")}
-                      helperText={t("Enter the value returned by the function (leave empty if nothing is returned)")}
+                      helperText={retvalErrorMsg ? retvalErrorMsg : t("Enter the value returned by the function (leave empty if nothing is returned)")}
                       variant="outlined"
-                      defaultValue={currentState.retval ? currentState.retval : (hasPrevRetval ? prevRetVal : "")}
-                      disabled={hasRetval || hasPrevRetval}
+                      defaultValue={currentRetval}
+                      error={Boolean(retvalErrorMsg)}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
                       InputProps={{
-                        readOnly: hasRetval || hasPrevRetval,
+                        readOnly: !stateEditable,
                         classes: { root: classes.sourceCode },
                       }}
                     />
@@ -252,12 +285,11 @@ function TraceChallenge(props) {
                     {nextLineErrorMsg && <Typography color="error" variant="body2">{nextLineErrorMsg}</Typography>}
                     <TextField
                       className={classes.fillParent}
-                      error={nextLine === null}
+                      error={_.isNil(nextLine)}
                       id="next-line"
                       value={nextLine !== null ? nextLine : ""}
                       helperText={nextLine !== null ? "" : t("Select the next line that will be executed by the Python interpreter by clicking in the code")}
                       variant="outlined"
-                      disabled={true}
                       InputProps={{
                         readOnly: true,
                         classes: { root: classes.sourceCode, input: classes.tightTextField },

@@ -2,6 +2,32 @@ from collections import defaultdict
 from trace_challenge.error_code import RET_OK, RET_DIFF, RET_DIFF_WHITE, RET_SHOULD_BE_INACTIVE, RET_SHOULD_BE_ACTIVE, RET_MISSING_QUOTES, RET_WRONG_TYPE
 
 
+def compare_repr_value(value, repr_str):
+    try:
+        var_value = None
+
+        if repr_str:
+            expected_type = type(value)
+            if expected_type in [int, float]:
+                var_value = expected_type(repr_str)
+            elif expected_type == bool:
+                if repr_str not in ['True', 'False']:
+                    raise ValueError(f'{repr_str} is not a boolean')
+                var_value = eval(repr_str)
+            else:
+                var_value = eval(repr_str)
+
+        if value != var_value:
+            return RET_DIFF
+    except NameError:
+        return RET_MISSING_QUOTES
+    except ValueError:
+        return RET_WRONG_TYPE
+    except:
+        return RET_DIFF
+    return RET_OK
+
+
 def compare(expected, received):
     value_errors = defaultdict(lambda: {})
     activate_errors = {}
@@ -16,27 +42,13 @@ def compare(expected, received):
         else:
             for var_name, var_value_str in received_memory.items():
                 try:
-                    var_value = None
                     expected_var_value = expected_memory[var_name]
-                    if var_value_str:
-                        expected_type = type(expected_var_value)
-                        if expected_type in [int, float]:
-                            var_value = expected_type(var_value_str)
-                        elif expected_type == bool:
-                            if var_value_str not in ['True', 'False']:
-                                raise ValueError(f'{var_value_str} is not a boolean')
-                            var_value = eval(var_value_str)
-                        else:
-                            var_value = eval(var_value_str)
-
-                    if expected_var_value != var_value:
-                        value_errors[name][var_name] = RET_DIFF
-                except NameError:
-                    value_errors[name][var_name] = RET_MISSING_QUOTES
-                except ValueError:
-                    value_errors[name][var_name] = RET_WRONG_TYPE
-                except:
+                    ret = compare_repr_value(expected_var_value, var_value_str)
+                    if ret != RET_OK:
+                        value_errors[name][var_name] = ret
+                except KeyError:
                     value_errors[name][var_name] = RET_DIFF
+
     if not value_errors and not activate_errors:
         return {
             'code': RET_OK,
