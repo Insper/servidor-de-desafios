@@ -9,7 +9,6 @@ exports.extractConcepts = (challenges, oldConcepts) => {
   return concepts
 }
 
-
 exports.groupByConcept = (challenges) => {
   let groups = {}
   for (let challenge of challenges) {
@@ -19,4 +18,12 @@ exports.groupByConcept = (challenges) => {
     groups[slug].push(challenge)
   }
   return groups
+}
+
+exports.saveCode = (challenge, code) => {
+  localStorage.setItem(`code.${challenge.slug}`, code)
+}
+
+exports.loadCode = (challenge) => {
+  return localStorage.getItem(`code.${challenge.slug}`)
 }

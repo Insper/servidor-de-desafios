@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useTranslation } from 'react-i18next';
 import { useStyles } from '../styles'
 import Button from '@material-ui/core/Button'
@@ -14,11 +14,12 @@ import ROUTES from '../routes'
 function UserButton(props) {
   const { t } = useTranslation()
   const classes = useStyles()
+  const menuButton = useRef()
   const [changePasswordOpened, setChangePasswordOpened] = useState(false)
-  const [anchorEl, setAnchorEl] = useState(false)
+  const [menuOpened, setMenuOpened] = useState(false)
 
-  const handleMenu = (event) => setAnchorEl(event.currentTarget)
-  const handleClose = () => setAnchorEl(null)
+  const handleMenu = (event) => setMenuOpened(true)
+  const handleClose = () => setMenuOpened(false)
   const handlePasswordChange = () => setChangePasswordOpened(true)
   const handlePasswordChangeClose = () => setChangePasswordOpened(false)
 
@@ -29,6 +30,7 @@ function UserButton(props) {
         aria-label="account of current user"
         aria-controls="menu-appbar"
         aria-haspopup="true"
+        ref={menuButton}
         onClick={handleMenu}
         color="inherit"
       >
@@ -36,7 +38,7 @@ function UserButton(props) {
       </IconButton>
       <Menu
         id="menu-appbar"
-        anchorEl={anchorEl}
+        anchorEl={menuButton.current}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right',
@@ -46,7 +48,7 @@ function UserButton(props) {
           vertical: 'top',
           horizontal: 'right',
         }}
-        open={Boolean(anchorEl)}
+        open={menuOpened}
         onClose={handleClose}
       >
 

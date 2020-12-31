@@ -15,10 +15,11 @@ import SendIcon from '@material-ui/icons/Send';
 import { DropzoneDialog } from 'material-ui-dropzone';
 import { getChallenge, postChallenge, getSubmissionList, getSubmissionCode } from '../api/pygym'
 import MaterialMarkdown from './MaterialMarkdown'
-import Editor from "@monaco-editor/react";
+import { ControlledEditor as Editor } from "@monaco-editor/react";
 import LoadingResultsProgress from './LoadingResultsProgress'
 import CodeChallengeFeedbackList from "./CodeChallengeFeedbackList"
 import Alert from "./Alert"
+import { saveCode, loadCode } from '../models/challenge'
 
 function CodeChallenge(props) {
   const { t } = useTranslation()
@@ -42,6 +43,18 @@ function CodeChallenge(props) {
       .then(setSubmissions)
       .catch(console.log)
   }, []);
+
+  useEffect(() => {
+    const savedCode = loadCode(challenge)
+    if (savedCode) setPreviousCode(savedCode)
+    else if (submissions && submissions[0] && !previousCode) {
+      loadSubmissionCode(submissions[0].id)
+    }
+  }, [submissions])
+
+  useEffect(() => {
+    if (editorRef.current) editorRef.current.setValue(previousCode)
+  }, [editorRef.current, previousCode])
 
   const handleEditorDidMount = (_, editor) => {
     editorRef.current = editor
@@ -84,10 +97,7 @@ function CodeChallenge(props) {
   const loadSubmissionCode = (submissionId) => {
     getSubmissionCode(props.slug, submissionId)
       .then(data => {
-        if (data.code) {
-          setPreviousCode(data.code)
-          if (editorRef.current) editorRef.current.setValue(data.code)
-        }
+        if (data.code) setPreviousCode(data.code)
       })
       .catch(console.log)
   }
@@ -100,8 +110,8 @@ function CodeChallenge(props) {
     setSnackbarOpen(false)
   }
 
-  if (submissions && submissions[0] && !previousCode) {
-    loadSubmissionCode(submissions[0].id)
+  const handleEditorChange = (event, value) => {
+    saveCode(challenge, value)
   }
 
   const functionName = (challenge && challenge.function_name) ? <Typography paragraph={true}>{t("The name of your function must be ")} <SyntaxHighlighter language="python" customStyle={{ padding: "0.1em" }} PreTag={"span"} style={prism}>{challenge.function_name}</SyntaxHighlighter></Typography> : ''
@@ -126,6 +136,7 @@ function CodeChallenge(props) {
               <Editor
                 // height="80vh" // By default, it fully fits with its parent
                 theme={"light"}
+                onChange={handleEditorChange}
                 editorDidMount={handleEditorDidMount}
                 language={"python"}
                 loading={<LoadingResultsProgress strokeWeight={3} />}
