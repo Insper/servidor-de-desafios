@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from 'react-redux'
 import {
   BrowserRouter as Router,
   Switch,
@@ -15,20 +16,22 @@ import MenuIcon from '@material-ui/icons/Menu'
 import Toolbar from '@material-ui/core/Toolbar'
 import { ThemeProvider } from '@material-ui/core/styles'
 import 'fontsource-roboto';
-import ContentList from './ContentList'
 import CodeChallenge from './CodeChallenge'
 import TraceChallenge from './TraceChallenge'
+import UserOverview from './UserOverview'
 import logo from '../img/logo.svg'
 import UserButton from './UserButton'
 import { getUserData } from '../api/pygym'
 import { useStyles, theme } from '../styles'
 import ROUTES from '../routes'
-import AppDrawer from "./AppDrawer";
-import ConceptDetails from "./ConceptDetails";
+import AppDrawer from "./AppDrawer"
+import ConceptDetails from "./ConceptDetails"
+import { fetchConcepts } from '../features/concepts/conceptsSlice'
 
 function App(props) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const dispatch = useDispatch()
 
   const [user, setUser] = useState({})
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -39,12 +42,14 @@ function App(props) {
       .catch(console.log)
   }, [])
 
+  useEffect(() => dispatch(fetchConcepts()), [])
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
 
   return (
-    <React.Fragment>
+    <React.StrictMode>
       <CssBaseline />
       <ThemeProvider theme={theme}>
         <Router>
@@ -76,7 +81,7 @@ function App(props) {
               <Box m={3} className={classes.flexbox}>
                 <Switch>
                   <Route exact path={ROUTES.home.path}>
-                    <ContentList />
+                    <UserOverview user={user} />
                   </Route>
                   <Route path={ROUTES.challenge.path} render={(props) =>
                     <CodeChallenge slug={props.match.params.slug} />
@@ -94,7 +99,7 @@ function App(props) {
           </div>
         </Router>
       </ThemeProvider>
-    </React.Fragment >
+    </React.StrictMode >
   );
 }
 

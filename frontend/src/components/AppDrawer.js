@@ -1,25 +1,21 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from 'react-redux'
 import Divider from '@material-ui/core/Divider'
 import Drawer from '@material-ui/core/Drawer'
 import Hidden from '@material-ui/core/Hidden'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
-import { getConceptList } from '../api/pygym'
 import { useStyles } from '../styles'
 import ROUTES from '../routes'
+import { selectConcepts } from '../features/concepts/conceptsSlice'
 
 function AppDrawer(props) {
   const { ariaLabel, mobileOpen, onClose, ...otherProps } = props
   const classes = useStyles()
 
-  const [concepts, setConcepts] = useState([])
-
-  useEffect(() => {
-    getConceptList()
-      .then(setConcepts)
-      .catch(console.log)
-  }, [])
+  const concepts = useSelector(selectConcepts)
 
   const drawer = (
     <div>
@@ -28,7 +24,7 @@ function AppDrawer(props) {
       <List>
         {concepts.map(concept => (
           <React.Fragment key={concept.slug} >
-            <ListItem button component="a" href={ROUTES.concept.link({ slug: concept.slug })}>
+            <ListItem button component={Link} to={ROUTES.concept.link({ slug: concept.slug })}>
               <ListItemText primary={concept.name} />
             </ListItem>
             {/* <Divider /> */}

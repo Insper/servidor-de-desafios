@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react"
+import { Link } from "react-router-dom";
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import Typography from '@material-ui/core/Typography'
 import _ from 'lodash'
 
-import { getConcept, getChallengeList, getTraceList } from '../api/pygym'
+import { selectConceptBySlug } from '../features/concepts/conceptsSlice'
 import ROUTES from '../routes'
 
 
@@ -13,23 +15,10 @@ function ConceptDetails(props) {
   const { slug, ...otherProps } = props
   const { t } = useTranslation()
 
-  const [concept, setConcept] = useState([])
-  const [challenges, setChallenges] = useState([])
-  const [traces, setTraces] = useState([])
-
-  useEffect(() => {
-    getConcept(slug)
-      .then(setConcept)
-      .catch(console.log)
-
-    getChallengeList(slug)
-      .then(setChallenges)
-      .catch(console.log)
-
-    getTraceList(slug)
-      .then(setTraces)
-      .catch(console.log)
-  }, [])
+  const concept = useSelector(state => selectConceptBySlug(state, slug))
+  if (!concept) return (<></>)
+  const challenges = concept.codeChallenges
+  const traces = concept.traceChallenges
 
   return (
     <>
@@ -37,7 +26,7 @@ function ConceptDetails(props) {
       {!_.isEmpty(challenges) && <Typography variant="h3">{t("Code Challenges")}</Typography>}
       <List component="nav">
         {challenges.map(challenge =>
-          <ListItem button component="a" key={`challenge-${challenge.slug}`} href={ROUTES.challenge.link({ slug: challenge.slug })}>
+          <ListItem button component={Link} key={`challenge-${challenge.slug}`} to={ROUTES.challenge.link({ slug: challenge.slug })}>
             {challenge.title}
           </ListItem>
         )}
@@ -45,7 +34,7 @@ function ConceptDetails(props) {
       {!_.isEmpty(traces) && <Typography variant="h3">{t("Trace Challenges")}</Typography>}
       <List component="nav">
         {traces.map(challenge =>
-          <ListItem button component="a" key={`challenge-${challenge.slug}`} href={ROUTES.challenge.link({ slug: challenge.slug })}>
+          <ListItem button component={Link} key={`challenge-${challenge.slug}`} to={ROUTES.trace.link({ slug: challenge.slug })}>
             {challenge.title}
           </ListItem>
         )}
