@@ -1,4 +1,5 @@
 import asyncio
+import shutil
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from code_challenge import gitpy
@@ -85,6 +86,15 @@ class Command(BaseCommand):
         except TraceChallenge.DoesNotExist:
             return
 
+    def copy_page_data(self, page_dir):
+        slug = page_dir.name
+        src = page_dir / 'raw' / slug
+        if src.is_dir():
+            dst = settings.PAGES_RAW_DIR / slug
+            if dst.exists():
+                shutil.rmtree(dst, ignore_errors=True)
+            shutil.copytree(src, dst)
+
     def create_concepts(self, concepts_file):
         with open(concepts_file) as f:
             for concept in [t.strip() for t in f.read().split() if t.strip()]:
@@ -109,6 +119,7 @@ class Command(BaseCommand):
         loop.run_until_complete(controller.update())
         updated_challenges = loop.run_until_complete(controller.changed_challenges(last_commit=repo.last_commit))
         updated_traces = loop.run_until_complete(controller.changed_trace_challenges(last_commit=repo.last_commit))
+        updated_pages = loop.run_until_complete(controller.changed_pages(last_commit=repo.last_commit))
         log = loop.run_until_complete(git.log(last=1))
 
         self.create_concepts(repo_dir / 'concepts.txt')
@@ -124,6 +135,9 @@ class Command(BaseCommand):
                 self.update_or_create_trace_challenge(slug, data, repo)
             else:
                 self.delte_trace_challenge(slug, repo)
+
+        for page_dir in updated_pages:
+            self.copy_page_data(page_dir)
 
         repo.last_commit = log[0]['commit']
         repo.save()

@@ -13,6 +13,8 @@ const API_TRACES = '/api/trace/'
 const API_CONCEPT_TRACES = (slug) => `${API_TRACES}?concept=${slug}`
 const API_TRACE = (slug) => `${API_TRACES}${slug}/`
 const API_TRACE_STATES = (slug) => `${API_TRACE(slug)}state/`
+const API_PAGES = '/api/page/'
+const API_PAGE = (concept_slug, page_slug) => `${API_PAGES}${concept_slug}/${page_slug}/`
 
 
 const getJSON = (url, extraParams) => {
@@ -101,6 +103,14 @@ const getTraceStateList = (slug) => {
   return getJSON(API_TRACE_STATES(slug))
 }
 
+const getPageList = () => {
+  return getJSON(API_PAGES)
+}
+
+const getPage = (concept_slug, page_slug) => {
+  return getJSON(API_PAGE(concept_slug, page_slug))
+}
+
 export {
   getUserData,
   postNewPassword,
@@ -114,5 +124,7 @@ export {
   getTraceList,
   getTrace,
   postTrace,
-  getTraceStateList
+  getTraceStateList,
+  getPageList,
+  getPage,
 }

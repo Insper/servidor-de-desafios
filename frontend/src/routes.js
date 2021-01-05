@@ -17,6 +17,7 @@ const ROUTES = {
   challenge: new Route('/challenge/:slug'),
   trace: new Route('/trace/:slug'),
   concept: new Route('/:slug'),
+  page: new Route('/:slug/:page'),
 }
 
 

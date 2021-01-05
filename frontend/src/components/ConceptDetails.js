@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import Button from '@material-ui/core/Button'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import Typography from '@material-ui/core/Typography'
@@ -19,10 +20,20 @@ function ConceptDetails(props) {
   if (!concept) return (<></>)
   const challenges = concept.codeChallenges
   const traces = concept.traceChallenges
+  const pages = concept.pages
 
   return (
     <>
       <Typography variant="h1" component="h2" gutterBottom={true}>{concept.name}</Typography>
+      {pages && <Typography variant="h3">{t("Material")}</Typography>}
+      <List component="nav">
+        {pages.map(page => {
+          const pageName = _.last(_.split(page, '/'))
+          return <ListItem button component={Link} key={`page-${page}`} to={ROUTES.page.link({ slug, page: pageName })}>
+            {_.capitalize(pageName)}
+          </ListItem>
+        })}
+      </List>
       {!_.isEmpty(challenges) && <Typography variant="h3">{t("Code Challenges")}</Typography>}
       <List component="nav">
         {challenges.map(challenge =>

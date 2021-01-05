@@ -2,16 +2,21 @@ import { createMuiTheme, makeStyles, responsiveFontSizes } from '@material-ui/co
 
 // Python color pallete (https://www.schemecolor.com/python-logo-colors.php#:~:text=The%20Python%20Logo%20Colors%20with,and%20Granite%20Gray%20(%23646464).):
 const Colors = {
-  BLUE1: '#4B8BBE',
+  BLUE1: '#4b8bbe',
   BLUE2: '#306998',
-  YELLOW1: '#FFE873',
-  YELLOW2: '#FFD43B',
+  YELLOW1: '#ffe873',
+  YELLOW2: '#ffd43b',
   GRAY1: '#646464',
-  GRAY2: '#E0E0E0',
-  SUCCESS: '#39C27C',
-  DANGER: '#FF665C',
-  DISABLED: '#CCCCCC',
-  TERMINAL_INPUT: '#27E427',
+  GRAY2: '#e0e0e0',
+  DISABLED: '#cccccc',
+  TERMINAL_INPUT: '#27e427',
+  SUCCESS: '#39c27c',
+  DANGER: '#ff1744',
+  DANGER_BACKGROUND: 'rgba(255,23,68,.1)',
+  INFO: '#448aff',
+  INFO_BACKGROUND: 'rgba(68,138,255,.1)',
+  EXERCISE: '#651fff',
+  EXERCISE_BACKGROUND: 'rgba(101,31,255,.1)',
 }
 
 
@@ -33,6 +38,7 @@ let theme = createMuiTheme({
 theme = responsiveFontSizes(theme);
 
 const drawerWidth = 240
+const admonitionLeftBorder = 5
 
 const customClasses = {
   root: {
@@ -79,6 +85,7 @@ const customClasses = {
     display: "block",
     marginLeft: "auto",
     marginRight: "auto",
+    maxWidth: "100%",
   },
   flexbox: {
     display: "flex",
@@ -178,6 +185,43 @@ const customClasses = {
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
     width: drawerWidth,
+  },
+  // Admonitions
+  admonitionCard: {
+    margin: theme.spacing(3, 0),
+    borderLeft: `${admonitionLeftBorder}px solid`
+  },
+  admonitionCardInfo: {
+    borderLeft: `${admonitionLeftBorder}px solid ${Colors.INFO}`
+  },
+  admonitionCardDanger: {
+    borderLeft: `${admonitionLeftBorder}px solid ${Colors.DANGER}`
+  },
+  admonitionCardExercise: {
+    borderLeft: `${admonitionLeftBorder}px solid ${Colors.EXERCISE}`
+  },
+  admonitionTitle: {
+    padding: `${theme.spacing(1, 2)} !important`,
+  },
+  admonitionTitleInfo: {
+    backgroundColor: Colors.INFO_BACKGROUND,
+  },
+  admonitionTitleDanger: {
+    backgroundColor: Colors.DANGER_BACKGROUND,
+  },
+  admonitionTitleExercise: {
+    backgroundColor: Colors.EXERCISE_BACKGROUND,
+  },
+  admonitionContent: {
+    padding: `${theme.spacing(2, 2, 0)} !important`,
+  },
+  admonitionTitleTypography: {
+    display: "flex !important",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  admonitionIcon: {
+    marginRight: theme.spacing(1),
   },
 }
 

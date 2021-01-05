@@ -126,7 +126,7 @@ function CodeChallenge(props) {
 
         <Grid item className={classes.gridItem} md={6}>
           <Typography variant="h2" component="h1" gutterBottom={true}>{challenge.title}</Typography>
-          <MaterialMarkdown children={challenge.question} />
+          <MaterialMarkdown>{challenge.question}</MaterialMarkdown>
           {functionName}
         </Grid>
 

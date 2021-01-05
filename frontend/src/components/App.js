@@ -26,6 +26,7 @@ import { useStyles, theme } from '../styles'
 import ROUTES from '../routes'
 import AppDrawer from "./AppDrawer"
 import ConceptDetails from "./ConceptDetails"
+import ContentPage from "./ContentPage"
 import { fetchConcepts } from '../features/concepts/conceptsSlice'
 
 function App(props) {
@@ -88,6 +89,9 @@ function App(props) {
                   } />
                   <Route path={ROUTES.trace.path} render={(props) =>
                     <TraceChallenge slug={props.match.params.slug} />
+                  } />
+                  <Route path={ROUTES.page.path} render={(props) =>
+                    <ContentPage conceptSlug={props.match.params.slug} pageSlug={props.match.params.page} />
                   } />
                   {/* Concepts must be last so the other routes take priority */}
                   <Route path={ROUTES.concept.path} render={(props) =>

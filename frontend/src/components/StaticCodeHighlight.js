@@ -4,11 +4,11 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
 
 function StaticCodeHighlight(props) {
-  const { children, style, highlightLinesPrimary, highlightLinesSecondary, highlightLineNumbers, clickableLines, onClick, ...otherProps } = props
+  const { children, style, language, highlightLinesPrimary, highlightLinesSecondary, highlightLineNumbers, clickableLines, onClick, ...otherProps } = props
 
   return (
     <SyntaxHighlighter
-      language="python"
+      language={language}
       style={style}
       wrapLines={true}
       showLineNumbers={true}
@@ -58,6 +58,7 @@ StaticCodeHighlight.propTypes = {
   highlightLineNumbers: PropTypes.arrayOf(PropTypes.number),
   clickableLines: PropTypes.arrayOf(PropTypes.number),
   onClick: PropTypes.func,
+  language: PropTypes.string,
 }
 
 StaticCodeHighlight.defaultProps = {
@@ -65,6 +66,7 @@ StaticCodeHighlight.defaultProps = {
   highlightLinesSecondary: [],
   highlightLineNumbers: [],
   clickableLines: [],
+  language: "python",
 }
 
 export default StaticCodeHighlight

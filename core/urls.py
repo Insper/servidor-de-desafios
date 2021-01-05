@@ -10,4 +10,5 @@ urlpatterns = [
     path('concept/<slug:slug>/', views.get_concept),
     path('code/', include('code_challenge.urls')),
     path('trace/', include('trace_challenge.urls')),
+    path('page/', include('pages.urls')),
 ]

@@ -29,6 +29,8 @@ CHALLENGES_DIR = BASE_DIR / 'raw' / 'challenge_files'
 CHALLENGES_RAW_DIR = BASE_DIR / 'code_challenge' / 'static' / 'raw'
 create_dir(CHALLENGES_DIR)
 create_dir(CHALLENGES_RAW_DIR)
+PAGES_RAW_DIR = BASE_DIR / 'pages' / 'static' / 'raw'
+create_dir(PAGES_RAW_DIR)
 
 
 # Quick-start development settings - unsuitable for production
@@ -58,6 +60,7 @@ INSTALLED_APPS = [
     'frontend',
     'code_challenge',
     'trace_challenge',
+    'pages',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

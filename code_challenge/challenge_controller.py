@@ -74,6 +74,9 @@ class ChallengeController:
 
         return all_traces
 
+    async def changed_pages(self, root_dir='pages', last_commit=None):
+        return await self.list_changed_dirs(root_dir, last_commit)
+
 
 def test_code_for(challenge):
     challenges_dir = settings.CHALLENGES_DIR / challenge.repo.slug / 'challenges'
