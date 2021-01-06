@@ -80,6 +80,29 @@ function TraceChallenge(props) {
 
   const stateEditable = currentStateIndex === latestStateIndex + 1
 
+  const isLast = totalStates > 0 && currentStateIndex >= totalStates
+  const idx = isLast ? totalStates - 1 : currentStateIndex
+  const currentState = states && states.length > idx ? states[idx] : {}
+  const nextState = states && states.length > idx + 1 ? states[idx + 1] : {}
+  const hasNextState = idx + 1 < totalStates
+  const linesSelectable = Object.entries(nextState).length === 0 && hasNextState
+  const prevState = states && states.length > 0 && idx > 0 ? states[idx - 1] : {}
+
+  const lineContainsReturn = line => _.first(_.split(_.trim(line, ' '))).startsWith('return')
+  let hasReturn = false
+  let hadReturn = false
+  let currentRetval = ""
+  if (lineContainsReturn(currentState.line)) {
+    currentRetval = currentState.retval === null ? '' : currentState.retval
+    hasReturn = true
+  }
+  else if (lineContainsReturn(prevState.line)) {
+    currentRetval = prevState.retval === null ? '' : prevState.retval
+    hadReturn = true
+  }
+
+  const stdout = currentState.stdout ? currentState.stdout : []
+
   const handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -106,7 +129,8 @@ function TraceChallenge(props) {
 
   const handleNext = () => {
     if (stateEditable) {
-      postTrace(props.slug, currentStateIndex, currentMemory, terminalText, nextLine, retval)
+      const curRetVal = hasReturn ? retval : null
+      postTrace(props.slug, currentStateIndex, currentMemory, terminalText, nextLine, curRetVal)
         .then(result => {
           setMemoryErrorMsg(m(result.memory_code.code))
           setMemoryActivateErrors(replaceMessages(result.memory_code.activate_errors))
@@ -114,6 +138,7 @@ function TraceChallenge(props) {
           setNextLineErrorMsg(m(result.next_line_code))
           setRetvalErrorMsg(m(result.retval_code))
           setTerminalErrorMsg(m(result.terminal_code))
+          setTerminalText('')
 
           const passedAll = result.memory_code.code === 0 && result.next_line_code === 0 && result.retval_code === 0 && result.terminal_code === 0
           if (passedAll) {
@@ -161,28 +186,6 @@ function TraceChallenge(props) {
     setRetvalErrorMsg("")
     setRetval(event.target.value)
   }
-
-  const isLast = totalStates > 0 && currentStateIndex >= totalStates
-  const idx = isLast ? totalStates - 1 : currentStateIndex
-  const currentState = states && states.length > idx ? states[idx] : {}
-  const nextState = states && states.length > idx + 1 ? states[idx + 1] : {}
-  const hasNextState = idx + 1 < totalStates
-  const linesSelectable = Object.entries(nextState).length === 0 && hasNextState
-  const prevState = states && states.length > 0 && idx > 0 ? states[idx - 1] : {}
-
-  const lineContainsReturn = line => _.first(_.split(_.trim(line, ' '))).startsWith('return')
-  let hasReturn = false
-  let currentRetval = ""
-  if (lineContainsReturn(currentState.line)) {
-    currentRetval = currentState.retval === null ? '' : currentState.retval
-    hasReturn = true
-  }
-  else if (lineContainsReturn(prevState.line)) {
-    currentRetval = prevState.retval === null ? '' : prevState.retval
-    hasReturn = true
-  }
-
-  const stdout = currentState.stdout ? currentState.stdout : []
 
   useEffect(() => {
     setCurrentMemory(currentState.name_dicts ? currentState.name_dicts : { '<module>': {} })
@@ -242,7 +245,7 @@ function TraceChallenge(props) {
                   readOnly={!stateEditable}
                 />
 
-                {hasReturn &&
+                {(hasReturn || hadReturn) &&
                   <Box mt={2} className={classes.flexbox}>
                     <TextField
                       id="retval"
@@ -257,7 +260,7 @@ function TraceChallenge(props) {
                         shrink: true,
                       }}
                       InputProps={{
-                        readOnly: !stateEditable,
+                        readOnly: !stateEditable || !hasReturn,
                         classes: { root: classes.sourceCode },
                       }}
                     />

@@ -92,6 +92,7 @@ class TraceChallengeView(AsyncAPIView):
         prev_stdout = prev_state.get('stdout', [])
         cur_stdout = cur_state.get('stdout', [])
         fillable_stdout = extract_fillable_stdout(prev_stdout, cur_stdout)
+        print(prev_stdout, cur_stdout, fillable_stdout)
         if isinstance(next_line, int):
             # We store it zero-indexed
             next_line -= 1

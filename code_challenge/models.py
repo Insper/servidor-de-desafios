@@ -17,7 +17,7 @@ class CodeChallenge(models.Model):
     published = models.BooleanField(default=True)
     show_stdout = models.BooleanField(default=True)
     concept = models.ForeignKey(Concept, on_delete=models.CASCADE)
-    function_name = models.CharField(max_length=50, blank=True)
+    function_name = models.CharField(max_length=50, blank=True, null=True)
     deleted = models.BooleanField(default=False)
 
     @property
