@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit'
 import _ from "lodash"
-import { getConceptList, getChallengeList, getTraceList, getPageList } from '../../api/pygym'
+import { getConceptList, getChallengeList, getTraceList } from '../../api/pygym'
 
 export const fetchConcepts = createAsyncThunk('concepts/fetchConcepts', async () => {
   const concepts = await getConceptList()
@@ -12,18 +12,8 @@ export const fetchConcepts = createAsyncThunk('concepts/fetchConcepts', async ()
     promises.push(getTraceList(concept.slug)
       .then(traces => concept.traceChallenges = traces))
     conceptsBySlug[concept.slug] = concept
-    concept.pages = []
   })
-  const allPages = await getPageList()
   await Promise.all(promises)
-
-  allPages.forEach(page => {
-    const parts = _.split(page, '/')
-    const concept = conceptsBySlug[parts[0]]
-    if (concept) {
-      concept.pages.push(page)
-    }
-  })
 
   return concepts
 })

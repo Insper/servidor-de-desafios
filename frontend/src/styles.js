@@ -11,6 +11,7 @@ const Colors = {
   DISABLED: '#cccccc',
   TERMINAL_INPUT: '#27e427',
   SUCCESS: '#39c27c',
+  SUCCESS_BACKGROUND: 'rgba(0,200,83,.1)',
   DANGER: '#ff1744',
   DANGER_BACKGROUND: 'rgba(255,23,68,.1)',
   INFO: '#448aff',
@@ -200,6 +201,9 @@ const customClasses = {
   admonitionCardExercise: {
     borderLeft: `${admonitionLeftBorder}px solid ${Colors.EXERCISE}`
   },
+  admonitionCardSuccess: {
+    borderLeft: `${admonitionLeftBorder}px solid ${Colors.SUCCESS}`
+  },
   admonitionTitle: {
     padding: `${theme.spacing(1, 2)} !important`,
   },
@@ -212,6 +216,9 @@ const customClasses = {
   admonitionTitleExercise: {
     backgroundColor: Colors.EXERCISE_BACKGROUND,
   },
+  admonitionTitleSuccess: {
+    backgroundColor: Colors.SUCCESS_BACKGROUND,
+  },
   admonitionContent: {
     padding: `${theme.spacing(2, 2, 0)} !important`,
   },
@@ -222,6 +229,10 @@ const customClasses = {
   },
   admonitionIcon: {
     marginRight: theme.spacing(1),
+  },
+  nestedListItem: {
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(2),
   },
 }
 

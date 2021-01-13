@@ -16,7 +16,8 @@ const ROUTES = {
   logout: new Route('/logout/'),
   challenge: new Route('/challenge/:slug'),
   trace: new Route('/trace/:slug'),
-  concept: new Route('/:slug'),
+  content: new Route('/:slug'),
+  contentChallenges: new Route('/:slug/challenges'),
   page: new Route('/:slug/:page'),
 }
 

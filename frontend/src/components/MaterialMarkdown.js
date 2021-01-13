@@ -7,6 +7,8 @@ import unified from 'unified'
 import parse from 'remark-parse'
 import remark2rehype from 'remark-rehype'
 import rehype2react from 'rehype-react'
+import math from 'remark-math'
+import katex from 'rehype-katex'
 import raw from 'rehype-raw'
 import directive from 'remark-directive'
 import visit from 'unist-util-visit'
@@ -16,13 +18,18 @@ import { useStyles, Colors } from '../styles'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import CardHeader from '@material-ui/core/CardHeader'
+import Collapse from "@material-ui/core/Collapse"
+import IconButton from '@material-ui/core/IconButton'
 import Link from '@material-ui/core/Link'
 import Typography from '@material-ui/core/Typography'
 import InfoIcon from '@material-ui/icons/Info'
 import FitnessCenterIcon from '@material-ui/icons/FitnessCenter'
 import ErrorIcon from '@material-ui/icons/Error'
+import ExpandLess from '@material-ui/icons/ExpandLess'
+import ExpandMore from '@material-ui/icons/ExpandMore'
 import { STATIC_URL } from './django'
 import StaticCodeHighlight from './StaticCodeHighlight'
+import { useTranslation } from "react-i18next";
 
 function MarkdownParagraph(props) {
   const { children, ...otherProps } = props
@@ -47,9 +54,19 @@ function MarkdownImage(props) {
 
 // Admonitions had to be implemented by hand: https://github.com/elviswolcott/remark-admonitions/issues/27
 // Implementation based on: https://github.com/remarkjs/remark-directive
+// Style and more from: https://squidfunk.github.io/mkdocs-material/reference/admonitions/
 function MarkdownAdmonition(props) {
-  const { children, type, title, ...otherProps } = props
+  const { children, type, title, collapse, ...otherProps } = props
   const classes = useStyles()
+  const [open, setOpen] = useState(!_.isNil(collapse) ? collapse : true)
+  const { t } = useTranslation()
+  const collapsable = !_.isNil(collapse)
+
+  const toggleOpen = () => {
+    setOpen(op => !op)
+    return true
+  }
+
   let typeClass
   let titleClass
   let icon
@@ -69,21 +86,36 @@ function MarkdownAdmonition(props) {
       titleClass = classes.admonitionTitleExercise
       icon = <FitnessCenterIcon className={classes.admonitionIcon} htmlColor={Colors.EXERCISE} />
       break
+    case 'success':
+      typeClass = classes.admonitionCardSuccess
+      titleClass = classes.admonitionTitleSuccess
+      icon = <FitnessCenterIcon className={classes.admonitionIcon} htmlColor={Colors.SUCCESS} />
+      break
   }
 
   return (
     <Card className={clsx(classes.admonitionCard, typeClass)}>
       {title && (
-        <CardHeader title={(
-          <>
-            {icon}
-            <RawMarkdown>{title}</RawMarkdown>
-          </>
-        )} className={clsx(classes.admonitionTitle, titleClass)} titleTypographyProps={{ noWrap: true, className: classes.admonitionTitleTypography }} />
+        <CardHeader
+          title={(
+            <>
+              {icon}
+              <MaterialMarkdown>{title}</MaterialMarkdown>
+            </>
+          )}
+          action={
+            collapsable && <IconButton aria-label={t("show more")}>
+              {open ? <ExpandLess /> : <ExpandMore />}
+            </IconButton>
+          }
+          onClick={toggleOpen}
+          className={clsx(classes.admonitionTitle, titleClass)} titleTypographyProps={{ noWrap: true, className: classes.admonitionTitleTypography }} />
       )}
-      <CardContent className={classes.admonitionContent}>
-        {children}
-      </CardContent>
+      <Collapse in={open || !collapsable}>
+        <CardContent className={classes.admonitionContent}>
+          {children}
+        </CardContent>
+      </Collapse>
     </Card>
   )
 }
@@ -137,8 +169,7 @@ function MarkdownCode(props) {
 function makeDirectives(directives) {
   return () => tree => {
     visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], node => {
-      if (!_.includes(directives, node.name)) return
-
+      if (!directives.includes(node.name)) return
       const data = node.data || (node.data = {})
       var hast = h(node.name, node.attributes)
 
@@ -153,27 +184,16 @@ function parseMarkdown(markdown, components) {
     .use(parse)
     .use(gfm)
     .use(directive)
-    .use(makeDirectives(['admonition', 'snip']))
+    .use(makeDirectives(['admonition', 'snip', 'challenge']))
+    .use(math)
     .use(remark2rehype, { allowDangerousHtml: true })
+    .use(katex)
     .use(raw)
     .use(rehype2react, {
       createElement: React.createElement,
       components: components
     })
     .processSync(markdown).result
-}
-
-function RawMarkdown(props) {
-  return parseMarkdown(
-    props.children,
-    {
-      admonition: MarkdownAdmonition,
-      img: MarkdownImage,
-      p: "span",
-      a: MarkdownLink,
-      code: MarkdownCode,
-    }
-  )
 }
 
 function MaterialMarkdown(props) {
@@ -183,10 +203,11 @@ function MaterialMarkdown(props) {
       {
         admonition: MarkdownAdmonition,
         snip: MarkdownCodeSnippet,
+        challenge: MarkdownChallenge,
         img: MarkdownImage,
-        p: MarkdownParagraph,
         a: MarkdownLink,
         code: MarkdownCode,
+        p: MarkdownParagraph,
       }
     )
   )

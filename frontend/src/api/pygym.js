@@ -13,7 +13,8 @@ const API_TRACES = '/api/trace/'
 const API_CONCEPT_TRACES = (slug) => `${API_TRACES}?concept=${slug}`
 const API_TRACE = (slug) => `${API_TRACES}${slug}/`
 const API_TRACE_STATES = (slug) => `${API_TRACE(slug)}state/`
-const API_PAGES = '/api/page/'
+const API_CONTENTS = '/api/content/'
+const API_PAGES = '/api/content/page/'
 const API_PAGE = (concept_slug, page_slug) => `${API_PAGES}${concept_slug}/${page_slug}/`
 
 
@@ -103,6 +104,10 @@ const getTraceStateList = (slug) => {
   return getJSON(API_TRACE_STATES(slug))
 }
 
+const getContents = () => {
+  return getJSON(API_CONTENTS)
+}
+
 const getPageList = () => {
   return getJSON(API_PAGES)
 }
@@ -125,6 +130,7 @@ export {
   getTrace,
   postTrace,
   getTraceStateList,
+  getContents,
   getPageList,
   getPage,
 }

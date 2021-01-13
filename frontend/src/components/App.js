@@ -25,8 +25,9 @@ import { getUserData } from '../api/pygym'
 import { useStyles, theme } from '../styles'
 import ROUTES from '../routes'
 import AppDrawer from "./AppDrawer"
-import ConceptDetails from "./ConceptDetails"
+import ContentChallenges from "./ContentChallenges"
 import ContentPage from "./ContentPage"
+import { fetchContents } from '../features/contents/contentsSlice'
 import { fetchConcepts } from '../features/concepts/conceptsSlice'
 
 function App(props) {
@@ -43,6 +44,7 @@ function App(props) {
       .catch(console.log)
   }, [])
 
+  useEffect(() => dispatch(fetchContents()), [])
   useEffect(() => dispatch(fetchConcepts()), [])
 
   const handleDrawerToggle = () => {
@@ -90,12 +92,15 @@ function App(props) {
                   <Route path={ROUTES.trace.path} render={(props) =>
                     <TraceChallenge slug={props.match.params.slug} />
                   } />
-                  <Route path={ROUTES.page.path} render={(props) =>
-                    <ContentPage conceptSlug={props.match.params.slug} pageSlug={props.match.params.page} />
+                  <Route path={ROUTES.contentChallenges.path} render={(props) =>
+                    <ContentChallenges slug={props.match.params.slug} />
                   } />
-                  {/* Concepts must be last so the other routes take priority */}
-                  <Route path={ROUTES.concept.path} render={(props) =>
-                    <ConceptDetails slug={props.match.params.slug} />
+                  <Route path={ROUTES.page.path} render={(props) =>
+                    <ContentPage contentSlug={props.match.params.slug} pageSlug={props.match.params.page} />
+                  } />
+                  {/* Contents must be last so the other routes take priority */}
+                  <Route path={ROUTES.content.path} render={(props) =>
+                    <ContentPage contentSlug={props.match.params.slug} pageSlug="handout" />
                   } />
                 </Switch>
               </Box>

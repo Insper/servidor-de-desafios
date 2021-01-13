@@ -90,7 +90,7 @@ class Command(BaseCommand):
         slug = page_dir.name
         src = page_dir / 'raw' / slug
         if src.is_dir():
-            dst = settings.PAGES_RAW_DIR / slug
+            dst = settings.CONTENT_RAW_DIR / slug
             if dst.exists():
                 shutil.rmtree(dst, ignore_errors=True)
             shutil.copytree(src, dst)
