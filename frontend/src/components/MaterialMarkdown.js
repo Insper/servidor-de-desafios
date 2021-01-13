@@ -21,6 +21,7 @@ import CardHeader from '@material-ui/core/CardHeader'
 import Collapse from "@material-ui/core/Collapse"
 import IconButton from '@material-ui/core/IconButton'
 import Link from '@material-ui/core/Link'
+import { Link as RouterLink } from "react-router-dom";
 import Typography from '@material-ui/core/Typography'
 import InfoIcon from '@material-ui/icons/Info'
 import FitnessCenterIcon from '@material-ui/icons/FitnessCenter'
@@ -28,8 +29,12 @@ import ErrorIcon from '@material-ui/icons/Error'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import { STATIC_URL } from './django'
-import StaticCodeHighlight from './StaticCodeHighlight'
 import { useTranslation } from "react-i18next";
+import { useSelector } from 'react-redux'
+import StaticCodeHighlight from './StaticCodeHighlight'
+import ROUTES from '../routes'
+import { selectCodeChallengeBySlug } from '../features/codeChallenges/codeChallengesSlice'
+import { selectTraceChallengeBySlug } from '../features/traceChallenges/traceChallengesSlice'
 
 function MarkdownParagraph(props) {
   const { children, ...otherProps } = props
@@ -100,7 +105,7 @@ function MarkdownAdmonition(props) {
           title={(
             <>
               {icon}
-              <MaterialMarkdown>{title}</MaterialMarkdown>
+              <MaterialMarkdown raw>{title}</MaterialMarkdown>
             </>
           )}
           action={
@@ -135,6 +140,28 @@ function MarkdownCodeSnippet(props) {
   return (
     <MarkdownCode>{[content]}</MarkdownCode>
   )
+}
+
+function MarkdownChallenge(props) {
+  const { type, slug, ...otherProps } = props
+  let selector, route
+  switch (type) {
+    case "trace":
+      selector = selectTraceChallengeBySlug
+      route = ROUTES.trace
+      break
+    default:
+      selector = selectCodeChallengeBySlug
+      route = ROUTES.challenge
+      break
+  }
+  const challenge = useSelector(state => selector(state, slug))
+
+  if (!challenge) return <></>
+  return (
+    <>
+      <RouterLink to={route.link({ slug })}>{challenge.title}</RouterLink>
+    </>)
 }
 
 function MarkdownCode(props) {
@@ -197,9 +224,10 @@ function parseMarkdown(markdown, components) {
 }
 
 function MaterialMarkdown(props) {
+  const { children, raw } = props
   return (
     parseMarkdown(
-      props.children,
+      children,
       {
         admonition: MarkdownAdmonition,
         snip: MarkdownCodeSnippet,
@@ -207,7 +235,7 @@ function MaterialMarkdown(props) {
         img: MarkdownImage,
         a: MarkdownLink,
         code: MarkdownCode,
-        p: MarkdownParagraph,
+        p: _.isNil(raw) ? MarkdownParagraph : 'span',
       }
     )
   )

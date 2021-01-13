@@ -7,9 +7,10 @@ import ListItem from '@material-ui/core/ListItem'
 import Typography from '@material-ui/core/Typography'
 import _ from 'lodash'
 
-import ContentPage from "./ContentPage"
+import { selectCodeChallengesBySlug } from '../features/codeChallenges/codeChallengesSlice'
 import { selectContentBySlug } from '../features/contents/contentsSlice'
 import { selectConceptBySlug } from '../features/concepts/conceptsSlice'
+import { selectTraceChallengesBySlug } from '../features/traceChallenges/traceChallengesSlice'
 import ROUTES from '../routes'
 
 
@@ -19,9 +20,9 @@ function ContentChallenges(props) {
 
   const content = useSelector(state => selectContentBySlug(state, slug))
   const concept = useSelector(state => selectConceptBySlug(state, content && content.concept))
+  const challenges = useSelector(state => selectCodeChallengesBySlug(state, concept ? concept.codeChallenges : []))
+  const traces = useSelector(state => selectTraceChallengesBySlug(state, concept ? concept.traceChallenges : []))
   if (!content || !concept) return (<></>)
-  const challenges = concept ? concept.codeChallenges : []
-  const traces = concept ? concept.traceChallenges : []
 
   return (
     <>
