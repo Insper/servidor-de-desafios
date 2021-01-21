@@ -5,7 +5,7 @@ import { getContents, getPageList } from '../../api/pygym'
 export const fetchContents = createAsyncThunk('contents/fetchContents', async () => {
   const [allContents, allPages] = await Promise.all([getContents(), getPageList()])
   const contentsBySlug = {}
-  let contents = allContents.topics
+  let contents = _.flatten(_.values(allContents))
 
   contents.forEach(content => {
     contentsBySlug[content.slug] = content
@@ -27,7 +27,7 @@ export const contentsAdapter = createEntityAdapter({
   selectId: content => content.slug,
 })
 
-const initialState = contentsAdapter.getInitialState({ status: 'idle', topics: [] })
+const initialState = contentsAdapter.getInitialState({ status: 'idle', contentListNames: [] })
 
 const contentsSlice = createSlice({
   name: 'contents',
@@ -38,18 +38,25 @@ const contentsSlice = createSlice({
         state.status = 'loading'
       })
       .addCase(fetchContents.fulfilled, (state, { payload }) => {
-        if (payload.topics) {
-          state.topics = payload.topics.map(topic => topic.slug)
-        }
-        contentsAdapter.setAll(state, payload.topics || [])
+        _.entries(payload).forEach(([contentListName, contents]) => {
+          state[contentListName] = contents.map(content => content.slug)
+        })
+        contentsAdapter.setAll(state, _.flatten(_.values(payload)) || [])
         state.status = 'idle'
+        state.contentListNames = _.keys(payload)
       })
   }
 })
 
 export const { selectAll: selectContents, selectById: selectContentBySlug } = contentsAdapter.getSelectors(state => state.contents)
-export const selectTopics = createSelector(state => state.contents, contents => {
-  return contents.topics.map(slug => contents.entities[slug])
+export const selectContentListNames = createSelector(state => state.contents, contents => {
+  return contents.contentListNames
+})
+export const selectContentList = contentListName => createSelector(state => state.contents, contents => {
+  return contents[contentListName].map(slug => contents.entities[slug])
+})
+export const selectContentLists = createSelector(state => state.contents, contents => {
+  return _.fromPairs(contents.contentListNames.map(contentListName => [contentListName, contents[contentListName].map(slug => contents.entities[slug])]))
 })
 
 export default contentsSlice.reducer

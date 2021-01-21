@@ -12,10 +12,11 @@ function ContentPage(props) {
   const [mdContent, setMdContent] = useState()
 
   useEffect(() => {
-    getPage(contentSlug, pageSlug)
+    getPage(contentSlug, pageSlug || "")
       .then(setMdContent)
-      .catch(console.log)
-      .finally(() => setLoading(false))
+      .catch(console.error)
+      .finally(() => setLoading(false)
+      )
   }, [contentSlug, pageSlug])
 
   if (loading) return <></>

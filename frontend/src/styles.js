@@ -87,6 +87,7 @@ const customClasses = {
     marginLeft: "auto",
     marginRight: "auto",
     maxWidth: "100%",
+    padding: theme.spacing(2, 0),
   },
   flexbox: {
     display: "flex",
@@ -232,6 +233,10 @@ const customClasses = {
   },
   nestedListItem: {
     paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(2),
+  },
+  doubleNestedListItem: {
+    paddingLeft: theme.spacing(8),
     paddingRight: theme.spacing(2),
   },
 }

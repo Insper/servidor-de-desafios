@@ -25,12 +25,13 @@ def list_pages(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_page(request, concept_slug, page_slug):
+def get_page(request, content_slug, page_slug=None):
     for repo in ChallengeRepo.objects.all():
-        fname = settings.CHALLENGES_DIR / repo.slug / 'pages' / concept_slug / f'{page_slug}.md'
-        try:
-            with open(fname) as f:
-                return Response(f.read())
-        except FileNotFoundError:
-            pass
+        dirname = settings.CHALLENGES_DIR / repo.slug / 'pages' / content_slug
+        for fname in [page_slug, 'index', 'handout']:
+            try:
+                with open(dirname / f'{fname}.md') as f:
+                    return Response(f.read())
+            except FileNotFoundError:
+                pass
     raise Http404('')

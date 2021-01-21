@@ -46,6 +46,9 @@ function MarkdownLink(props) {
   const { href, ...otherProps } = props
   let safeHref = href
   if (href.startsWith("raw/")) safeHref = STATIC_URL + href
+  else if (href.startsWith("/")) {
+    return <Link component={RouterLink} to={href} {...otherProps} />
+  }
   return <Link href={safeHref} {...otherProps} />
 }
 
@@ -138,7 +141,7 @@ function MarkdownCodeSnippet(props) {
 
   if (!content) return <></>
   return (
-    <MarkdownCode>{[content]}</MarkdownCode>
+    <MarkdownCode {...otherProps}>{[content]}</MarkdownCode>
   )
 }
 
@@ -166,10 +169,10 @@ function MarkdownChallenge(props) {
 
 function MarkdownCode(props) {
   // We assume there is always a single child
-  const { children } = props
+  const { children, showLineNumbers, className } = props
+  let language = "python"
   if (_.split(children, '\n').length <= 1) {
     let newChildren = children
-    let language = "python"
     if (children && children[0].startsWith("#!")) {
       const start = children[0].indexOf(' ')
       language = children[0].substring(2, start)
@@ -181,12 +184,14 @@ function MarkdownCode(props) {
       </SyntaxHighlighter>
     )
   }
+  if (className && className.startsWith("language-")) language = className.substring(9)
   return (
     <StaticCodeHighlight
+      language={language}
       customStyle={{
         padding: "8px",
       }}
-      showLineNumbers={false}
+      showLineNumbers={!_.isNil(showLineNumbers)}
     >
       {[_.trim(children[0])]}
     </StaticCodeHighlight>
@@ -225,6 +230,7 @@ function parseMarkdown(markdown, components) {
 
 function MaterialMarkdown(props) {
   const { children, raw } = props
+
   return (
     parseMarkdown(
       children,

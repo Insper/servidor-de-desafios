@@ -15,12 +15,20 @@ const API_TRACE = (slug) => `${API_TRACES}${slug}/`
 const API_TRACE_STATES = (slug) => `${API_TRACE(slug)}state/`
 const API_CONTENTS = '/api/content/'
 const API_PAGES = '/api/content/page/'
-const API_PAGE = (concept_slug, page_slug) => `${API_PAGES}${concept_slug}/${page_slug}/`
+const API_PAGE = (conceptSlug, pageSlug) => `${API_PAGES}${conceptSlug}/${pageSlug}${pageSlug ? "/" : ""}`
 
 
 const getJSON = (url, extraParams) => {
   return fetch(url, { ...{ credentials: 'include' }, ...extraParams })
-    .then(res => res.json())
+    .then(res => {
+      if (res.status >= 400) {
+        if (res.status === 403) location.reload()
+        let error = new Error(res.statusText || res.status)
+        error.response = res
+        return Promise.reject(error)
+      }
+      return res.json()
+    })
 }
 
 const postJSON = (url, data) => {

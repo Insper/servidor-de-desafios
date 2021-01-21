@@ -100,7 +100,7 @@ function App(props) {
                   } />
                   {/* Contents must be last so the other routes take priority */}
                   <Route path={ROUTES.content.path} render={(props) =>
-                    <ContentPage contentSlug={props.match.params.slug} pageSlug="handout" />
+                    <ContentPage contentSlug={props.match.params.slug} />
                   } />
                 </Switch>
               </Box>

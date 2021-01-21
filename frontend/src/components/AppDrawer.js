@@ -13,15 +13,16 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import { useStyles } from '../styles'
 import ROUTES from '../routes'
-import { selectTopics } from '../features/contents/contentsSlice'
+import { selectContentLists } from '../features/contents/contentsSlice'
 
-function AppDrawer(props) {
-  const { ariaLabel, mobileOpen, onClose, ...otherProps } = props
+function ContentList(props) {
+  const { title, list, nestedContent, hasNumbers, startOpened } = props
   const classes = useStyles()
   const { t } = useTranslation()
 
-  const topics = useSelector(selectTopics)
-  const [opened, setOpened] = useState({})
+  const [opened, setOpened] = useState({ [title]: !_.isNil(startOpened) })
+
+  if (!title || !list) return <></>
 
   const createClickHandler = (slug) => {
     return () => {
@@ -31,33 +32,67 @@ function AppDrawer(props) {
     }
   }
 
+  return (
+    <>
+      <ListItem button onClick={createClickHandler(title)}>
+        <ListItemText primary={title} />
+        {opened[title] ? <ExpandLess /> : <ExpandMore />}
+      </ListItem>
+      <Collapse in={opened[title]} timeout="auto" unmountOnExit>
+        {
+          list.map((content, idx) => (
+            <React.Fragment key={content.slug} >
+              {!_.isNil(nestedContent) ?
+                <>
+                  <ListItem button className={classes.nestedListItem} onClick={createClickHandler(content.slug)} disableGutters>
+                    <ListItemText primary={`${!_.isNil(hasNumbers) ? _.padStart(idx + 1, 2, '0') + ". " : ""}${content.title}`} />
+                    {opened[content.slug] ? <ExpandLess /> : <ExpandMore />}
+                  </ListItem>
+                  <Collapse in={opened[content.slug]} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      <ListItem button className={classes.doubleNestedListItem} component={Link} to={ROUTES.content.link({ slug: content.slug })} disableGutters>
+                        <ListItemText primary={t("Handout")} />
+                      </ListItem>
+                      <ListItem button className={classes.doubleNestedListItem} component={Link} to={ROUTES.contentChallenges.link({ slug: content.slug })} disableGutters>
+                        <ListItemText primary={t("Challenges")} />
+                      </ListItem>
+                    </List>
+                  </Collapse>
+                </> :
+                <ListItem button className={classes.nestedListItem} component={Link} to={ROUTES.content.link({ slug: content.slug })} disableGutters>
+                  <ListItemText primary={`${!_.isNil(hasNumbers) ? _.padStart(idx + 1, 2, '0') + ". " : ""}${content.title}`} />
+                </ListItem>
+              }
+            </React.Fragment>
+          ))
+        }
+      </Collapse>
+    </>
+  )
+}
+
+function AppDrawer(props) {
+  const { ariaLabel, mobileOpen, onClose, ...otherProps } = props
+  const classes = useStyles()
+  const { t } = useTranslation()
+
+  const contentLists = useSelector(selectContentLists)
+  const topics = contentLists.topics
+  const otherLists = _.omit(contentLists, ['topics'])
+
   const drawer = (
     <div>
       <div className={classes.toolbar} />
       <Divider />
       <List>
-        <ListItem>
-          <ListItemText primary={t("Topics")} />
-        </ListItem>
-        {topics.map((topic, idx) => (
-          <React.Fragment key={topic.slug} >
-            <ListItem button onClick={createClickHandler(topic.slug)}>
-              <ListItemText primary={`${_.padStart(idx + 1, 2, '0')}. ${topic.title}`} />
-              {opened[topic.slug] ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={opened[topic.slug]} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem button className={classes.nestedListItem} component={Link} to={ROUTES.content.link({ slug: topic.slug })} disableGutters>
-                  <ListItemText primary={t("Handout")} />
-                </ListItem>
-                <ListItem button className={classes.nestedListItem} component={Link} to={ROUTES.contentChallenges.link({ slug: topic.slug })} disableGutters>
-                  <ListItemText primary={t("Challenges")} />
-                </ListItem>
-              </List>
-            </Collapse>
+        <ContentList title={t("Topics")} list={topics} hasNumbers nestedContent startOpened />
+        <Divider />
+        {_.entries(otherLists).map(([listName, list]) => (
+          <React.Fragment key={listName} >
+            <ContentList title={listName} list={list} />
+            <Divider />
           </React.Fragment>
         ))}
-        <Divider />
       </List>
     </div >
   )
