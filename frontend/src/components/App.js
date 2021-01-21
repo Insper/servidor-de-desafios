@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from 'react-redux'
+import CookieConsent from "react-cookie-consent";
 import {
   BrowserRouter as Router,
   Switch,
@@ -58,6 +59,12 @@ function App(props) {
         <Router>
           <div className={classes.root}>
             <AppBar position="fixed" className={classes.appBar}>
+              <CookieConsent
+                location="bottom"
+                buttonText={t("I agree")}
+              >
+                {t("This website uses cookies to enhance the user experience")}.
+              </CookieConsent>
               <Toolbar>
                 <IconButton
                   color="inherit"

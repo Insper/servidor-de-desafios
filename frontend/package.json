@@ -55,6 +55,7 @@
     "micromark-extension-directive": "^1.1.2",
     "moment": "^2.29.1",
     "normalizr": "^3.6.1",
+    "react-cookie-consent": "^6.2.1",
     "react-i18next": "^11.8.5",
     "react-redux": "^7.2.2",
     "react-refractor": "^2.1.2",
