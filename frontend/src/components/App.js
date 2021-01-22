@@ -28,6 +28,7 @@ import ROUTES from '../routes'
 import AppDrawer from "./AppDrawer"
 import ContentChallenges from "./ContentChallenges"
 import ContentPage from "./ContentPage"
+import ThanksPage from "./ThanksPage"
 import { fetchContents } from '../features/contents/contentsSlice'
 import { fetchConcepts } from '../features/concepts/conceptsSlice'
 
@@ -93,6 +94,9 @@ function App(props) {
                   <Route exact path={ROUTES.home.path}>
                     <UserOverview user={user} />
                   </Route>
+                  <Route path={ROUTES.thanks.path} render={(props) =>
+                    <ThanksPage />
+                  } />
                   <Route path={ROUTES.challenge.path} render={(props) =>
                     <CodeChallenge slug={props.match.params.slug} />
                   } />

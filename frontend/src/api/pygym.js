@@ -2,6 +2,7 @@ import { csrftoken } from '../components/django'
 
 const API_USER = '/api/user/'
 const API_CHANGE_PASS = '/api/change-password/'
+const API_THANKS = '/api/thanks/'
 const API_CONCEPTS = '/api/concept/'
 const API_CONCEPT = (slug) => `${API_CONCEPTS}${slug}/`
 const API_CHALLENGES = '/api/code/'
@@ -56,6 +57,10 @@ const postNewPassword = (oldPassword, newPassword, repeatPassword) => {
     newPassword: newPassword,
     repeatPassword: repeatPassword
   })
+}
+
+const getThanks = () => {
+  return getJSON(API_THANKS)
 }
 
 const getConceptList = () => {
@@ -127,6 +132,7 @@ const getPage = (concept_slug, page_slug) => {
 export {
   getUserData,
   postNewPassword,
+  getThanks,
   getConceptList,
   getConcept,
   getChallengeList,

@@ -14,6 +14,7 @@ const ROUTES = {
   home: new Route('/'),
   login: new Route('/login/'),
   logout: new Route('/logout/'),
+  thanks: new Route('/thanks'),
   challenge: new Route('/challenge/:slug'),
   trace: new Route('/trace/:slug'),
   content: new Route('/:slug'),

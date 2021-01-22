@@ -93,6 +93,10 @@ function AppDrawer(props) {
             <Divider />
           </React.Fragment>
         ))}
+        <ListItem button component={Link} to={ROUTES.thanks.link()}>
+          {t("Thanks")}
+        </ListItem>
+        <Divider />
       </List>
     </div >
   )

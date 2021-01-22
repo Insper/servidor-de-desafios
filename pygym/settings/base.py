@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'code_challenge',
     'trace_challenge',
     'content',
+    'thanks',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
