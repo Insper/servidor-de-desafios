@@ -31,6 +31,8 @@ import ContentPage from "./ContentPage"
 import ThanksPage from "./ThanksPage"
 import { fetchContents } from '../features/contents/contentsSlice'
 import { fetchConcepts } from '../features/concepts/conceptsSlice'
+import { fetchTraceInteractions } from '../features/traceInteractions/traceInteractionsSlice'
+import { fetchCodeInteractions } from '../features/codeInteractions/codeInteractionsSlice'
 
 function App(props) {
   const classes = useStyles()
@@ -48,6 +50,8 @@ function App(props) {
 
   useEffect(() => dispatch(fetchContents()), [])
   useEffect(() => dispatch(fetchConcepts()), [])
+  useEffect(() => dispatch(fetchTraceInteractions(), []))
+  useEffect(() => dispatch(fetchCodeInteractions(), []))
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)

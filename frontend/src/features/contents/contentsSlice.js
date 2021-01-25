@@ -52,9 +52,6 @@ export const { selectAll: selectContents, selectById: selectContentBySlug } = co
 export const selectContentListNames = createSelector(state => state.contents, contents => {
   return contents.contentListNames
 })
-export const selectContentList = contentListName => createSelector(state => state.contents, contents => {
-  return contents[contentListName].map(slug => contents.entities[slug])
-})
 export const selectContentLists = createSelector(state => state.contents, contents => {
   return _.fromPairs(contents.contentListNames.map(contentListName => [contentListName, contents[contentListName].map(slug => contents.entities[slug])]))
 })

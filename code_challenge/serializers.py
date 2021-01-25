@@ -1,4 +1,4 @@
-from .models import CodeChallenge, CodeChallengeSubmission
+from .models import CodeChallenge, CodeChallengeSubmission, UserChallengeInteraction
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from core.serializers import ConceptSerializer
 
@@ -28,3 +28,11 @@ class CodeChallengeSubmissionSerializer(ModelSerializer):
     class Meta:
         model = CodeChallengeSubmission
         fields = ['id', 'creation_date', 'success', 'stacktraces', 'stdouts']
+
+
+class UserChallengeInteractionSerializer(ModelSerializer):
+    challenge = ShortCodeChallengeSerializer(read_only=True)  # TODO This is not ideal (will require joins), it's probably better to update only the new submissions
+
+    class Meta:
+        model = UserChallengeInteraction
+        fields = ['challenge', 'attempts', 'successful_attempts', 'completed']

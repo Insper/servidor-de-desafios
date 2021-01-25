@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponseForbidden
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import TraceChallenge, TraceStateSubmission, UserTraceChallengeInteraction
-from .serializers import ShortTraceChallengeSerializer, FullTraceChallengeSerializer
+from .serializers import ShortTraceChallengeSerializer, FullTraceChallengeSerializer, UserTraceChallengeInteractionSerializer
 from .trace_controller import compare_terminal, states_for, extract_fillable_state, extract_fillable_stdout, get_compare_code, stringify_memory
 from core.django_custom import AsyncAPIView
 from .code_runner import compare_memories
@@ -144,3 +144,16 @@ class TraceStateListView(APIView):
             'totalStates': len(states),
             'latestState': latest_state,
         })
+
+
+class TraceInteractionListView(APIView):
+    """
+    List all user-trace interactions for this user.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        user = request.user
+        interactions = UserTraceChallengeInteraction.objects.filter(user=user)
+        serializer = UserTraceChallengeInteractionSerializer(interactions, many=True)
+        return Response(serializer.data)

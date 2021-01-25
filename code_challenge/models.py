@@ -73,3 +73,7 @@ class UserChallengeInteraction(models.Model):
     challenge = models.ForeignKey(CodeChallenge, on_delete=models.CASCADE)
     attempts = models.IntegerField(default=0)
     successful_attempts = models.IntegerField(default=0)
+
+    @property
+    def completed(self):
+        return self.successful_attempts > 0

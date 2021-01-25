@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .challenge_controller import test_code_for
-from .serializers import FullCodeChallengeSerializer, ShortCodeChallengeSerializer, CodeChallengeSubmissionSerializer
-from .models import CodeChallenge, CodeChallengeSubmission, user_challenge_path
+from .serializers import FullCodeChallengeSerializer, ShortCodeChallengeSerializer, CodeChallengeSubmissionSerializer, UserChallengeInteractionSerializer
+from .models import CodeChallenge, CodeChallengeSubmission, UserChallengeInteraction, user_challenge_path
 from .code_runner import run_tests
 from core.django_custom import AsyncAPIView
 
@@ -55,7 +55,7 @@ class CodeChallengeView(AsyncAPIView):
         return await sync_to_async(self.sync_get)(request, slug, format)
 
     def create_submission_and_serialize(self, author, challenge, result, code):
-        submission = CodeChallengeSubmission.objects.create(author=author, challenge=challenge)
+        submission = CodeChallengeSubmission(author=author, challenge=challenge)
         submission.failures = result.failure_msgs
         submission.stack_traces = result.stack_traces
         submission.stdouts = [
@@ -110,3 +110,16 @@ class CodeChallengeSubmissionCodeView(APIView):
             return Response({'code': submission.code.read().decode('utf-8')})
         except CodeChallengeSubmission.DoesNotExist:
             raise Http404('This submission does not exist')
+
+
+class CodeInteractionListView(APIView):
+    """
+    List all user-code interactions for this user.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        user = request.user
+        interactions = UserChallengeInteraction.objects.filter(user=user)
+        serializer = UserChallengeInteractionSerializer(interactions, many=True)
+        return Response(serializer.data)

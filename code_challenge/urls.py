@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('', views.CodeChallengeListView.as_view(), name='challenges'),
+    path('interaction/', views.CodeInteractionListView.as_view(), name='code_interaction_list'),
     path('<slug:slug>/', views.CodeChallengeView.as_view(), name='challenge'),
     path('<slug:slug>/submission', views.CodeChallengeSubmissionListView.as_view(), name='submissions'),
     path('<slug:slug>/submission/<int:submission_id>/code', views.CodeChallengeSubmissionCodeView.as_view(), name='submission_code'),

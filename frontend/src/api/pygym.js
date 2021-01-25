@@ -6,11 +6,13 @@ const API_THANKS = '/api/thanks/'
 const API_CONCEPTS = '/api/concept/'
 const API_CONCEPT = (slug) => `${API_CONCEPTS}${slug}/`
 const API_CHALLENGES = '/api/code/'
+const API_CHALLENGE_INTERACTIONS = '/api/code/interaction/'
 const API_CONCEPT_CHALLENGES = (slug) => `${API_CHALLENGES}?concept=${slug}`
 const API_CHALLENGE = (slug) => `${API_CHALLENGES}${slug}/`
 const API_SUBMISSIONS = (slug) => `${API_CHALLENGE(slug)}submission`
 const API_SUBMISSION_CODE = (slug, submissionId) => `${API_CHALLENGE(slug)}submission/${submissionId}/code`
 const API_TRACES = '/api/trace/'
+const API_TRACE_INTERACTIONS = '/api/trace/interaction/'
 const API_CONCEPT_TRACES = (slug) => `${API_TRACES}?concept=${slug}`
 const API_TRACE = (slug) => `${API_TRACES}${slug}/`
 const API_TRACE_STATES = (slug) => `${API_TRACE(slug)}state/`
@@ -76,6 +78,10 @@ const getChallengeList = (concept) => {
   return getJSON(API_CHALLENGES)
 }
 
+const getCodeInteractionList = () => {
+  return getJSON(API_CHALLENGE_INTERACTIONS)
+}
+
 const getChallenge = (slug) => {
   return getJSON(API_CHALLENGE(slug))
 }
@@ -113,6 +119,10 @@ const postTrace = (slug, stateIndex, memory, terminal, nextLine, retval) => {
   })
 }
 
+const getTraceInteractionList = () => {
+  return getJSON(API_TRACE_INTERACTIONS)
+}
+
 const getTraceStateList = (slug) => {
   return getJSON(API_TRACE_STATES(slug))
 }
@@ -136,6 +146,7 @@ export {
   getConceptList,
   getConcept,
   getChallengeList,
+  getCodeInteractionList,
   getChallenge,
   postChallenge,
   getSubmissionList,
@@ -143,6 +154,7 @@ export {
   getTraceList,
   getTrace,
   postTrace,
+  getTraceInteractionList,
   getTraceStateList,
   getContents,
   getPageList,
