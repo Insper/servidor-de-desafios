@@ -48,6 +48,9 @@ export default function ContentSummary(props) {
         <Box mt="auto">
           <Button variant="contained" color="primary" fullWidth component={Link} to={ROUTES.content.link({ slug: content.slug })}>{t("Handout")}</Button>
         </Box>
+        <Box mt={1}>
+          <Button variant="contained" color="primary" fullWidth component={Link} to={ROUTES.contentChallenges.link({ slug: content.slug })}>{t("Challenges")}</Button>
+        </Box>
       </Box>
     </Paper>
   )
