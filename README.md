@@ -24,6 +24,10 @@ Always activate the virtual env before starting to work:
 
     $ poetry shell
 
+#### AWS SAM
+
+Follow the instructions here: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html
+
 #### React Frontend
 
 We use [React](https://reactjs.org/) to develop our frontend. To install it you must first [install Node.js](https://nodejs.org/en/download/package-manager/). Then, go to `frontend` directory and install all the dependencies:
@@ -40,6 +44,10 @@ The font used for the logo is [Gayathri](https://fonts.google.com/specimen/Gayat
 Run the server with:
 
     $ uvicorn pygym.asgi_dev:application --reload
+
+You also have to run the simulated AWS lambda:
+
+    $ sam local start-api
 
 To update the react frontend, run:
 
@@ -63,10 +71,6 @@ This command will generate the files `frontend/src/locale/en/translation.json` a
 ### Updating AWS lambda code
 
 Change directory to `aws_lambda` and run `update.sh` followed by `prepare_zip.sh`. Upload the generated zip file to AWS.
-
-
-
-
 
 # ANTIGO
 
@@ -126,11 +130,12 @@ comando no servidor, via SSH:
     $ python manage.py batch_add_users ARQUIVO_BLACKBOARD.csv
 
 ### Criando um cadastro
+
 Para criar um cadastro para administrar os exercícios, execute o comando:
 
     $ python manage.py createsuperuser
 
- Em seguida, basta definir um nome usuário e senha.
+Em seguida, basta definir um nome usuário e senha.
 
 ### Criando novos exercícios
 
@@ -142,7 +147,6 @@ Depois, execute o seguinte comando:
 
 Isso permite você a entrar no Django admin (pode digitar no seu navegador: 'localhost:8000/admin/')
 Para criar o exercício, clique em 'Adicionar', ao lado de 'Exercícios de programação'. Será necessário definir algumas características:
-
 
     * Título: Nome que aparecerá para o exercício no servidor
     * Descrição: Enunciado
