@@ -13,14 +13,12 @@ requests = "^2.25.0"
 Markdown = "^3.3.3"
 djangorestframework = "^3.12.2"
 strtest = "^0.0.4"
-aioboto3 = "^8.2.0"
 django-cors-headers = "^3.7.0"
 python-dotenv = "^0.15.0"
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.3"
 pytest = "^6.1.2"
-pytest-asyncio = "^0.14.0"
 uvicorn = "^0.13.1"
 
 [build-system]

@@ -43,7 +43,7 @@ The font used for the logo is [Gayathri](https://fonts.google.com/specimen/Gayat
 
 Run the server with:
 
-    $ uvicorn pygym.asgi_dev:application --reload
+    $ python manage.py runserver --nostatic
 
 You also have to run the simulated AWS lambda:
 

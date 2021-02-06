@@ -23,6 +23,19 @@ def states_for(trace):
         raise RuntimeError(f'No states found for trace challenge {trace.slug}')
 
 
+def states_from_slug(slug):
+    for base_repo in settings.CHALLENGES_DIR.iterdir():
+        code_file = base_repo / 'traces' / slug / 'trace.json'
+        if code_file.is_file():
+            try:
+                with open(code_file) as f:
+                    return json.load(f)
+            except FileNotFoundError:
+                pass
+    return None
+
+
+
 def extract_fillable_memory(prev_memory, cur_memory):
     fillable = {block: vars for block, vars in prev_memory.items() if block in cur_memory} if prev_memory else {}
 
