@@ -1,7 +1,15 @@
 from .models import CodeChallenge, CodeChallengeSubmission, UserChallengeInteraction
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, ReadOnlyField
 from core.serializers import ConceptSerializer
 
+
+class FullestCodeChallengeSerializer(ModelSerializer):
+    concept = ConceptSerializer(read_only=True)
+    test_code = ReadOnlyField(source='test_code')
+
+    class Meta:
+        model = CodeChallenge
+        fields = ['title', 'slug', 'question', 'concept', 'function_name', 'test_code']
 
 class FullCodeChallengeSerializer(ModelSerializer):
     concept = ConceptSerializer(read_only=True)

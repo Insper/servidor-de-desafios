@@ -1,65 +1,61 @@
-import asyncio
 from pathlib import Path
+import subprocess
 
 
-async def git_cmd(cmd, cwd=None):
-    full_cmd = f'git {cmd}'
-    proc = await asyncio.create_subprocess_shell(
-        full_cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        cwd=cwd)
+def git_cmd(cmd, cwd=None):
+    if isinstance(cmd, str):
+        cmd = [cmd]
+    full_cmd = ['git'] + cmd
+    proc = subprocess.run(full_cmd, capture_output=True, cwd=cwd)
 
-    stdout, stderr = await proc.communicate()
-
-    return proc.returncode, stdout.decode(), stderr.decode()
+    return proc.returncode, proc.stdout.decode(), proc.stderr.decode()
 
 
 class Git:
     def __init__(self, base_dir):
         self.base_dir = base_dir
 
-    async def _git(self, cmd, args=None):
+    def _git(self, cmd, args=None):
         if args is None:
             args = []
-        retcode, stdout, stderr = await git_cmd(f'{cmd} {" ".join(str(arg) for arg in args)}', self.base_dir)
+        retcode, stdout, stderr = git_cmd([cmd] + list(args), self.base_dir)
 
         return retcode, stdout, stderr
 
-    async def init(self):
-        await self._git(f'init')
+    def init(self):
+        self._git('init')
 
-    async def clone(self, url):
+    def clone(self, url):
         if self.is_repo():
             raise RuntimeError('There is already a git repo in {self.base_dir}')
-        await git_cmd(f'clone {url} {self.base_dir}')
+        git_cmd(['clone', url, self.base_dir])
 
     def is_repo(self):
         path = Path(self.base_dir)
         return path.exists() and (path / '.git').is_dir()
 
-    async def status(self):
-        return await self._git(f'status')
+    def status(self):
+        return self._git('status')
 
-    async def pull(self, *pull_args):
-        await self._git(f'pull', args=pull_args)
+    def pull(self, *pull_args):
+        self._git('pull', args=pull_args)
 
-    async def add(self, *add_args):
-        await self._git(f'add', args=add_args)
+    def add(self, *add_args):
+        self._git('add', args=add_args)
 
-    async def commit(self, *commit_args):
-        await self._git(f'commit', args=commit_args)
+    def commit(self, *commit_args):
+        self._git('commit', args=commit_args)
 
-    async def push(self, *push_args):
-        await self._git(f'push', args=push_args)
+    def push(self, *push_args):
+        self._git('push', args=push_args)
 
-    async def rm(self, *rm_args):
-        await self._git(f'rm', args=rm_args)
+    def rm(self, *rm_args):
+        self._git('rm', args=rm_args)
 
-    async def log(self, *log_args, last=None):
+    def log(self, *log_args, last=None):
         if last:
             log_args += ('-n', f'{last}')
-        _, entries_str, _ = await self._git('log', args=log_args)
+        _, entries_str, _ = self._git('log', args=log_args)
 
         commit_pattern = 'commit '
         author_pattern = 'Author: '
@@ -97,6 +93,6 @@ class Git:
             })
         return commits
 
-    async def changed_files(self, sha):
-        _, files, _ = await self._git(f'diff --name-only {sha}')
+    def changed_files(self, sha):
+        _, files, _ = self._git('diff', ['--name-only', sha])
         return [self.base_dir / f.strip() for f in files.split('\n') if f.strip()]

@@ -1,9 +1,11 @@
 from core.views import change_password
 from django.urls import include, path
+from rest_framework.authtoken import views as authviews
 from . import views
 
 
 urlpatterns = [
+    path('token/', authviews.obtain_auth_token),
     path('user/', views.get_user),
     path('change-password/', views.change_password),
     path('concept/', views.ConceptListView.as_view()),

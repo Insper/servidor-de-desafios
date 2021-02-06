@@ -109,7 +109,7 @@ def save_trace_challenge(base_dir, slug, details, code, trace):
     return details_file, code_file, trace_file
 
 
-class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
+class ChallengeControllerTestCase(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory
         self.tmp_path = Path(tempfile.mkdtemp())
@@ -118,15 +118,15 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
         # Remove the directory after the test
         shutil.rmtree(self.tmp_path)
 
-    async def test_update_smoke_test(self):
+    def test_update_smoke_test(self):
         git = gitpy.Git(self.tmp_path)
         controller = ChallengeController(git, 'https://github.com/Insper/design-de-software-exercicios.git')
-        await controller.update()
+        controller.update()
         assert True  # Got here, so that's fine
 
-    async def test_list_new_challenges(self):
+    def test_list_new_challenges(self):
         git = gitpy.Git(self.tmp_path)
-        await git.init()
+        git.init()
         n = 5
         fs = {}
         for c in range(1, n+1):
@@ -144,10 +144,10 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
                 files = save_challenge(self.tmp_path, challenge_name, details, question, tests)
                 fs[challenge_name] = (details, question, tests)
                 for f in files:
-                    await git.add(f)
-            await git.commit(f'-m "Commit message #{c}."')
+                    git.add(f)
+            git.commit(f'-m "Commit message #{c}."')
 
-        log = await git.log()
+        log = git.log()
         assert len(log) == n
         commits = [None]
         for entry in reversed(log):
@@ -155,7 +155,7 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
 
         cm = ChallengeController(git, None)
         for c, commit in enumerate(commits):
-            challenges = await cm.changed_challenges(last_commit=commit)
+            challenges = cm.changed_challenges(last_commit=commit)
             assert len(challenges) == n - c
             for challenge in challenges:
                 got_details = challenges[challenge]
@@ -166,9 +166,9 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
                 assert got_details['question'] == question
                 assert got_details['tests_file'] == str(self.tmp_path / 'challenges' / challenge / 'tests.py')
 
-    async def test_list_new_trace_challenges(self):
+    def test_list_new_trace_challenges(self):
         git = gitpy.Git(self.tmp_path)
-        await git.init()
+        git.init()
         n = 5
         fs = {}
         for c in range(1, n+1):
@@ -191,10 +191,10 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
                 files = save_trace_challenge(self.tmp_path, challenge_name, details, code, trace)
                 fs[challenge_name] = details
                 for f in files:
-                    await git.add(f)
-            await git.commit(f'-m "Commit message #{c}."')
+                    git.add(f)
+            git.commit(f'-m "Commit message #{c}."')
 
-        log = await git.log()
+        log = git.log()
         assert len(log) == n
         commits = [None]
         for entry in reversed(log):
@@ -202,7 +202,7 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
 
         cm = ChallengeController(git, None)
         for c, commit in enumerate(commits):
-            challenges = await cm.changed_trace_challenges(last_commit=commit)
+            challenges = cm.changed_trace_challenges(last_commit=commit)
             assert len(challenges) == n - c
             for challenge in challenges:
                 got_details = challenges[challenge]
@@ -211,9 +211,9 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
                     assert k in got_details
                     assert got_details[k] == v
 
-    async def test_list_deleted_challenges(self):
+    def test_list_deleted_challenges(self):
         git = gitpy.Git(self.tmp_path)
-        await git.init()
+        git.init()
         n = 5
         challenge_paths = []
         for i in range(1, n+1):
@@ -229,22 +229,22 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
             tests = f'def test_dummy():\n    pass'
             files = save_challenge(self.tmp_path, challenge_name, details, question, tests)
             for f in files:
-                await git.add(f)
+                git.add(f)
             challenge_paths.append(self.tmp_path / 'challenges' / challenge_name)
-        await git.commit(f'-m "Adding all files."')
+        git.commit(f'-m "Adding all files."')
 
         cm = ChallengeController(git, None)
         for i in range(1, n+1):
             challenge = challenge_paths.pop()
-            await git.rm('-rf', challenge)
-            await git.commit('-m', f'Removing {challenge}')
-            challenges = await cm.changed_challenges(last_commit='HEAD^')
+            git.rm('-rf', challenge)
+            git.commit('-m', f'Removing {challenge}')
+            challenges = cm.changed_challenges(last_commit='HEAD^')
             assert len(challenges) == 1
             assert list(challenges.keys())[0] == challenge.name
 
-    async def test_list_deleted_challenges(self):
+    def test_list_deleted_challenges(self):
         git = gitpy.Git(self.tmp_path)
-        await git.init()
+        git.init()
         n = 5
         challenge_paths = []
         for i in range(1, n+1):
@@ -265,15 +265,15 @@ class ChallengeControllerTestCase(unittest.IsolatedAsyncioTestCase):
             trace = f'[{{"line_i": 0, "line": "x = {x}", "name_dicts": {{"<module>": {{"x": {x}}}}}, "call_line_i": null, "retval": null, "stdout": []}}, {{"line_i": 1, "line": "y = {y}", "name_dicts": {{"<module>": {{"x": {x}, "y": {y}}}}}, "call_line_i": null, "retval": null, "stdout": []}}, {{"line_i": 2, "line": "z = x * y", "name_dicts": {{"<module>": {{"x": {x}, "y": {y}, "z": {z}}}}}, "call_line_i": null, "retval": null, "stdout": []}}, {{"line_i": 3, "line": "print(\'O ret\u00e2ngulo de lados {{0}} e {{1}} tem \u00e1rea {{2}}\'.format(x, y, z))", "name_dicts": {{"<module>": {{"x": {x}, "y": {y}, "z": {z}}}}}, "call_line_i": null, "retval": null, "stdout": [{{"out": "O ret\u00e2ngulo de lados {x} e {y} tem \u00e1rea {z}", "in": null}}]}}]'
             files = save_trace_challenge(self.tmp_path, challenge_name, details, code, trace)
             for f in files:
-                await git.add(f)
+                git.add(f)
             challenge_paths.append(self.tmp_path / 'traces' / challenge_name)
-        await git.commit(f'-m "Adding all files."')
+        git.commit(f'-m "Adding all files."')
 
         cm = ChallengeController(git, None)
         for i in range(1, n+1):
             challenge = challenge_paths.pop()
-            await git.rm('-rf', challenge)
-            await git.commit('-m', f'Removing {challenge}')
-            challenges = await cm.changed_trace_challenges(last_commit='HEAD^')
+            git.rm('-rf', challenge)
+            git.commit('-m', f'Removing {challenge}')
+            challenges = cm.changed_trace_challenges(last_commit='HEAD^')
             assert len(challenges) == 1
             assert list(challenges.keys())[0] == challenge.name

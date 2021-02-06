@@ -49,7 +49,10 @@ class TraceChallengeView(AsyncAPIView):
 
     def sync_get(self, request, slug, format=None):
         challenge = get_challenge_or_404(slug)
-        serializer = FullTraceChallengeSerializer(challenge)
+        if 'short' in request.GET:
+            serializer = ShortTraceChallengeSerializer(challenge)
+        else:
+            serializer = FullTraceChallengeSerializer(challenge)
         return Response(serializer.data)
 
     async def get(self, request, slug, format=None):

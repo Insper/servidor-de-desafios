@@ -1,14 +1,13 @@
-from asgiref.sync import sync_to_async
+from django.conf import settings
 from django.http import Http404
 from django.core.files.base import ContentFile
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .challenge_controller import test_code_for
+from .challenge_controller import test_code_from_slug
 from .serializers import FullCodeChallengeSerializer, ShortCodeChallengeSerializer, CodeChallengeSubmissionSerializer, UserChallengeInteractionSerializer
 from .models import CodeChallenge, CodeChallengeSubmission, UserChallengeInteraction, user_challenge_path
-from .code_runner import run_tests
-from core.django_custom import AsyncAPIView
 
 
 class CodeChallengeListView(APIView):
@@ -40,44 +39,39 @@ def get_challenge_or_404(slug):
     raise Http404(f'There is no challenge with slug {slug}')
 
 
-class CodeChallengeView(AsyncAPIView):
+class CodeChallengeView(APIView):
     """
     Get challenge.
     """
     permission_classes = (IsAuthenticated,)
 
-    def sync_get(self, request, slug, format=None):
+    def get(self, request, slug, format=None):
         challenge = get_challenge_or_404(slug)
-        serializer = FullCodeChallengeSerializer(challenge)
+        if 'short' in request.GET:
+            serializer = ShortCodeChallengeSerializer(challenge)
+        else:
+            serializer = FullCodeChallengeSerializer(challenge)
         return Response(serializer.data)
 
-    async def get(self, request, slug, format=None):
-        return await sync_to_async(self.sync_get)(request, slug, format)
-
-    def create_submission_and_serialize(self, author, challenge, result, code):
-        submission = CodeChallengeSubmission(author=author, challenge=challenge)
-        submission.failures = result.failure_msgs
-        submission.stack_traces = result.stack_traces
+    def post(self, request, slug, format=None):
+        challenge = get_challenge_or_404(slug)
+        code = request.data.get('code')
+        result = request.data.get('result')
+        submission = CodeChallengeSubmission(author=request.user, challenge=challenge)
+        submission.failures = result['failure_msgs']
+        submission.stack_traces = result['stack_traces']
         submission.stdouts = [
                 [{
                     'output': line[0] if len(line) else None,
                     'input': line[1] if len(line) > 1 else None
                 } for line in test_case
-            ] for test_case in result.stdouts]
-        submission.success = result.success
+            ] for test_case in result['stdouts']]
+        submission.success = result['success']
         submission.save()
         submission.code.save(user_challenge_path(submission, ''), ContentFile(code))
 
         serializer = CodeChallengeSubmissionSerializer(submission)
-        return serializer.data
-
-    async def post(self, request, slug, format=None):
-        challenge = await sync_to_async(get_challenge_or_404)(slug)
-        code = request.data.get('code')
-        test_code = await sync_to_async(test_code_for)(challenge)
-        result = await run_tests(code, test_code, challenge.function_name)
-        data = await sync_to_async(self.create_submission_and_serialize)(request.user, challenge, result, code)
-        return Response(data)
+        return Response(serializer.data)
 
 
 class CodeChallengeSubmissionListView(APIView):
@@ -123,3 +117,12 @@ class CodeInteractionListView(APIView):
         interactions = UserChallengeInteraction.objects.filter(user=user)
         serializer = UserChallengeInteractionSerializer(interactions, many=True)
         return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_test_code(request, slug):
+    test_code = None
+    if request.GET.get('token') == settings.BACKEND_TOKEN:
+        test_code = test_code_from_slug(slug)
+    return Response(test_code)

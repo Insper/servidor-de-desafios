@@ -47,6 +47,7 @@ Run the server with:
 
 You also have to run the simulated AWS lambda:
 
+    $ cd aws_lambda/sam-app/
     $ sam local start-api
 
 To update the react frontend, run:

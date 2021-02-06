@@ -9,16 +9,16 @@ class ChallengeController:
         self.repo_url = repo_url
         self.git = git
 
-    async def update(self):
+    def update(self):
         if self.git.is_repo():
-            await self.git.pull()
+            self.git.pull()
         else:
-            await self.git.clone(self.repo_url)
+            self.git.clone(self.repo_url)
 
-    async def list_changed_dirs(self, root_dir, last_commit=None):
+    def list_changed_dirs(self, root_dir, last_commit=None):
         if last_commit:
             cdir = str(Path(self.git.base_dir / root_dir).absolute())
-            challenge_dirs = await self.git.changed_files(last_commit)
+            challenge_dirs = self.git.changed_files(last_commit)
             tmp = challenge_dirs
             challenge_dirs = set()
             for d in tmp:
@@ -32,8 +32,8 @@ class ChallengeController:
             challenge_dirs = (self.git.base_dir / root_dir).iterdir()
         return [d for d in challenge_dirs if d.is_dir() or not d.exists()]
 
-    async def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md', raw_dir='raw', last_commit=None):
-        challenge_dirs = await self.list_changed_dirs(challenges_dir, last_commit)
+    def changed_challenges(self, challenges_dir='challenges', details_file='details.json', question_file='question.md', raw_dir='raw', last_commit=None):
+        challenge_dirs = self.list_changed_dirs(challenges_dir, last_commit)
 
         all_challenges = {}
         for challenge_dir in challenge_dirs:
@@ -59,8 +59,8 @@ class ChallengeController:
 
         return all_challenges
 
-    async def changed_trace_challenges(self, root_dir='traces', details_file='details.json', last_commit=None):
-        trace_dirs = await self.list_changed_dirs(root_dir, last_commit)
+    def changed_trace_challenges(self, root_dir='traces', details_file='details.json', last_commit=None):
+        trace_dirs = self.list_changed_dirs(root_dir, last_commit)
 
         all_traces = {}
         for trace_dir in trace_dirs:
@@ -74,8 +74,8 @@ class ChallengeController:
 
         return all_traces
 
-    async def changed_pages(self, root_dir='pages', last_commit=None):
-        return await self.list_changed_dirs(root_dir, last_commit)
+    def changed_pages(self, root_dir='pages', last_commit=None):
+        return self.list_changed_dirs(root_dir, last_commit)
 
 
 def test_code_for(challenge):
@@ -86,3 +86,15 @@ def test_code_for(challenge):
             return f.read()
     except FileNotFoundError:
         return None
+
+
+def test_code_from_slug(slug):
+    for base_repo in settings.CHALLENGES_DIR.iterdir():
+        tests_file = base_repo / 'challenges' / slug / 'tests.py'
+        if tests_file.is_file():
+            try:
+                with open(tests_file) as f:
+                    return f.read()
+            except FileNotFoundError:
+                pass
+    return None

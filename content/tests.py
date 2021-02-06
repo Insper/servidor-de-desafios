@@ -5,7 +5,7 @@ import json
 from content.content_controller import list_pages, list_contents
 
 
-class PageControllerTestCase(unittest.IsolatedAsyncioTestCase):
+class PageControllerTestCase(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory
         self.tmp_path = Path(tempfile.mkdtemp())

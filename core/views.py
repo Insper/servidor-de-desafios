@@ -15,6 +15,13 @@ PASSWORDS_DONT_MATCH = 2
 OLD_NEW_PASSWORDS_EQUAL = 3
 
 
+@api_view(['POST'])
+def login_with_credentials(request):
+    login = request.data.get('login')
+    password = request.data.get('password')
+    return Response(login, password)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request):

@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import sys
 import json
+from dotenv import load_dotenv
 
 
 def create_dir(dirpath):
@@ -32,6 +33,10 @@ create_dir(CHALLENGES_RAW_DIR)
 CONTENT_RAW_DIR = BASE_DIR / 'content' / 'static' / 'raw'
 create_dir(CONTENT_RAW_DIR)
 
+# Load environment variables in .env file
+load_dotenv(BASE_DIR / '.env')
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+BACKEND_TOKEN = os.environ.get('BACKEND_TOKEN')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -69,10 +74,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -154,6 +162,12 @@ AUTH_PASSWORD_VALIDATORS = []
 
 AUTH_USER_MODEL = 'core.PyGymUser'
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

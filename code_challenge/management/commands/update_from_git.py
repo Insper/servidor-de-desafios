@@ -1,4 +1,3 @@
-import asyncio
 import shutil
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -114,13 +113,11 @@ class Command(BaseCommand):
         git = gitpy.Git(repo_dir)
         controller = ChallengeController(git, repo.remote)
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(controller.update())
-        updated_challenges = loop.run_until_complete(controller.changed_challenges(last_commit=repo.last_commit))
-        updated_traces = loop.run_until_complete(controller.changed_trace_challenges(last_commit=repo.last_commit))
-        updated_pages = loop.run_until_complete(controller.changed_pages(last_commit=repo.last_commit))
-        log = loop.run_until_complete(git.log(last=1))
+        controller.update()
+        updated_challenges = controller.changed_challenges(last_commit=repo.last_commit)
+        updated_traces = controller.changed_trace_challenges(last_commit=repo.last_commit)
+        updated_pages = controller.changed_pages(last_commit=repo.last_commit)
+        log = git.log(last=1)
 
         self.create_concepts(repo_dir / 'concepts.txt')
 
