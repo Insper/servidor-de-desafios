@@ -10,6 +10,5 @@ def index(request):
     authors = []
     for fname in sorted(thanks_dir.glob('*.json')):
         with open(fname) as f:
-            print(fname)
             authors.append(json.load(f))
     return Response(authors)

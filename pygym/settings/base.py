@@ -37,16 +37,17 @@ create_dir(CONTENT_RAW_DIR)
 load_dotenv(BASE_DIR / '.env')
 CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
 BACKEND_TOKEN = os.environ.get('BACKEND_TOKEN')
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-try:
-    with open(str(Path(BASE_DIR) / '.django_secret_key')) as f:
-        SECRET_KEY = f.read()
-except FileNotFoundError:
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
     SECRET_KEY = 'r*gl!)m0t=x##wt##w#4t=fl6-^kk8(smd547w*oi#77=*$69a'
-    print('Using development secret key. If you are in the production server you should create a .django_secret_key file with the secret key.')
-
+    print('Using development secret key. If you are in the production server you are missing the DJANGO_SECRET_KEY environment variable with the secret key.')
+POSTGRES_DB = os.environ.get('POSTGRES_DB')
+POSTGRES_USER = os.environ.get('POSTGRES_USER')
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
+USE_POSTGRES = POSTGRES_DB and POSTGRES_USER and POSTGRES_PASSWORD and POSTGRES_HOST
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -110,43 +111,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pygym.wsgi.application'
 
-# Set to True/False to enable/disable aws (to run tests and memory comparisons in trace challenges)
-AWS_WANTED = False
-AWS_ACCESS_KEY = None
-AWS_SECRET_KEY = None
-try:
-    with open(str(Path(BASE_DIR) / '.aws_credentials')) as f:
-        aws_credentials = json.load(f)
-    AWS_ACCESS_KEY = aws_credentials['AWS_ACCESS_KEY']
-    AWS_SECRET_KEY = aws_credentials['AWS_SECRET_KEY']
-except:
-    print('Using default configuration for aws lambda', file=sys.stderr)
-USE_AWS = AWS_ACCESS_KEY and AWS_SECRET_KEY and AWS_WANTED
-if USE_AWS:
-    print('Using AWS', file=sys.stderr)
-else:
-    print('Not using AWS', file=sys.stderr)
-
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {}
-try:
-    with open(str(Path(BASE_DIR) / '.db_credentials')) as f:
-        db_credentials = json.load(f)
+if USE_POSTGRES:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': db_credentials['db'],
-        'USER': db_credentials['user'],
-        'PASSWORD': db_credentials['password'],
-        'HOST': 'localhost',
+        'NAME': POSTGRES_DB,
+        'USER': POSTGRES_USER,
+        'PASSWORD': POSTGRES_PASSWORD,
+        'HOST': POSTGRES_HOST,
         'PORT': '5432',
     }
-except Exception as e:
-    print(
-        'Using sqlite3. If you want to use PostgreSQL make sure that .db_credentials exists in this project\'s root folder and the keys are correct.',
-        file=sys.stderr)
+else:
+    print('Using sqlite3. If this is the production server you are missing the postgres environment variables.', file=sys.stderr)
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
