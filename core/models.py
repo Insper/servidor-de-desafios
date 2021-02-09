@@ -2,10 +2,21 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 
 class PyGymUser(AbstractUser):
     pass
+
+
+class EmailToken(models.Model):
+    user = models.ForeignKey(PyGymUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=16)
+    creation_date = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        return timezone.now() - self.creation_date < timedelta(minutes=30)
 
 
 class Concept(models.Model):

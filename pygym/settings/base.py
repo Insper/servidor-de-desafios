@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 import sys
-import json
 from dotenv import load_dotenv
 
 
@@ -35,8 +34,11 @@ create_dir(CONTENT_RAW_DIR)
 
 # Load environment variables in .env file
 load_dotenv(BASE_DIR / '.env')
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+CORS_ALLOWED_ORIGINS = [c for c in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if c]
+FRONTEND_URL = os.environ.get('FRONTEND_URL')
 BACKEND_TOKEN = os.environ.get('BACKEND_TOKEN')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_SES_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SES_SECRET_ACCESS_KEY')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
@@ -68,6 +70,7 @@ INSTALLED_APPS = [
     'trace_challenge',
     'content',
     'thanks',
+    'pygym_auth',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -133,6 +136,7 @@ else:
 if 'test' in sys.argv:
     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

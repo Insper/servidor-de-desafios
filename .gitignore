@@ -1,4 +1,5 @@
 # Custom folders
+production.env
 .django_secret_key
 raw
 tmp

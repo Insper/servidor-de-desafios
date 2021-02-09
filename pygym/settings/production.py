@@ -1,5 +1,6 @@
 from .base import *
 import requests
+from dotenv import load_dotenv
 
 
 DEBUG = False
@@ -8,7 +9,15 @@ PRODUCTION = True
 PUBLIC_IPv4 = requests.get('https://api.ipify.org').text
 ALLOWED_HOSTS = [PUBLIC_IPv4, 'softdes.insper.edu.br']
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+load_dotenv(BASE_DIR / '.env')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 STATIC_ROOT = "/var/www/softdes/static"
 MEDIA_ROOT = "/var/www/softdes/media"
