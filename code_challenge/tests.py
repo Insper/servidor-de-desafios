@@ -1,11 +1,15 @@
 from pathlib import Path
+from django.http import Http404
+from django.test import TestCase
+from django.utils import timezone
 import shutil, tempfile
 import json
-from django.test import TestCase
 import unittest
 from code_challenge.models import CodeChallenge, CodeChallengeSubmission, UserChallengeInteraction
 from core.models import PyGymUser, Concept, UserConceptInteraction, ChallengeRepo
+from quiz.models import Quiz, UserQuiz
 from code_challenge.challenge_controller import ChallengeController
+from code_challenge.views import get_challenge_or_404
 import code_challenge.gitpy as gitpy
 
 
@@ -74,7 +78,7 @@ class SubmissionSignalTestCase(TestCase):
 
 
 def save_challenge(base_dir, slug, details, question, tests):
-    challenge_dir = base_dir / 'challenges' / slug
+    challenge_dir = base_dir / slug
     try:
         challenge_dir.mkdir(parents=True)
     except FileExistsError:
@@ -141,7 +145,7 @@ class ChallengeControllerTestCase(unittest.TestCase):
                 question = f'Something about question {i}. Version {c}'
                 challenge_name = f'challenge_{i}'
                 tests = f'def test_dummy_{c}():\n    pass'
-                files = save_challenge(self.tmp_path, challenge_name, details, question, tests)
+                files = save_challenge(self.tmp_path / 'challenges', challenge_name, details, question, tests)
                 fs[challenge_name] = (details, question, tests)
                 for f in files:
                     git.add(f)
@@ -227,7 +231,7 @@ class ChallengeControllerTestCase(unittest.TestCase):
             question = f'Something about question {i}.'
             challenge_name = f'challenge_{i}'
             tests = f'def test_dummy():\n    pass'
-            files = save_challenge(self.tmp_path, challenge_name, details, question, tests)
+            files = save_challenge(self.tmp_path / 'challenges', challenge_name, details, question, tests)
             for f in files:
                 git.add(f)
             challenge_paths.append(self.tmp_path / 'challenges' / challenge_name)
@@ -242,7 +246,7 @@ class ChallengeControllerTestCase(unittest.TestCase):
             assert len(challenges) == 1
             assert list(challenges.keys())[0] == challenge.name
 
-    def test_list_deleted_challenges(self):
+    def test_list_deleted_trace_challenges(self):
         git = gitpy.Git(self.tmp_path)
         git.init()
         n = 5
@@ -277,3 +281,83 @@ class ChallengeControllerTestCase(unittest.TestCase):
             challenges = cm.changed_trace_challenges(last_commit='HEAD^')
             assert len(challenges) == 1
             assert list(challenges.keys())[0] == challenge.name
+
+
+class CodeChallengeTestCase(TestCase):
+    def setUp(self):
+        self.user = PyGymUser.objects.create_user(username='user', password='1234')
+        self.repo = ChallengeRepo.objects.create()
+        self.concept = Concept.objects.create(name='Memoization', slug='algo-memoization')
+
+    def test_get_saved_challenge(self):
+        challenge = CodeChallenge.objects.create(title="Challenge", slug="challenge", repo=self.repo, concept=self.concept)
+        loaded = get_challenge_or_404(challenge.slug, self.user)
+        self.assertEqual(loaded.slug, challenge.slug)
+
+    def test_get_invalid_challenge(self):
+        CodeChallenge.objects.create(title="Challenge", slug="challenge", repo=self.repo, concept=self.concept)
+        with self.assertRaises(Http404):
+            get_challenge_or_404('invalid-slug', self.user)
+
+    def test_get_unpublished_challenge(self):
+        challenge = CodeChallenge.objects.create(title="Challenge", slug="challenge", repo=self.repo, concept=self.concept, published=False)
+        with self.assertRaises(Http404):
+            get_challenge_or_404(challenge.slug, self.user)
+
+    def test_get_unpublished_challenge_in_quiz(self):
+        challenge1 = CodeChallenge.objects.create(title="Challenge 1", slug="challenge1", repo=self.repo, concept=self.concept, published=False)
+        challenge2 = CodeChallenge.objects.create(title="Challenge 2", slug="challenge2", repo=self.repo, concept=self.concept, published=False)
+        challenges = [challenge1, challenge2]
+        quiz = Quiz.objects.create(title='Quiz', duration=20, deadline=timezone.now() + timezone.timedelta(minutes=40))
+        quiz.challenges.set(challenges)
+        quiz.save()
+        uq = UserQuiz.objects.create(quiz=quiz, user=self.user)
+        uq.challenges.set(challenges)
+        uq.save()
+
+        loaded = get_challenge_or_404(challenge1.slug, self.user)
+        self.assertEqual(loaded.slug, challenge1.slug)
+
+    def test_get_unpublished_challenge_in_submitted_quiz(self):
+        challenge1 = CodeChallenge.objects.create(title="Challenge 1", slug="challenge1", repo=self.repo, concept=self.concept, published=False)
+        challenge2 = CodeChallenge.objects.create(title="Challenge 2", slug="challenge2", repo=self.repo, concept=self.concept, published=False)
+        challenges = [challenge1, challenge2]
+        quiz = Quiz.objects.create(title='Quiz', duration=20, deadline=timezone.now() + timezone.timedelta(minutes=40))
+        quiz.challenges.set(challenges)
+        quiz.save()
+        uq = UserQuiz.objects.create(quiz=quiz, user=self.user, submitted=True)
+        uq.challenges.set(challenges)
+        uq.save()
+
+        with self.assertRaises(Http404):
+            get_challenge_or_404(challenge1.slug, self.user)
+
+    def test_get_unpublished_challenge_in_not_submitted_quiz_after_timeout(self):
+        challenge1 = CodeChallenge.objects.create(title="Challenge 1", slug="challenge1", repo=self.repo, concept=self.concept, published=False)
+        challenge2 = CodeChallenge.objects.create(title="Challenge 2", slug="challenge2", repo=self.repo, concept=self.concept, published=False)
+        challenges = [challenge1, challenge2]
+        quiz = Quiz.objects.create(title='Quiz', duration=20, deadline=timezone.now() + timezone.timedelta(minutes=40))
+        quiz.challenges.set(challenges)
+        quiz.save()
+        uq = UserQuiz.objects.create(quiz=quiz, user=self.user, submitted=False)
+        uq.challenges.set(challenges)
+        uq.start_time = timezone.now() - timezone.timedelta(minutes=30)
+        uq.save()
+
+        with self.assertRaises(Http404):
+            get_challenge_or_404(challenge1.slug, self.user)
+
+    def test_get_unpublished_challenge_in_not_submitted_quiz_before_timeout(self):
+        challenge1 = CodeChallenge.objects.create(title="Challenge 1", slug="challenge1", repo=self.repo, concept=self.concept, published=False)
+        challenge2 = CodeChallenge.objects.create(title="Challenge 2", slug="challenge2", repo=self.repo, concept=self.concept, published=False)
+        challenges = [challenge1, challenge2]
+        quiz = Quiz.objects.create(title='Quiz', duration=20, deadline=timezone.now() + timezone.timedelta(minutes=40))
+        quiz.challenges.set(challenges)
+        quiz.save()
+        uq = UserQuiz.objects.create(quiz=quiz, user=self.user, submitted=False)
+        uq.challenges.set(challenges)
+        uq.start_time = timezone.now() - timezone.timedelta(minutes=24)
+        uq.save()
+
+        loaded = get_challenge_or_404(challenge1.slug, self.user)
+        self.assertEqual(loaded.slug, challenge1.slug)

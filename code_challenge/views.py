@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from .challenge_controller import test_code_from_slug
 from .serializers import FullCodeChallengeSerializer, ShortCodeChallengeSerializer, CodeChallengeSubmissionSerializer, UserChallengeInteractionSerializer
 from .models import CodeChallenge, CodeChallengeSubmission, UserChallengeInteraction, user_challenge_path
+from quiz.models import UserQuiz
 
 
 class CodeChallengeListView(APIView):
@@ -29,12 +30,15 @@ class CodeChallengeListView(APIView):
         return Response(serializer.data)
 
 
-def get_challenge_or_404(slug):
+def get_challenge_or_404(slug, user, tolerance=5 * 60):
     try:
         challenge = CodeChallenge.objects.get(slug=slug)
         if not challenge.deleted and challenge.published:
             return challenge
-    except CodeChallenge.DoesNotExist:
+        user_quiz = UserQuiz.objects.get(user=user, challenges__slug=slug)
+        if user_quiz.remaining_seconds > -tolerance and not user_quiz.submitted:
+            return challenge
+    except (CodeChallenge.DoesNotExist, UserQuiz.DoesNotExist):
         pass
     raise Http404(f'There is no challenge with slug {slug}')
 
@@ -46,7 +50,7 @@ class CodeChallengeView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, slug, format=None):
-        challenge = get_challenge_or_404(slug)
+        challenge = get_challenge_or_404(slug, request.user, tolerance=40)
         if 'short' in request.GET:
             serializer = ShortCodeChallengeSerializer(challenge)
         else:
@@ -54,7 +58,7 @@ class CodeChallengeView(APIView):
         return Response(serializer.data)
 
     def post(self, request, slug, format=None):
-        challenge = get_challenge_or_404(slug)
+        challenge = get_challenge_or_404(slug, request.user)
         code = request.data.get('code')
         result = request.data.get('result')
         submission = CodeChallengeSubmission(author=request.user, challenge=challenge)

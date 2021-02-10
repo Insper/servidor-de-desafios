@@ -7,7 +7,8 @@ from datetime import timedelta
 
 
 class PyGymUser(AbstractUser):
-    pass
+    additional_quiz_time_percent=models.FloatField(default=0)
+    additional_quiz_time_absolute=models.IntegerField(default=0)
 
 
 class EmailToken(models.Model):
@@ -46,7 +47,7 @@ class UserConceptInteraction(models.Model):
 
 
 class ChallengeRepo(models.Model):
-    remote = models.URLField()
+    remote = models.CharField(max_length=1024)
     slug = models.SlugField()
     last_commit = models.CharField(max_length=100, blank=True, null=True)
 

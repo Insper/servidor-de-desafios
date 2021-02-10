@@ -32,11 +32,13 @@ class Command(BaseCommand):
         try:
             challenge = CodeChallenge.objects.get(slug=slug, repo=repo)
             challenge.title = data['title']
+            challenge.repo = repo
             challenge.question = data['question']
             challenge.concept = concept
             challenge.published = data['published']
             challenge.show_stdout = data['terminal']
             challenge.function_name = data['function_name']
+            challenge.deleted = False
             challenge.save()
         except CodeChallenge.DoesNotExist:
             challenge = CodeChallenge.objects.create(
@@ -66,6 +68,8 @@ class Command(BaseCommand):
             challenge.title = data['title']
             challenge.concept = concept
             challenge.published = data['published']
+            challenge.repo = repo
+            challenge.deleted = False
             challenge.save()
         except TraceChallenge.DoesNotExist:
             challenge = TraceChallenge.objects.create(

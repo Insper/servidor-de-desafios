@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'code_challenge',
     'trace_challenge',
     'content',
+    'quiz',
     'thanks',
     'pygym_auth',
     'django.contrib.admin',
