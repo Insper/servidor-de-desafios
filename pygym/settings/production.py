@@ -25,7 +25,7 @@ AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 
-# STATIC_ROOT = "/var/www/softdes/static"
+STATIC_URL = 'https://softdes-static.s3.amazonaws.com/'
 MEDIA_ROOT = "/var/www/softdes/media"
 
 LOGGING = {
