@@ -3,6 +3,9 @@ from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 
 from .serializers import UserSerializer, ConceptSerializer
 from .models import Concept
@@ -10,6 +13,8 @@ from .models import Concept
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@cache_page(60*60*2)
+@vary_on_cookie
 def get_user(request):
     return Response(UserSerializer(request.user).data)
 
@@ -20,6 +25,7 @@ class ConceptListView(APIView):
     """
     permission_classes = (IsAuthenticated,)
 
+    @method_decorator(cache_page(60*60*2))
     def get(self, request, format=None):
         concepts = Concept.objects.order_by('order')
         serializer = ConceptSerializer(concepts, many=True)
@@ -28,6 +34,7 @@ class ConceptListView(APIView):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@cache_page(60*60*2)
 def get_concept(request, slug):
     try:
         concept = Concept.objects.get(slug=slug)

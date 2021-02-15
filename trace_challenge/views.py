@@ -5,6 +5,9 @@ from django.http import Http404, HttpResponseForbidden
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from .models import TraceChallenge, TraceStateSubmission, UserTraceChallengeInteraction
 from .serializers import ShortTraceChallengeSerializer, FullTraceChallengeSerializer, UserTraceChallengeInteractionSerializer
 from .trace_controller import compare_terminal, states_for, states_from_slug, extract_fillable_state, extract_fillable_stdout, get_compare_code, stringify_memory
@@ -17,6 +20,7 @@ class TraceChallengeListView(APIView):
     """
     permission_classes = (IsAuthenticated,)
 
+    @method_decorator(cache_page(60*60*2))
     def get(self, request, format=None):
         concept_slug = request.query_params.get('concept')
         query = {
@@ -46,6 +50,7 @@ class TraceChallengeView(APIView):
     """
     permission_classes = (IsAuthenticated,)
 
+    @method_decorator(cache_page(60*60*2))
     def get(self, request, slug, format=None):
         challenge = get_challenge_or_404(slug)
         if 'short' in request.GET:
@@ -160,6 +165,7 @@ class TraceInteractionListView(APIView):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@cache_page(60*60*2)
 def get_memory(request, slug, state_index):
     states = states_from_slug(slug)
     cur_state = states[state_index]

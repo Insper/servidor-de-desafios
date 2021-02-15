@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from .challenge_controller import test_code_from_slug
 from .serializers import FullCodeChallengeSerializer, ShortCodeChallengeSerializer, CodeChallengeSubmissionSerializer, UserChallengeInteractionSerializer
 from .models import CodeChallenge, CodeChallengeSubmission, UserChallengeInteraction, user_challenge_path
@@ -17,6 +19,7 @@ class CodeChallengeListView(APIView):
     """
     permission_classes = (IsAuthenticated,)
 
+    @method_decorator(cache_page(60*60*2))
     def get(self, request, format=None):
         concept_slug = request.query_params.get('concept')
         query = {
@@ -49,6 +52,7 @@ class CodeChallengeView(APIView):
     """
     permission_classes = (IsAuthenticated,)
 
+    @method_decorator(cache_page(60*60*2))
     def get(self, request, slug, format=None):
         challenge = get_challenge_or_404(slug, request.user, tolerance=40)
         if 'short' in request.GET:
@@ -125,6 +129,7 @@ class CodeInteractionListView(APIView):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@cache_page(60*60*2)
 def get_test_code(request, slug):
     test_code = None
     if request.GET.get('token') == settings.BACKEND_TOKEN:

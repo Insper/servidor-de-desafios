@@ -171,3 +171,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = 'media/'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
