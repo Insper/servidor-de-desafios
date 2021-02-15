@@ -34,7 +34,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '~/django.log',
+            'filename': '/home/ubuntu/django.log',
         },
     },
     'loggers': {
