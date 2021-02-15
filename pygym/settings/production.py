@@ -6,8 +6,6 @@ from dotenv import load_dotenv
 DEBUG = False
 PRODUCTION = True
 
-PUBLIC_IPv4 = requests.get('https://api.ipify.org').text
-ALLOWED_HOSTS = [PUBLIC_IPv4, 'softdes.insper.edu.br']
 
 load_dotenv(BASE_DIR / '.env')
 
