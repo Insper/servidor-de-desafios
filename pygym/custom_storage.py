@@ -18,6 +18,9 @@ def force_bytes_content(content, blocksize=1024):
 
 
 class MediaStorage(S3Boto3Storage):
+    bucket_name = 'softdes-static'
+    location = 'media'
+
     def _clean_name(self, name):
         # pathlib support
         return super()._clean_name(str(name))
