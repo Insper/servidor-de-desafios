@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 DEBUG = False
 PRODUCTION = True
 
+SECURE_SSL_REDIRECT = True
 
 load_dotenv(BASE_DIR / '.env')
 
