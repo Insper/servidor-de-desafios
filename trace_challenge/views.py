@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_cookie
 from .models import TraceChallenge, TraceStateSubmission, UserTraceChallengeInteraction
 from .serializers import ShortTraceChallengeSerializer, FullTraceChallengeSerializer, UserTraceChallengeInteractionSerializer
 from .trace_controller import compare_terminal, states_for, states_from_slug, extract_fillable_state, extract_fillable_stdout, get_compare_code, stringify_memory

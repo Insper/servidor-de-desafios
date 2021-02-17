@@ -5,7 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_cookie
 
 from .serializers import UserSerializer, ConceptSerializer
 from .models import Concept
@@ -13,8 +12,6 @@ from .models import Concept
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@cache_page(60*60*2)
-@vary_on_cookie
 def get_user(request):
     return Response(UserSerializer(request.user).data)
 
