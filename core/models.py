@@ -16,9 +16,6 @@ class EmailToken(models.Model):
     token = models.CharField(max_length=16)
     creation_date = models.DateTimeField(auto_now_add=True)
 
-    def is_valid(self):
-        return timezone.now() - self.creation_date < timedelta(minutes=30)
-
 
 class Concept(models.Model):
     name = models.CharField(max_length=128)

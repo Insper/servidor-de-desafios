@@ -67,7 +67,7 @@ Este é um e-mail enviado automaticamente, por favor, não responda.
 '''.format(
             nome=first_name,
             email=email,
-            link='{base}/auth/confirm/?token={token}'.format(base=settings.FRONTEND_URL, token=email_token.token),
+            link='{base}auth/confirm/?token={token}'.format(base=settings.FRONTEND_URL, token=email_token.token),
             username=username,
         ),
         'softdes.insper@gmail.com',
@@ -82,21 +82,18 @@ def email_confirmation(request):
     if request.data.get('token') != settings.BACKEND_TOKEN:
         raise PermissionDenied()
 
-    not_confirmed = Response({'confirmed': False})
     email_token = request.data.get('user_token')
     if not email_token:
-        return not_confirmed
+        return Response({'confirmed': False, 'msg': 'missing token'})
 
     try:
         stored_token = EmailToken.objects.get(token=email_token)
-        if not stored_token.is_valid():
-            return not_confirmed
 
         Token.objects.get_or_create(user=stored_token.user)
 
     except EmailToken.DoesNotExist:
-        return not_confirmed
-    return Response({'confirmed': True})
+        return Response({'confirmed': False, 'msg': 'token does not exist'})
+    return Response({'confirmed': True, 'msg': 'ok'})
 
 
 @api_view(['POST'])
