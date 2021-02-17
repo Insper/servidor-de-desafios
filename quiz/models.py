@@ -58,6 +58,10 @@ class UserQuiz(models.Model):
         ) - ellapsed)
 
     @property
+    def slug(self):
+        return self.quiz.slug
+
+    @property
     def has_manual_assessment(self):
         return self.quiz.has_manual_assessment
 

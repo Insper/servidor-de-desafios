@@ -9,7 +9,6 @@ from core.models import ChallengeRepo
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 @cache_page(60*60*2)
 def list_contents(request):
     contents = controller.list_contents(settings.CHALLENGES_DIR)
@@ -17,7 +16,6 @@ def list_contents(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 @cache_page(60*60*2)
 def list_pages(request):
     all_pages = []
@@ -27,7 +25,6 @@ def list_pages(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 @cache_page(60*60*2)
 def get_page(request, content_slug, page_slug=None):
     for repo in ChallengeRepo.objects.all():

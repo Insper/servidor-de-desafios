@@ -8,4 +8,4 @@ class UserQuizSerializer(ModelSerializer):
 
     class Meta:
         model = UserQuiz
-        fields = ['title', 'start_time', 'submission_time', 'remaining_seconds', 'submitted', 'challenges', 'has_manual_assessment']
+        fields = ['title', 'start_time', 'submission_time', 'remaining_seconds', 'submitted', 'challenges', 'has_manual_assessment', 'slug']

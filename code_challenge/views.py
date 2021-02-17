@@ -40,6 +40,7 @@ def get_challenge_or_404(slug, user, tolerance=5 * 60):
             return challenge
         user_quiz = UserQuiz.objects.get(user=user, challenges__slug=slug)
         if user_quiz.remaining_seconds > -tolerance and not user_quiz.submitted:
+            challenge.in_quiz = True
             return challenge
     except (CodeChallenge.DoesNotExist, UserQuiz.DoesNotExist):
         pass

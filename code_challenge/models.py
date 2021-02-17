@@ -19,6 +19,7 @@ class CodeChallenge(models.Model):
     concept = models.ForeignKey(Concept, on_delete=models.CASCADE)
     function_name = models.CharField(max_length=50, blank=True, null=True)
     deleted = models.BooleanField(default=False)
+    in_quiz = False
 
     @property
     def question_html(self):

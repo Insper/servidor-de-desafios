@@ -53,16 +53,21 @@ class QuizView(APIView):
 
 
     def get(self, request, slug):
-        try:
-            quiz = Quiz.objects.get(slug=slug)
-        except Quiz.DoesNotExist:
-            raise Http404()
+        quiz = None
+        if slug != 'current':
+            try:
+                quiz = Quiz.objects.get(slug=slug)
+            except Quiz.DoesNotExist:
+                raise Http404()
 
         try:
-            user_quiz = UserQuiz.objects.get(quiz=quiz, user=request.user)
+            if quiz:
+                user_quiz = UserQuiz.objects.get(quiz=quiz, user=request.user)
+            else:
+                user_quiz = UserQuiz.objects.filter(user=request.user, submitted=False).latest('start_time')
         except UserQuiz.DoesNotExist:
             raise Http404()
-        if user_quiz.submitted or user_quiz.remaining_seconds <= 0:
+        if not user_quiz or user_quiz.submitted or user_quiz.remaining_seconds <= 0:
             raise Http404()
         return Response(UserQuizSerializer(user_quiz).data)
 
