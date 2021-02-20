@@ -3,11 +3,42 @@ from django.http import Http404
 from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 import random
 
-from .serializers import UserQuizSerializer
+from .serializers import QuizSerializer, UserQuizSerializer
 from .models import QuestionTypes, Quiz, UserQuiz
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def list_quizzes(request):
+    quizzes = Quiz.objects.all()
+    return Response(QuizSerializer(quizzes, many=True).data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def list_user_quizzes(request, slug):
+    try:
+        quiz = Quiz.objects.get(slug=slug)
+    except Quiz.DoesNotExist:
+        raise Http404()
+
+    user_quizzes = UserQuiz.objects.filter(quiz=quiz)
+    return Response(UserQuizSerializer(user_quizzes, many=True).data)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def quiz_details(request, slug):
+    try:
+        quiz = Quiz.objects.get(slug=slug)
+        return Response(QuizSerializer(quiz).data)
+    except Quiz.DoesNotExist:
+        raise Http404()
+
 
 
 class QuizView(APIView):

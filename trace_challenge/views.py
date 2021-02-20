@@ -156,8 +156,11 @@ class TraceInteractionListView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        user = request.user
-        interactions = UserTraceChallengeInteraction.objects.filter(user=user)
+        selected_username = request.GET.get('username')
+        if selected_username and request.user.is_staff:
+            interactions = UserTraceChallengeInteraction.objects.filter(user__username=selected_username)
+        else:
+            interactions = UserTraceChallengeInteraction.objects.filter(user=request.user)
         serializer = UserTraceChallengeInteractionSerializer(interactions, many=True)
         return Response(serializer.data)
 

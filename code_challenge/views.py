@@ -4,7 +4,7 @@ from django.core.files.base import ContentFile
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from .challenge_controller import test_code_from_slug
@@ -122,10 +122,24 @@ class CodeInteractionListView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        user = request.user
-        interactions = UserChallengeInteraction.objects.filter(user=user)
+        selected_username = request.GET.get('username')
+        if selected_username and request.user.is_staff:
+            interactions = UserChallengeInteraction.objects.filter(user__username=selected_username)
+        else:
+            interactions = UserChallengeInteraction.objects.filter(user=request.user)
         serializer = UserChallengeInteractionSerializer(interactions, many=True)
         return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def list_interactions_for(request):
+    usernames = request.GET.get('usernames').split(',')
+    challenge_slugs = request.GET.get('challenges').split(',')
+
+    interactions = UserChallengeInteraction.objects.filter(user__username__in=usernames, challenge__slug__in=challenge_slugs)
+    serializer = UserChallengeInteractionSerializer(interactions, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])

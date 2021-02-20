@@ -5,7 +5,7 @@ from rest_framework.serializers import ModelSerializer
 class UserSerializer(ModelSerializer):
     class Meta:
         model = PyGymUser
-        fields = ['username', 'first_name', 'last_name']
+        fields = ['username', 'first_name', 'last_name', 'is_staff']
 
 
 class ConceptSerializer(ModelSerializer):
