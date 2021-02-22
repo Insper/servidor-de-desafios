@@ -1,0 +1,12 @@
+{
+  "Python Gym": "Python Gym",
+  "Enter your new password": "Enter your new password",
+  "Maximum allowed number of files exceeded": {
+    " Only {{filesLimit}} allowed": ""
+  },
+  "File {{fileName}} successfully added": "",
+  "Shouldn't be empty": "Shouldn't be empty",
+  "Difference in whitespaces": {
+    " There shouldn't be any additional or missing spaces or new lines": ""
+  }
+}

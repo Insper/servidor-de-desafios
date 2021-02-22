@@ -8,12 +8,79 @@
 
 ### Setup
 
+#### Poetry
+
+##### Installing Poetry
+
+In this project we use [Poetry](https://python-poetry.org/) for dependency management. You can install it by following the instructions here: https://python-poetry.org/docs/#installation
+
+With Poetry installed you can install the dependencies with:
+
+    $ poetry install
+
+##### Activating the virtual env with Poetry
+
+Always activate the virtual env before starting to work:
+
+    $ poetry shell
+
+#### AWS SAM
+
+Follow the instructions here: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html
+
+#### React Frontend
+
+We use [React](https://reactjs.org/) to develop our frontend. To install it you must first [install Node.js](https://nodejs.org/en/download/package-manager/). Then, go to `frontend` directory and install all the dependencies:
+
+    $ cd frontend
+    $ npm install
+
+### Design
+
+The font used for the logo is [Gayathri](https://fonts.google.com/specimen/Gayathri?preview.text=python%20gym&preview.text_type=custom).
+
+### Running server in dev mode
+
+Run the server with:
+
+    $ python manage.py runserver --nostatic
+
+You also have to run the simulated AWS lambda:
+
+    $ cd aws_lambda/sam-app/
+    $ sam local start-api
+
+To update the react frontend, run:
+
+    $ cd frontend
+    $ npm run dev
+
+If you are developing the frontend, the following will probably be useful:
+
+    $ cd frontend
+    $ npm run watch
+
+### Translation
+
+Python Gym currently supports pt-BR and en-US. To translate the strings, run:
+
+    $ cd frontend
+    $ npm run translate
+
+This command will generate the files `frontend/src/locale/en/translation.json` and `frontend/src/locale/pt/translation.json`. Just fill the empty values.
+
+### Updating AWS lambda code
+
+Change directory to `aws_lambda` and run `update.sh` followed by `prepare_zip.sh`. Upload the generated zip file to AWS.
+
+# ANTIGO
+
 #### Configurando um ambiente virtual
 
 Para não ter conflitos entre versões ou bibliotecas, podemos criar um ambiente virtual. Para isso, entre na pasta em que clonou o servidor e execute o seguinte comando no terminal:
 
     $ python -m venv env
-    
+
 #### Ativando o ambiente virtual
 
 Depois de criado, é preciso ativar o ambiente virtual.
@@ -24,7 +91,7 @@ No Windows:
 
 No Linux/MacOS:
 
-    $ . env/bin/activate    
+    $ . env/bin/activate
 
 #### Instalando bibliotecas
 
@@ -64,11 +131,12 @@ comando no servidor, via SSH:
     $ python manage.py batch_add_users ARQUIVO_BLACKBOARD.csv
 
 ### Criando um cadastro
+
 Para criar um cadastro para administrar os exercícios, execute o comando:
 
     $ python manage.py createsuperuser
-    
- Em seguida, basta definir um nome usuário e senha.
+
+Em seguida, basta definir um nome usuário e senha.
 
 ### Criando novos exercícios
 
@@ -77,10 +145,9 @@ Se você tiver configurado um ambiente virtual, é necessário [ativá-lo](#ativ
 Depois, execute o seguinte comando:
 
         $ python manage.py runserver
-               
+
 Isso permite você a entrar no Django admin (pode digitar no seu navegador: 'localhost:8000/admin/')
 Para criar o exercício, clique em 'Adicionar', ao lado de 'Exercícios de programação'. Será necessário definir algumas características:
-
 
     * Título: Nome que aparecerá para o exercício no servidor
     * Descrição: Enunciado
@@ -131,7 +198,7 @@ Python junto com a biblioteca `challenge_test_lib`.
 
 Você pode, por exemplo, criar um arquivo com respostas que deveriam passar no teste do exercício e um outro com algumas que deveriam falhar. Para executar, use o seguinte comando:
 
-    $ insper_test.py -f nome_da_funcao arquivo_com_resposta.py arquivo_com_funções_teste.py 
+    $ insper_test.py -f nome_da_funcao arquivo_com_resposta.py arquivo_com_funções_teste.py
 
 ### Criando novos tutoriais
 

@@ -1,19 +1,16 @@
-from django.urls import path
-
+from django.urls import include, path
 from . import views
-from django.views.generic import TemplateView
+
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('exercicio', views.index, name='index'),
-    path('exercicio/<int:c_id>', views.exercicio, name='exercicio'),
-    path('prova', views.ProvasListView.as_view(), name='provas'),
-    path('prova/<slug:slug>', views.ProvaDetailView.as_view(), name='prova'),
-    path('prova/<slug:slug>/download',
-         views.download_submissoes_prova,
-         name='download_prova'),
-    path('sandbox', views.sandbox, name='sandbox'),
-    path('agradecimentos',
-         TemplateView.as_view(template_name='core/thanks.html'),
-         name='agradecimentos'),
+    path('auth/', include('pygym_auth.urls')),
+    path('user/', views.get_user),
+    path('user/admin/', views.list_users),
+    path('concept/', views.ConceptListView.as_view()),
+    path('concept/<slug:slug>/', views.get_concept),
+    path('code/', include('code_challenge.urls')),
+    path('trace/', include('trace_challenge.urls')),
+    path('quiz/', include('quiz.urls')),
+    path('content/', include('content.urls')),
+    path('thanks/', include('thanks.urls')),
 ]

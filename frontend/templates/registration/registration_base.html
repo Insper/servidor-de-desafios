@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Python handouts and challenges">
+  <meta name="author" content="Andrew Kurauchi">
+  <title>Python Gym</title>
+  <link rel="icon" href="{% static 'favicon.ico' %}">
+
+
+  {% block extra-css %}
+  {% endblock %}
+</head>
+
+<body>
+
+  {% block content %}
+  {% endblock %}
+
+  {% block extra-js %}
+  {% endblock %}
+</body>
+
+</html>
