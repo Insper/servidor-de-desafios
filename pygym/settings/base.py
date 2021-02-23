@@ -137,7 +137,7 @@ else:
 if 'test' in sys.argv:
     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
-raise DATABASES
+raise RuntimeError(str(DATABASES))
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Password validation
