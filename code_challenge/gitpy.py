@@ -6,7 +6,7 @@ def git_cmd(cmd, cwd=None):
     if isinstance(cmd, str):
         cmd = [cmd]
     full_cmd = ['git'] + cmd
-    proc = subprocess.run(full_cmd, capture_output=True, cwd=cwd)
+    proc = subprocess.run(full_cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     return proc.returncode, proc.stdout.decode(), proc.stderr.decode()
 
