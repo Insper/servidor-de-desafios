@@ -8,7 +8,7 @@ def git_cmd(cmd, cwd=None):
     full_cmd = ['git'] + cmd
     proc = subprocess.run(full_cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    return proc.returncode, proc.stdout.decode(), proc.stderr.decode()
+    return proc.returncode, proc.stdout.decode('utf-8'), proc.stderr.decode('utf-8')
 
 
 class Git:
