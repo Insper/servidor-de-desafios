@@ -86,11 +86,11 @@ def save_challenge(base_dir, slug, details, question, tests):
     details_file = challenge_dir / 'details.json'
     question_file = challenge_dir / 'question.md'
     test_file = challenge_dir / 'tests.py'
-    with open(details_file, 'w') as f:
+    with open(details_file, 'w', encoding='utf-8') as f:
         json.dump(details, f)
-    with open(question_file, 'w') as f:
+    with open(question_file, 'w', encoding='utf-8') as f:
         f.write(question)
-    with open(test_file, 'w') as f:
+    with open(test_file, 'w', encoding='utf-8') as f:
         f.write(tests)
     return details_file, question_file, test_file
 
@@ -104,11 +104,11 @@ def save_trace_challenge(base_dir, slug, details, code, trace):
     details_file = challenge_dir / 'details.json'
     code_file = challenge_dir / 'code.py'
     trace_file = challenge_dir / 'trace.json'
-    with open(details_file, 'w') as f:
+    with open(details_file, 'w', encoding='utf-8') as f:
         json.dump(details, f)
-    with open(code_file, 'w') as f:
+    with open(code_file, 'w', encoding='utf-8') as f:
         f.write(code)
-    with open(trace_file, 'w') as f:
+    with open(trace_file, 'w', encoding='utf-8') as f:
         f.write(trace)
     return details_file, code_file, trace_file
 

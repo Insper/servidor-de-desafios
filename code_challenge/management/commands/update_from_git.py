@@ -99,7 +99,7 @@ class Command(BaseCommand):
             shutil.copytree(src, dst)
 
     def create_concepts(self, concepts_file):
-        with open(concepts_file) as f:
+        with open(concepts_file, encoding='utf-8') as f:
             for concept in [t.strip() for t in f.read().split() if t.strip()]:
                 args = concept.split(',')
                 if len(args) > 2:

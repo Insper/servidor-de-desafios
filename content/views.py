@@ -31,7 +31,7 @@ def get_page(request, content_slug, page_slug=None):
         dirname = settings.CHALLENGES_DIR / repo.slug / 'pages' / content_slug
         for fname in [page_slug, 'index', 'handout']:
             try:
-                with open(dirname / f'{fname}.md') as f:
+                with open(dirname / f'{fname}.md', encoding='utf-8') as f:
                     return Response(f.read())
             except FileNotFoundError:
                 pass

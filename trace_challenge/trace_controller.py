@@ -7,7 +7,7 @@ def code_for(challenge):
     challenges_dir = settings.CHALLENGES_DIR / challenge.repo.slug / 'traces'
     code_file = challenges_dir / challenge.slug / 'code.py'
     try:
-        with open(code_file) as f:
+        with open(code_file, encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
         raise RuntimeError(f'No code found for trace challenge {challenge.slug}')
@@ -17,7 +17,7 @@ def states_for(trace):
     traces_dir = settings.CHALLENGES_DIR / trace.repo.slug / 'traces'
     code_file = traces_dir / trace.slug / 'trace.json'
     try:
-        with open(code_file) as f:
+        with open(code_file, encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
         raise RuntimeError(f'No states found for trace challenge {trace.slug}')
@@ -28,7 +28,7 @@ def states_from_slug(slug):
         code_file = base_repo / 'traces' / slug / 'trace.json'
         if code_file.is_file():
             try:
-                with open(code_file) as f:
+                with open(code_file, encoding='utf-8') as f:
                     return json.load(f)
             except FileNotFoundError:
                 pass

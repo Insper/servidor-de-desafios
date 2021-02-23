@@ -9,6 +9,6 @@ def index(request):
     thanks_dir = Path(__file__).parent / 'static' / 'thanks'
     authors = []
     for fname in sorted(thanks_dir.glob('*.json')):
-        with open(fname) as f:
+        with open(fname, encoding='utf-8') as f:
             authors.append(json.load(f))
     return Response(authors)

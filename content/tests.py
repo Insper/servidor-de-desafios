@@ -20,7 +20,7 @@ class PageControllerTestCase(unittest.TestCase):
 
         for p, value in tree.items():
             if isinstance(value, str):
-                with open(root / p, 'w') as f:
+                with open(root / p, 'w', encoding='utf-8') as f:
                     f.write(value)
             elif isinstance(value, dict):
                 cur_dir = root / p

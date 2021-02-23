@@ -38,9 +38,9 @@ class ChallengeController:
         all_challenges = {}
         for challenge_dir in challenge_dirs:
             try:
-                with open(challenge_dir / details_file) as f:
+                with open(challenge_dir / details_file, encoding='utf-8') as f:
                     details = json.load(f)
-                with open(challenge_dir / question_file) as f:
+                with open(challenge_dir / question_file, encoding='utf-8') as f:
                     question = f.read()
                 tests_file = challenge_dir / 'tests.py'
                 details['question'] = question
@@ -65,7 +65,7 @@ class ChallengeController:
         all_traces = {}
         for trace_dir in trace_dirs:
             try:
-                with open(trace_dir / details_file) as f:
+                with open(trace_dir / details_file, encoding='utf-8') as f:
                     details = json.load(f)
                 all_traces[trace_dir.name] = details
             except FileNotFoundError:
@@ -82,7 +82,7 @@ def test_code_for(challenge):
     challenges_dir = settings.CHALLENGES_DIR / challenge.repo.slug / 'challenges'
     tests_file = challenges_dir / challenge.slug / 'tests.py'
     try:
-        with open(tests_file) as f:
+        with open(tests_file, encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
         return None
@@ -93,7 +93,7 @@ def test_code_from_slug(slug):
         tests_file = base_repo / 'challenges' / slug / 'tests.py'
         if tests_file.is_file():
             try:
-                with open(tests_file) as f:
+                with open(tests_file, encoding='utf-8') as f:
                     return f.read()
             except FileNotFoundError:
                 pass

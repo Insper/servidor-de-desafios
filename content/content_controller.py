@@ -31,6 +31,6 @@ def list_contents(root_dir):
         contents_file = repo_dir / 'contents.json'
         if not contents_file.is_file():
             continue
-        with open(contents_file) as f:
+        with open(contents_file, encoding='utf-8') as f:
             contents = _deepmerge(contents, json.load(f))
     return contents
