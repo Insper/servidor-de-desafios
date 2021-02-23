@@ -111,7 +111,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         repos = ChallengeRepo.objects.all()
-        repo = self.get_choice('Select repo:', repos)
+        try:
+            repo = self.get_choice('Select repo:', repos)
+        except:
+            self.stdout.write(self.style.WARNING(f'No repo configured'))
+            return
 
         repo_dir = settings.CHALLENGES_DIR / repo.slug
         git = gitpy.Git(repo_dir)
