@@ -137,10 +137,7 @@ else:
 if 'test' in sys.argv:
     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
-import logging
-logger = logging.getLogger(__name__)
-
-logger.debug(DATABASES)
+raise DATABASES
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Password validation
