@@ -35,6 +35,7 @@ create_dir(CONTENT_RAW_DIR)
 # Load environment variables in .env file
 load_dotenv(BASE_DIR / '.env')
 CORS_ALLOWED_ORIGINS = [c for c in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if c]
+CORS_ALLOW_ALL_ORIGINS = True
 FRONTEND_URL = os.environ.get('FRONTEND_URL')
 BACKEND_TOKEN = os.environ.get('BACKEND_TOKEN')
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_SES_KEY_ID')
