@@ -35,7 +35,7 @@ class CodeChallengeSubmissionSerializer(ModelSerializer):
 
     class Meta:
         model = CodeChallengeSubmission
-        fields = ['id', 'creation_date', 'success', 'stacktraces', 'stdouts']
+        fields = ['id', 'creation_date', 'success', 'failures', 'stacktraces', 'stdouts']
 
 
 class UserChallengeInteractionSerializer(ModelSerializer):

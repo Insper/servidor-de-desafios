@@ -60,7 +60,7 @@ class CodeChallengeSubmission(models.Model):
         for st in self.stack_traces:
             safe = st
             if 'AssertionError' in safe:
-                safe = 'Wrong answer.'
+                safe = 'A resposta obtida foi diferente da esperada.'
             else:
                 start = safe.rfind(STACKTRACE_FILE_PATTERN)
                 if start >= 0:
