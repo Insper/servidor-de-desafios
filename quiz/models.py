@@ -58,6 +58,10 @@ class UserQuiz(models.Model):
         ) - ellapsed)
 
     @property
+    def duration(self):
+        return self.quiz.duration
+
+    @property
     def slug(self):
         return self.quiz.slug
 
