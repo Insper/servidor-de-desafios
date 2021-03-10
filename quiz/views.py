@@ -64,6 +64,13 @@ def start_grading_quiz(request, slug):
     if quiz.question_type == QuestionTypes.RANDOM:
         total_challenges = 1
 
+    quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz=quiz)
+    feedbacks_by_user_and_challenge = {}
+    for feedback in quiz_feedbacks:
+        feedbacks_by_user_and_challenge.setdefault(
+            feedback.user.username, {}
+        )[feedback.challenge.slug] = feedback
+
     feedback_list = []
     for user_quiz in UserQuiz.objects.filter(quiz=quiz):
         user = user_quiz.user
@@ -71,9 +78,8 @@ def start_grading_quiz(request, slug):
             submissions = user_challenges.get(user.id, {}).get(challenge.slug, [])
             submissions.sort(key=lambda sub: sub.creation_date)
 
-            try:
-                feedback = QuizChallengeFeedback.objects.get(quiz=quiz, user=user, challenge=challenge)
-            except QuizChallengeFeedback.DoesNotExist:
+            feedback = feedbacks_by_user_and_challenge.get(user.username, {}).get(challenge.slug)
+            if not feedback:
                 feedback = QuizChallengeFeedback.objects.create(quiz=quiz, user=user, challenge=challenge)
                 auto_grade = 10 / total_challenges
                 if quiz.has_manual_assessment:
