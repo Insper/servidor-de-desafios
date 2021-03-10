@@ -34,6 +34,7 @@ class CodeChallengeListView(APIView):
 
 
 def get_challenge_or_404(slug, user, tolerance=5 * 60):
+    challenge = None
     try:
         challenge = CodeChallenge.objects.get(slug=slug)
         if not challenge.deleted and challenge.published:
@@ -44,6 +45,8 @@ def get_challenge_or_404(slug, user, tolerance=5 * 60):
             return challenge
     except (CodeChallenge.DoesNotExist, UserQuiz.DoesNotExist):
         pass
+    if challenge and user.is_staff:
+        return challenge
     raise Http404(f'There is no challenge with slug {slug}')
 
 

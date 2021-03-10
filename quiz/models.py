@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from code_challenge.models import CodeChallenge
+from code_challenge.models import CodeChallenge, CodeChallengeSubmission
 from django.utils import timezone
 import secrets
 
@@ -71,3 +71,20 @@ class UserQuiz(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.quiz}'
+
+
+class QuizChallengeFeedback(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    challenge = models.ForeignKey(CodeChallenge, on_delete=models.CASCADE)
+    submissions = models.ManyToManyField(CodeChallengeSubmission)
+    auto_grade = models.FloatField(default=0)
+    manual_grade = models.FloatField(default=0)
+    feedback = models.TextField(blank=True)
+
+    @property
+    def grade(self):
+        return self.auto_grade + self.manual_grade
+
+    def __str__(self):
+        return f'{self.user} - {self.quiz} - {self.challenge}'
