@@ -51,14 +51,7 @@ def start_grading_quiz(request, slug):
         raise Http404()
 
     challenges = quiz.challenges.all()
-    all_submissions = CodeChallengeSubmission.objects.filter(challenge__in=challenges)
-    user_challenges = {}
-    for submission in all_submissions:
-        user_challenges.setdefault(
-            submission.author.id, {}
-        ).setdefault(
-            submission.challenge.slug, []
-        ).append(submission)
+    user_challenges = None
 
     total_challenges = len(challenges)
     if quiz.question_type == QuestionTypes.RANDOM:
@@ -75,11 +68,22 @@ def start_grading_quiz(request, slug):
     for user_quiz in UserQuiz.objects.filter(quiz=quiz):
         user = user_quiz.user
         for challenge in challenges:
-            submissions = user_challenges.get(user.id, {}).get(challenge.slug, [])
-            submissions.sort(key=lambda sub: sub.creation_date)
-
             feedback = feedbacks_by_user_and_challenge.get(user.username, {}).get(challenge.slug)
             if not feedback:
+                if not user_challenges:
+                    all_submissions = CodeChallengeSubmission.objects.filter(challenge__in=challenges)
+                    user_challenges = {}
+                    for submission in all_submissions:
+                        user_challenges.setdefault(
+                            submission.author.id, {}
+                        ).setdefault(
+                            submission.challenge.slug, []
+                        ).append(submission)
+
+                submissions = user_challenges.get(user.id, {}).get(challenge.slug, [])
+                submissions.sort(key=lambda sub: sub.creation_date)
+                submissions = submissions[-1:]
+
                 feedback = QuizChallengeFeedback.objects.create(quiz=quiz, user=user, challenge=challenge)
                 auto_grade = 10 / total_challenges
                 if quiz.has_manual_assessment:
