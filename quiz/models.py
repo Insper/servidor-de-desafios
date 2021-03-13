@@ -26,6 +26,7 @@ class Quiz(models.Model):
     deadline = models.DateTimeField()
     challenges = models.ManyToManyField(CodeChallenge)
     has_manual_assessment = models.BooleanField(default=False)
+    grading_started = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.title} [{self.duration} min] ({self.slug})'
@@ -77,14 +78,18 @@ class QuizChallengeFeedback(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     challenge = models.ForeignKey(CodeChallenge, on_delete=models.CASCADE)
-    submissions = models.ManyToManyField(CodeChallengeSubmission)
+    submission = models.ForeignKey(CodeChallengeSubmission, on_delete=models.CASCADE, null=True)
     auto_grade = models.FloatField(default=0)
-    manual_grade = models.FloatField(default=0)
+    manual_grade = models.FloatField(null=True)
     feedback = models.TextField(blank=True)
 
     @property
     def grade(self):
-        return self.auto_grade + self.manual_grade
+        return self.auto_grade + (self.manual_grade if self.manual_grade else 0)
+
+    @property
+    def graded(self):
+        return self.manual_grade is not None
 
     def __str__(self):
         return f'{self.user} - {self.quiz} - {self.challenge}'

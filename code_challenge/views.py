@@ -98,6 +98,22 @@ class CodeChallengeSubmissionListView(APIView):
         return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_submission(request, slug, submission_id):
+    query_args = {
+        'id': submission_id,
+        'challenge__slug': slug,
+    }
+    if not request.user.is_superuser:
+        query_args['author__id'] = request.user.id
+    try:
+        submission = CodeChallengeSubmission.objects.get(**query_args)
+    except CodeChallengeSubmission.DoesNotExist:
+        raise Http404()
+    return Response(CodeChallengeSubmissionSerializer(submission).data)
+
+
 class CodeChallengeSubmissionCodeView(APIView):
     """
     Get challenge submission code.

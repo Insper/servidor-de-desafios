@@ -10,5 +10,6 @@ urlpatterns = [
     path('<slug:slug>/', views.CodeChallengeView.as_view(), name='challenge'),
     path('<slug:slug>/test-code/', views.get_test_code, name='challenge_test_code'),
     path('<slug:slug>/submission/', views.CodeChallengeSubmissionListView.as_view(), name='submissions'),
+    path('<slug:slug>/submission/<int:submission_id>/', views.get_submission, name='submission'),
     path('<slug:slug>/submission/<int:submission_id>/code/', views.CodeChallengeSubmissionCodeView.as_view(), name='submission_code'),
 ]

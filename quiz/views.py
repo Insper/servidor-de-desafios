@@ -42,63 +42,65 @@ def quiz_details(request, slug):
 
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated, IsAdminUser])
-def start_grading_quiz(request, slug):
-    try:
-        quiz = Quiz.objects.get(slug=slug)
-    except Quiz.DoesNotExist:
-        raise Http404()
-
+def start_grading_quiz(quiz):
     challenges = quiz.challenges.all()
-    user_challenges = None
 
     total_challenges = len(challenges)
     if quiz.question_type == QuestionTypes.RANDOM:
         total_challenges = 1
 
-    quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz=quiz)
+    quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz=quiz).prefetch_related('user', 'challenge')
     feedbacks_by_user_and_challenge = {}
     for feedback in quiz_feedbacks:
         feedbacks_by_user_and_challenge.setdefault(
             feedback.user.username, {}
         )[feedback.challenge.slug] = feedback
 
-    feedback_list = []
+    to_save = []
     for user_quiz in UserQuiz.objects.filter(quiz=quiz):
         user = user_quiz.user
         for challenge in challenges:
             feedback = feedbacks_by_user_and_challenge.get(user.username, {}).get(challenge.slug)
             if not feedback:
-                if not user_challenges:
-                    all_submissions = CodeChallengeSubmission.objects.filter(challenge__in=challenges)
-                    user_challenges = {}
-                    for submission in all_submissions:
-                        user_challenges.setdefault(
-                            submission.author.id, {}
-                        ).setdefault(
-                            submission.challenge.slug, []
-                        ).append(submission)
+                submission = CodeChallengeSubmission.objects.filter(
+                    author__id=user.id, challenge__slug=challenge.slug
+                ).order_by(
+                    '-creation_date'
+                ).first()
 
-                submissions = user_challenges.get(user.id, {}).get(challenge.slug, [])
-                submissions.sort(key=lambda sub: sub.creation_date)
-                submissions = submissions[-1:]
-
-                feedback = QuizChallengeFeedback.objects.create(quiz=quiz, user=user, challenge=challenge)
+                feedback = QuizChallengeFeedback(quiz=quiz, user=user, challenge=challenge, submission=submission)
                 auto_grade = 10 / total_challenges
                 if quiz.has_manual_assessment:
                     auto_grade *= 0.4
-                if submissions and submissions[-1].success:
+                if submission and submission.success:
                     feedback.auto_grade = auto_grade
                 else:
                     feedback.auto_grade = 0
 
-                feedback.submissions.set(submissions)
-                feedback.save()
+                to_save.append(feedback)
+    if to_save:
+        QuizChallengeFeedback.objects.bulk_create(to_save)
+    quiz.grading_started = True
+    quiz.save()
 
-            feedback_list.append(feedback)
+    return Response({})
 
-    return Response(QuizChallengeFeedbackSerializer(feedback_list, many=True).data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def quiz_grades(request, slug):
+    try:
+        quiz = Quiz.objects.get(slug=slug)
+    except Quiz.DoesNotExist:
+        raise Http404()
+    if not quiz.grading_started:
+        start_grading_quiz(quiz)
+
+    quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz__slug=slug)
+    if request.GET.get('username'):
+        quiz_feedbacks = quiz_feedbacks.filter(user__username=request.GET.get('username'))
+    quiz_feedbacks = quiz_feedbacks.prefetch_related('user', 'challenge')
+    return Response(QuizChallengeFeedbackSerializer(quiz_feedbacks, many=True).data)
 
 
 @api_view(['POST'])

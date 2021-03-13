@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .models import Quiz, UserQuiz, QuizChallengeFeedback
 from core.serializers import UserSerializer
 from code_challenge.serializers import ShortCodeChallengeSerializer, CodeChallengeSubmissionSerializer
@@ -30,11 +30,16 @@ class UserQuizSerializer(ModelSerializer):
 
 
 class QuizChallengeFeedbackSerializer(ModelSerializer):
-    quiz = QuizSerializer()
     user = UserSerializer()
-    challenge = ShortCodeChallengeSerializer(read_only=True)
-    submissions = CodeChallengeSubmissionSerializer(read_only=True, many=True)
+    challenge_slug = SerializerMethodField()
+    submission_id = SerializerMethodField()
+
+    def get_challenge_slug(self, obj):
+        return obj.challenge.slug
+
+    def get_submission_id(self, obj):
+        return obj.submission_id
 
     class Meta:
         model = QuizChallengeFeedback
-        fields = ['quiz', 'user', 'challenge', 'submissions', 'auto_grade', 'manual_grade', 'feedback']
+        fields = ['id', 'user', 'challenge_slug', 'submission_id', 'auto_grade', 'manual_grade', 'graded', 'feedback']
