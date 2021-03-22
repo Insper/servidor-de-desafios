@@ -96,7 +96,7 @@ def quiz_grades(request, slug):
     if not quiz.grading_started:
         start_grading_quiz(quiz)
 
-    quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz__slug=slug)
+    quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz__slug=slug).order_by('pk')
     if request.GET.get('username'):
         quiz_feedbacks = quiz_feedbacks.filter(user__username=request.GET.get('username'))
     quiz_feedbacks = quiz_feedbacks.prefetch_related('user', 'challenge')
