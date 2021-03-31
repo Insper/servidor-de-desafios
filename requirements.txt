@@ -22,4 +22,5 @@ sqlparse==0.4.1
 strtest==0.0.4
 urllib3==1.25.11
 zipp==3.4.0
+pandas
 psycopg2-binary==2.8.6
