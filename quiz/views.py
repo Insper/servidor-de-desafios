@@ -1,4 +1,4 @@
-from code_challenge.models import CodeChallengeSubmission
+from code_challenge.models import CodeChallengeSubmission, UserChallengeInteraction
 from rest_framework.response import Response
 from django.http import Http404
 from django.utils import timezone
@@ -41,7 +41,6 @@ def quiz_details(request, slug):
         raise Http404()
 
 
-
 def start_grading_quiz(quiz):
     challenges = quiz.challenges.all()
 
@@ -56,17 +55,18 @@ def start_grading_quiz(quiz):
             feedback.user.username, {}
         )[feedback.challenge.slug] = feedback
 
+    interactions = UserChallengeInteraction.objects.filter(challenge__in=challenges).prefetch_related('latest_submission')
+    interactions_by_user_and_challenge = {}
+    for interaction in interactions:
+        interactions_by_user_and_challenge.setdefault(interaction.user.username, {})[interaction.challenge.slug] = interaction
     to_save = []
     for user_quiz in UserQuiz.objects.filter(quiz=quiz):
         user = user_quiz.user
         for challenge in challenges:
             feedback = feedbacks_by_user_and_challenge.get(user.username, {}).get(challenge.slug)
-            if not feedback:
-                submission = CodeChallengeSubmission.objects.filter(
-                    author__id=user.id, challenge__slug=challenge.slug
-                ).order_by(
-                    '-creation_date'
-                ).first()
+            interaction = interactions_by_user_and_challenge.get(user.username, {}).get(challenge.slug)
+            if not feedback and interaction:
+                submission = interaction.latest_submission
 
                 feedback = QuizChallengeFeedback(quiz=quiz, user=user, challenge=challenge, submission=submission)
                 auto_grade = 10 / total_challenges

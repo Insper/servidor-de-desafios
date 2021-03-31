@@ -14,12 +14,13 @@ import code_challenge.gitpy as gitpy
 
 
 class SubmissionSignalTestCase(TestCase):
-    def assertInteractions(self, user, challenge, challenge_attempts,
+    def assertInteractions(self, user, challenge, submission, challenge_attempts,
             successful_challenge_attempts, concept_attempts, successful_concept_attempts,
             total_challenges, successful_challenges):
         user_challenge = UserChallengeInteraction.objects.get(user=user, challenge=challenge)
         self.assertEqual(challenge_attempts, user_challenge.attempts)
         self.assertEqual(successful_challenge_attempts, user_challenge.successful_attempts)
+        self.assertEqual(submission, user_challenge.latest_submission)
 
         user_concept = UserConceptInteraction.objects.get(user=user, concept=challenge.concept)
         self.assertEqual(concept_attempts, user_concept.attempts)
@@ -34,9 +35,9 @@ class SubmissionSignalTestCase(TestCase):
         concept = Concept.objects.create(name='Memoization', slug='algo-memoization')
         challenge = CodeChallenge.objects.create(title="Challenge", slug="challenge", repo=repo, concept=concept)
 
-        CodeChallengeSubmission.objects.create(challenge=challenge, author=user)
+        submission = CodeChallengeSubmission.objects.create(challenge=challenge, author=user)
 
-        self.assertInteractions(user, challenge, 1, 0, 1, 0, 1, 0)
+        self.assertInteractions(user, challenge, submission, 1, 0, 1, 0, 1, 0)
 
     def test_should_update_interactions_when_created(self):
         '''When a challenge submission is created for a challenge, the user-challenge interaction and user-concept interaction are updated.'''
@@ -51,30 +52,30 @@ class SubmissionSignalTestCase(TestCase):
         # Interactions should be created
         CodeChallengeSubmission.objects.create(challenge=other_challenge, author=user, success=False)
         CodeChallengeSubmission.objects.create(challenge=challenge_in_other_concept, author=user, success=False)
-        CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=False)
+        submission = CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=False)
 
-        self.assertInteractions(user, main_challenge, 1, 0, 2, 0, 2, 0)
+        self.assertInteractions(user, main_challenge, submission, 1, 0, 2, 0, 2, 0)
 
         # Now the interactions should be updated
         CodeChallengeSubmission.objects.create(challenge=other_challenge, author=user, success=True)
         CodeChallengeSubmission.objects.create(challenge=challenge_in_other_concept, author=user, success=True)
-        CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=True)
+        submission = CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=True)
 
-        self.assertInteractions(user, main_challenge, 2, 1, 4, 2, 2, 2)
+        self.assertInteractions(user, main_challenge, submission, 2, 1, 4, 2, 2, 2)
 
         # Successful count shouldn't change
         CodeChallengeSubmission.objects.create(challenge=other_challenge, author=user, success=False)
         CodeChallengeSubmission.objects.create(challenge=challenge_in_other_concept, author=user, success=False)
-        CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=False)
+        submission = CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=False)
 
-        self.assertInteractions(user, main_challenge, 3, 1, 6, 2, 2, 2)
+        self.assertInteractions(user, main_challenge, submission, 3, 1, 6, 2, 2, 2)
 
         # Successful count should change
         CodeChallengeSubmission.objects.create(challenge=other_challenge, author=user, success=True)
         CodeChallengeSubmission.objects.create(challenge=challenge_in_other_concept, author=user, success=True)
-        CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=True)
+        submission = CodeChallengeSubmission.objects.create(challenge=main_challenge, author=user, success=True)
 
-        self.assertInteractions(user, main_challenge, 4, 2, 8, 4, 2, 2)
+        self.assertInteractions(user, main_challenge, submission, 4, 2, 8, 4, 2, 2)
 
 
 def save_challenge(base_dir, slug, details, question, tests):

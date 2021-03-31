@@ -22,6 +22,7 @@ def post_submission_save(sender, instance, created, raw, using, update_fields, *
         user_challenge = UserChallengeInteraction.objects.create(user=author, challenge=challenge)
         user_concept.total_challenges += 1
 
+    user_challenge.latest_submission = instance
     user_challenge.attempts += 1
     user_concept.attempts += 1
     if instance.success:

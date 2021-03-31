@@ -72,9 +72,13 @@ class CodeChallengeSubmission(models.Model):
 class UserChallengeInteraction(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     challenge = models.ForeignKey(CodeChallenge, on_delete=models.CASCADE)
+    latest_submission = models.ForeignKey(CodeChallengeSubmission, on_delete=models.SET_NULL, null=True)
     attempts = models.IntegerField(default=0)
     successful_attempts = models.IntegerField(default=0)
 
     @property
     def completed(self):
         return self.successful_attempts > 0
+
+    def __str__(self):
+        return f'{self.user} - {self.challenge} [{self.successful_attempts}/{self.attempts}]'
