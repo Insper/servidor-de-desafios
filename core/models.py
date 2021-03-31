@@ -6,9 +6,18 @@ from django.utils import timezone
 from datetime import timedelta
 
 
+class UserTag(models.Model):
+    tag = models.CharField(max_length=128)
+    slug = models.SlugField(max_length=128)
+
+    def __str__(self):
+        return self.tag
+
+
 class PyGymUser(AbstractUser):
-    additional_quiz_time_percent=models.FloatField(default=0)
-    additional_quiz_time_absolute=models.IntegerField(default=0)
+    additional_quiz_time_percent = models.FloatField(default=0)
+    additional_quiz_time_absolute = models.IntegerField(default=0)
+    tags = models.ManyToManyField(UserTag, related_name='users')
 
 
 class EmailToken(models.Model):

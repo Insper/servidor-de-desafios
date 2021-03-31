@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
-from .serializers import UserSerializer, ConceptSerializer
-from .models import Concept, PyGymUser
+from .serializers import UserSerializer, UserTagSerializer, ConceptSerializer
+from .models import Concept, PyGymUser, UserTag
 
 
 @api_view(['GET'])
@@ -21,6 +21,13 @@ def get_user(request):
 def list_users(request):
     users = PyGymUser.objects.all()
     return Response(UserSerializer(users, many=True).data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def list_user_tags(request):
+    tags = UserTag.objects.all()
+    return Response(UserTagSerializer(tags, many=True).data)
 
 
 class ConceptListView(APIView):
