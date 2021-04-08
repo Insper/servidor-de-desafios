@@ -103,7 +103,9 @@ class Command(BaseCommand):
             for concept in [t.strip() for t in f.read().split() if t.strip()]:
                 args = concept.split(',')
                 if len(args) > 2:
-                    Concept.objects.get_or_create(name=args[0], slug=args[1], order=int(args[2]))
+                    c, _ = Concept.objects.get_or_create(name=args[0], slug=args[1])
+                    c.order = int(args[2])
+                    c.save()
                 elif len(args) > 1:
                     Concept.objects.get_or_create(name=args[0], slug=args[1])
                 else:
