@@ -9,14 +9,14 @@ class FullestCodeChallengeSerializer(ModelSerializer):
 
     class Meta:
         model = CodeChallenge
-        fields = ['title', 'slug', 'question', 'concept', 'function_name', 'test_code', 'in_quiz']
+        fields = ['title', 'slug', 'question', 'concept', 'function_name', 'test_code', 'in_quiz', 'weight', 'difficulty']
 
 class FullCodeChallengeSerializer(ModelSerializer):
     concept = ConceptSerializer(read_only=True)
 
     class Meta:
         model = CodeChallenge
-        fields = ['title', 'slug', 'question', 'concept', 'function_name', 'in_quiz']
+        fields = ['title', 'slug', 'question', 'concept', 'function_name', 'in_quiz', 'weight', 'difficulty']
 
 
 class ShortCodeChallengeSerializer(ModelSerializer):
@@ -24,7 +24,7 @@ class ShortCodeChallengeSerializer(ModelSerializer):
 
     class Meta:
         model = CodeChallenge
-        fields = ['title', 'slug', 'concept', 'in_quiz']
+        fields = ['title', 'slug', 'concept', 'in_quiz', 'weight', 'difficulty']
 
 
 class CodeChallengeSubmissionSerializer(ModelSerializer):

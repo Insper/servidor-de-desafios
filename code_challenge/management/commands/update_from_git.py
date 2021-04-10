@@ -38,6 +38,8 @@ class Command(BaseCommand):
             challenge.published = data['published']
             challenge.show_stdout = data['terminal']
             challenge.function_name = data['function_name']
+            challenge.weight = data['weight']
+            challenge.difficulty = data['difficulty']
             challenge.deleted = False
             challenge.save()
         except CodeChallenge.DoesNotExist:
@@ -49,6 +51,8 @@ class Command(BaseCommand):
                 published=data['published'],
                 show_stdout=data['terminal'],
                 function_name=data['function_name'],
+                weight=data['weight'],
+                difficulty=data['difficulty'],
                 concept=concept,
             )
         return challenge

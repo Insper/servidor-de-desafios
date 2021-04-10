@@ -19,6 +19,8 @@ class CodeChallenge(models.Model):
     concept = models.ForeignKey(Concept, on_delete=models.CASCADE)
     function_name = models.CharField(max_length=50, blank=True, null=True)
     deleted = models.BooleanField(default=False)
+    weight = models.IntegerField(default=1)
+    difficulty = models.IntegerField(default=1)
     in_quiz = False
 
     @property
