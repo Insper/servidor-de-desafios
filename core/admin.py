@@ -3,7 +3,7 @@ import pandas as pd
 from django.contrib import admin
 from django.forms import ModelForm, FileField
 from django.contrib.auth.admin import UserAdmin
-from .models import PyGymUser, Concept, ChallengeRepo, UserTag
+from .models import PyGymUser, Concept, ChallengeRepo, UserTag, Semester
 
 
 class UserInline(admin.TabularInline):
@@ -65,3 +65,4 @@ admin.site.register(PyGymUser, CustomUserAdmin)
 admin.site.register(Concept)
 admin.site.register(ChallengeRepo)
 admin.site.register(UserTag, UserTagAdmin)
+admin.site.register(Semester)

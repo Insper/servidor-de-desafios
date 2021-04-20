@@ -12,6 +12,7 @@ urlpatterns = [
     path('code/', include('code_challenge.urls')),
     path('trace/', include('trace_challenge.urls')),
     path('quiz/', include('quiz.urls')),
+    path('grade/', include('grade.urls')),
     path('content/', include('content.urls')),
     path('thanks/', include('thanks.urls')),
 ]

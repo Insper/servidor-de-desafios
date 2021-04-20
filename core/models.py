@@ -26,6 +26,14 @@ class EmailToken(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
 
 
+class Semester(models.Model):
+    year = models.IntegerField()
+    semester = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.year}-{self.semester}'
+
+
 class Concept(models.Model):
     name = models.CharField(max_length=128)
     slug = models.CharField(max_length=128)

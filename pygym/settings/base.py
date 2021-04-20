@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'code_challenge',
     'trace_challenge',
     'content',
+    'grade',
     'quiz',
     'thanks',
     'pygym_auth',

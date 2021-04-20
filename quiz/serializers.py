@@ -33,6 +33,7 @@ class QuizChallengeFeedbackSerializer(ModelSerializer):
     user = UserSerializer()
     challenge_slug = SerializerMethodField()
     submission_id = SerializerMethodField()
+    quiz_slug = SerializerMethodField()
 
     def get_challenge_slug(self, obj):
         return obj.challenge.slug
@@ -40,6 +41,9 @@ class QuizChallengeFeedbackSerializer(ModelSerializer):
     def get_submission_id(self, obj):
         return obj.submission_id
 
+    def get_quiz_slug(self, obj):
+        return obj.quiz.slug
+
     class Meta:
         model = QuizChallengeFeedback
-        fields = ['id', 'user', 'challenge_slug', 'submission_id', 'auto_grade', 'manual_grade', 'graded', 'feedback']
+        fields = ['id', 'user', 'quiz_slug', 'challenge_slug', 'submission_id', 'auto_grade', 'manual_grade', 'graded', 'feedback']
