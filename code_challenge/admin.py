@@ -4,7 +4,7 @@ from code_challenge.models import CodeChallenge, CodeChallengeSubmission, UserCh
 
 
 def latest_submission(obj):
-    return format_html(f'<a href="/admin/code_challenge/codechallengesubmission/{obj.id}/change/">{obj}</a>')
+    return format_html(f'<a href="/admin/code_challenge/codechallengesubmission/{obj.latest_submission.id}/change/">{obj}</a>')
 
 class UserChallengeInteractionAdmin(admin.ModelAdmin):
     exclude = ('latest_submission',)
