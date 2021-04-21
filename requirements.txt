@@ -23,4 +23,5 @@ strtest==0.0.4
 urllib3==1.25.11
 zipp==3.4.0
 pandas
+django-admin-shell
 psycopg2-binary==2.8.6

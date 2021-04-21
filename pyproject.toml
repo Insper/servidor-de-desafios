@@ -19,6 +19,7 @@ gunicorn = "^20.0.4"
 django-storages = "^1.11.1"
 boto3 = "^1.17.6"
 pandas = "^1.2.3"
+django-admin-shell = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.3"

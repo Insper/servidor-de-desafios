@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'quiz',
     'thanks',
     'pygym_auth',
+    'django_admin_shell',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
