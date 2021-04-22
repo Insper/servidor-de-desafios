@@ -9,6 +9,7 @@ def latest_submission(obj):
 class UserChallengeInteractionAdmin(admin.ModelAdmin):
     exclude = ('latest_submission',)
     readonly_fields = (latest_submission,)
+    list_filter = ('user', 'challenge')
 
 
 admin.site.register(CodeChallenge)
