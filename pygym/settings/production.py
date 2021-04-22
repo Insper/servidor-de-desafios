@@ -3,7 +3,7 @@ import requests
 from dotenv import load_dotenv
 
 
-DEBUG = True
+DEBUG = False
 PRODUCTION = True
 
 # SECURE_SSL_REDIRECT = True
