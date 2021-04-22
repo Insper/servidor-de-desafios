@@ -12,6 +12,10 @@ class UserChallengeInteractionAdmin(admin.ModelAdmin):
     list_filter = ('user', 'challenge')
 
 
+class CodeChallengeSubmissionAdmin(admin.ModelAdmin):
+    list_filter = ('author', 'challenge')
+
+
 admin.site.register(CodeChallenge)
-admin.site.register(CodeChallengeSubmission)
+admin.site.register(CodeChallengeSubmission, CodeChallengeSubmissionAdmin)
 admin.site.register(UserChallengeInteraction, UserChallengeInteractionAdmin)
