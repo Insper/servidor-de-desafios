@@ -153,12 +153,24 @@ class CodeInteractionListView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def list_interactions_for(request):
-    usernames = request.GET.get('usernames').split(',')
-    challenge_slugs = request.GET.get('challenges').split(',')
+    usernames = request.GET.get('usernames')
+    challenge_slugs = request.GET.get('challenges')
+    kw_filters = {}
+    if usernames:
+        kw_filters['user__username__in'] = usernames.split(',')
+    if challenge_slugs:
+        kw_filters['challenge__slug__in'] = challenge_slugs.split(',')
 
-    interactions = UserChallengeInteraction.objects.filter(user__username__in=usernames, challenge__slug__in=challenge_slugs)
-    serializer = UserChallengeInteractionSerializer(interactions, many=True)
-    return Response(serializer.data)
+    if kw_filters:
+        interactions = UserChallengeInteraction.objects.filter(**kw_filters).prefetch_related('challenge')
+        serializer = UserChallengeInteractionSerializer(interactions, many=True)
+        data = serializer.data
+    else:
+        interactions = UserChallengeInteraction.objects.all().prefetch_related('challenge')
+        data = {}
+        for interaction in interactions:
+            data.setdefault(interaction.user.username, {})[interaction.challenge.slug] = [interaction.attempts, interaction.successful_attempts]
+    return Response(data)
 
 
 @api_view(['GET'])

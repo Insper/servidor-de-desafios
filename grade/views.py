@@ -34,11 +34,14 @@ def get_semester_grades(semester, user=None):
         quiz_slug = quiz_feedback["quiz_slug"]
         challenge_slug = quiz_feedback["challenge_slug"]
         username = quiz_feedback["user"]["username"]
-        del quiz_feedback["user"]
-        del quiz_feedback["challenge_slug"]
-        del quiz_feedback["quiz_slug"]
-        del quiz_feedback["graded"]
-        del quiz_feedback["id"]
+        if user:
+            del quiz_feedback["user"]
+            del quiz_feedback["challenge_slug"]
+            del quiz_feedback["quiz_slug"]
+            del quiz_feedback["graded"]
+            del quiz_feedback["id"]
+        else:
+            quiz_feedback = [quiz_feedback["auto_grade"], quiz_feedback["manual_grade"]]
         quizzes_serialized.setdefault(username, {}).setdefault(quiz_slug, {})[challenge_slug] = quiz_feedback
 
     # Serialize all code challenges
