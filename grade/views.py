@@ -9,6 +9,54 @@ from code_challenge.models import UserChallengeInteraction
 from quiz.serializers import QuizChallengeFeedbackSerializer
 
 
+def load_grade_schema(semester):
+    course_grade = CourseGrade.objects.filter(semester=semester).last()
+    quiz_grades = course_grade.quizzes.filter(available=True).prefetch_related('quiz')
+    exam_grades = course_grade.exams.filter(available=True).prefetch_related('quiz')
+
+    return {
+        "semester": str(semester),
+        "quiz_weight": course_grade.quiz_weight,
+        "quizzes": [
+            {
+                "title": grade.quiz.title,
+                "quiz_slug": grade.quiz.slug,
+                "weight": grade.weight,
+                "has_manual_assessment": grade.quiz.has_manual_assessment,
+            } for grade in quiz_grades
+        ],
+        "exams": [
+            {
+                "title": grade.quiz.title,
+                "quiz_slug": grade.quiz.slug,
+                "weight": grade.weight,
+                "has_manual_assessment": grade.quiz.has_manual_assessment,
+            } for grade in exam_grades
+        ],
+    }
+
+def load_user_grades(semester, username):
+    course_grade = CourseGrade.objects.filter(semester=semester).last()
+    quiz_grades = course_grade.quizzes.filter(available=True).prefetch_related('quiz')
+    exam_grades = course_grade.exams.filter(available=True).prefetch_related('quiz')
+
+    # Get submissions
+    quizzes = [quiz_grade.quiz for quiz_grade in quiz_grades]
+    exams = [exam_grade.quiz for exam_grade in exam_grades]
+
+    all_quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz__in=quizzes + exams, user__username=username).prefetch_related('quiz', 'challenge')
+
+    # Serialize all quizzes
+    quizzes_serialized = {}
+    for quiz_feedback in all_quiz_feedbacks:
+        quiz_slug = quiz_feedback.quiz.slug
+        challenge_slug = quiz_feedback.challenge.slug
+        quiz_grade = (quiz_feedback.auto_grade or 0) + (quiz_feedback.manual_grade or 0)
+        quizzes_serialized.setdefault(quiz_slug, {})[challenge_slug] = quiz_grade
+    return quizzes_serialized
+
+
+
 def get_semester_grades(semester, user=None):
     course_grade = CourseGrade.objects.filter(semester=semester).last()
     quiz_grades = course_grade.quizzes.filter(available=True).prefetch_related('quiz')
@@ -107,3 +155,17 @@ def current_grades(request):
 def all_current_grades(request):
     semester = Semester.objects.latest('year', 'semester')
     return Response(get_semester_grades(semester))
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_grade_schema(request):
+    semester = Semester.objects.latest('year', 'semester')
+    return Response(load_grade_schema(semester))
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_user_grade(request, username):
+    semester = Semester.objects.latest('year', 'semester')
+    return Response(load_user_grades(semester, username))

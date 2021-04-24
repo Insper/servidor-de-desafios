@@ -155,6 +155,7 @@ class CodeInteractionListView(APIView):
 def list_interactions_for(request):
     usernames = request.GET.get('usernames')
     challenge_slugs = request.GET.get('challenges')
+    simple = request.GET.get('simple')
     kw_filters = {}
     if usernames:
         kw_filters['user__username__in'] = usernames.split(',')
@@ -163,13 +164,15 @@ def list_interactions_for(request):
 
     if kw_filters:
         interactions = UserChallengeInteraction.objects.filter(**kw_filters).prefetch_related('challenge')
-        serializer = UserChallengeInteractionSerializer(interactions, many=True)
-        data = serializer.data
     else:
         interactions = UserChallengeInteraction.objects.all().prefetch_related('challenge')
+    if simple or not kw_filters:
         data = {}
         for interaction in interactions:
             data.setdefault(interaction.user.username, {})[interaction.challenge.slug] = [interaction.attempts, interaction.successful_attempts]
+    else:
+        serializer = UserChallengeInteractionSerializer(interactions, many=True)
+        data = serializer.data
     return Response(data)
 
 
