@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.http import Http404
+from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.core.files.base import ContentFile
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
@@ -174,6 +176,16 @@ def list_interactions_for(request):
         serializer = UserChallengeInteractionSerializer(interactions, many=True)
         data = serializer.data
     return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def count_working_days(request, username):
+    working_days = CodeChallengeSubmission.objects.filter(author__username=username).annotate(date=TruncDate('creation_date')) \
+        .values('date') \
+        .distinct() \
+        .aggregate(dates=Count('date'))
+    return Response(working_days['dates'])
 
 
 @api_view(['GET'])

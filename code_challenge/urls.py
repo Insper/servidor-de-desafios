@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.CodeChallengeListView.as_view(), name='challenges'),
     path('interaction/', views.CodeInteractionListView.as_view(), name='code_interaction_list'),
     path('admin/interaction/', views.list_interactions_for, name='list_interactions_for'),
+    path('admin/working-days/<str:username>/', views.count_working_days, name='count_working_days'),
     path('<slug:slug>/', views.CodeChallengeView.as_view(), name='challenge'),
     path('<slug:slug>/test-code/', views.get_test_code, name='challenge_test_code'),
     path('<slug:slug>/submission/', views.CodeChallengeSubmissionListView.as_view(), name='submissions'),
