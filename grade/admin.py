@@ -1,7 +1,7 @@
 from io import TextIOWrapper
 from django.contrib import admin
 from django.forms import ModelForm, FileField
-from .models import CourseGrade, QuizGrade, ExamGrade, CodeExerciseGrade, SubChallengeGrade
+from .models import CourseGrade, QuizGrade, ExamGrade, CodeExerciseGrade, SubChallengeGrade, CodeExerciseFeedback, SubChallengeGrade
 
 
 class QuizGradeInline(admin.TabularInline):
@@ -24,4 +24,5 @@ class CourseGradeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CourseGrade, CourseGradeAdmin)
+admin.site.register(CodeExerciseFeedback)
 admin.site.register(SubChallengeGrade)

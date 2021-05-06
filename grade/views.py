@@ -2,11 +2,12 @@ from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from core.models import Semester
-from grade.models import CourseGrade
+from core.models import Semester, PyGymUser
+from grade.models import CodeExerciseGrade, CourseGrade, SubChallengeAutoFeedback, SubChallengeGrade, CodeExerciseFeedback
 from quiz.models import QuizChallengeFeedback
-from code_challenge.models import UserChallengeInteraction
+from code_challenge.models import CodeChallengeSubmission
 from quiz.serializers import QuizChallengeFeedbackSerializer
+from grade.serializers import CodeExerciseGradeSerializer, CodeExerciseFeedbackSerializer
 
 
 def load_grade_schema(semester):
@@ -140,10 +141,14 @@ def get_semester_grades(semester, user=None):
     }
 
 
+def current_semester():
+    return Semester.objects.latest('year', 'semester')
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def current_grades(request):
-    semester = Semester.objects.latest('year', 'semester')
+    semester = current_semester()
     user = request.user
     if not user:
         raise Http404()
@@ -153,19 +158,106 @@ def current_grades(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def all_current_grades(request):
-    semester = Semester.objects.latest('year', 'semester')
+    semester = current_semester()
     return Response(get_semester_grades(semester))
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def get_grade_schema(request):
-    semester = Semester.objects.latest('year', 'semester')
+    semester = current_semester()
     return Response(load_grade_schema(semester))
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def get_user_grade(request, username):
-    semester = Semester.objects.latest('year', 'semester')
+    semester = current_semester()
     return Response(load_user_grades(semester, username))
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def all_current_code_grades(request):
+    semester = current_semester()
+    code_grades = CodeExerciseGrade.objects.filter(course_grade__semester=semester)
+    return Response(CodeExerciseGradeSerializer(code_grades, many=True).data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_ungraded_users(request, code_exercise_slug):
+    # TODO list only current students
+    try:
+        code_exercise_grade = CodeExerciseGrade.objects.get(slug=code_exercise_slug)
+    except CodeExerciseGrade.DoesNotExist:
+        raise Http404()
+    all_students = PyGymUser.objects.filter(is_staff=False)
+    graded_students_ids = CodeExerciseFeedback.objects.filter(grade_schema=code_exercise_grade).values_list('user__id').distinct()
+    return Response(all_students.exclude(id__in=graded_students_ids).values_list('username', flat=True))
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def grade_code_exercise(request, code_exercise_slug, username):
+    try:
+        code_exercise_grade = CodeExerciseGrade.objects.get(slug=code_exercise_slug)
+        user = PyGymUser.objects.get(username=username)
+    except (CodeExerciseGrade.DoesNotExist, PyGymUser.DoesNotExist):
+        raise  Http404()
+
+    try:
+        feedback = CodeExerciseFeedback.objects.get(user=user, grade_schema__slug=code_exercise_slug)
+        changed = False
+        if 'manual_grade' in request.data:
+            feedback.manual_grade = request.data['manual_grade']
+            changed = True
+        if 'feedback' in request.data:
+            feedback.feedback = request.data['feedback']
+            changed = True
+        if changed:
+            feedback.save()
+        return Response(CodeExerciseFeedbackSerializer(feedback).data)
+    except CodeExerciseFeedback.DoesNotExist:
+        pass
+
+    full_feedback = CodeExerciseFeedback.objects.create(user=user, grade_schema=code_exercise_grade)
+    auto_grade = 0
+
+    for subchallenge_grade in SubChallengeGrade.objects.filter(code_exercise=code_exercise_grade):
+        filters = {'author': user, 'challenge': subchallenge_grade.challenge}
+        if code_exercise_grade.deadline:
+            filters['creation_date__lte'] = code_exercise_grade.deadline
+        try:
+            submission = CodeChallengeSubmission.objects.filter(**filters).latest('creation_date')
+            SubChallengeAutoFeedback.objects.create(user=user, submission=submission, grade_schema=subchallenge_grade, full_feedback=full_feedback)
+            auto_grade += submission.success * subchallenge_grade.weight / 10
+        except CodeChallengeSubmission.DoesNotExist:
+            pass
+
+    full_feedback.auto_grade = auto_grade
+    full_feedback.save()
+
+    return Response(CodeExerciseFeedbackSerializer(full_feedback).data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_code_feedbacks(request, code_exercise_slug):
+    try:
+        code_exercise_grade = CodeExerciseGrade.objects.get(slug=code_exercise_slug)
+    except CodeExerciseGrade.DoesNotExist:
+        raise  Http404()
+
+    feedbacks = CodeExerciseFeedback.objects.filter(grade_schema=code_exercise_grade).prefetch_related('grade_schema')
+    return Response(CodeExerciseFeedbackSerializer(feedbacks, many=True).data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_code_grade(request, code_exercise_slug):
+    try:
+        code_exercise_grade = CodeExerciseGrade.objects.get(slug=code_exercise_slug)
+        return Response(CodeExerciseGradeSerializer(code_exercise_grade).data)
+    except CodeExerciseGrade.DoesNotExist:
+        raise  Http404()
