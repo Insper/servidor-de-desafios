@@ -63,18 +63,16 @@ def get_semester_grades(semester, user=None):
     quiz_grades = course_grade.quizzes.filter(available=True).prefetch_related('quiz')
     exam_grades = course_grade.exams.filter(available=True).prefetch_related('quiz')
     code_exercise_grades = course_grade.code_exercises.filter(available=True)
+    code_exercise_feedbacks = CodeExerciseFeedback.objects.filter(grade_schema__in=code_exercise_grades)
 
     # Get submissions
     quizzes = [quiz_grade.quiz for quiz_grade in quiz_grades]
     exams = [exam_grade.quiz for exam_grade in exam_grades]
-    all_subchallenges = sum([list(grade.subchallenges.all()) for grade in code_exercise_grades], [])
-    code_challenges = [challenge.challenge for challenge in all_subchallenges]
 
     all_quiz_feedbacks = QuizChallengeFeedback.objects.filter(quiz__in=quizzes + exams)
-    # all_code_exercise_feedbacks = UserChallengeInteraction.objects.filter(challenge__in=code_challenges)
     if user:
         all_quiz_feedbacks = all_quiz_feedbacks.filter(user=user)
-        # all_code_exercise_feedbacks = all_code_exercise_feedbacks.filter(user=user)
+        code_exercise_feedbacks = code_exercise_feedbacks.filter(user=user)
     all_quiz_feedbacks_serialized = QuizChallengeFeedbackSerializer(all_quiz_feedbacks, many=True).data
 
     # Serialize all quizzes
@@ -94,16 +92,19 @@ def get_semester_grades(semester, user=None):
         quizzes_serialized.setdefault(username, {}).setdefault(quiz_slug, {})[challenge_slug] = quiz_feedback
 
     # Serialize all code challenges
-    # challenges_serialized = {}
-    # for feedback in all_code_exercise_feedbacks:
-    #     feedback.user.username
-    #     challenge_slug = feedback.challenge.slug
-    #     submission = feedback.latest_submission
-    #     challenges_serialized.setdefault(username, {})[challenge_slug] = {"id": submission.id, "success": submission.success}
+    challenges_serialized = {}
+    for feedback in code_exercise_feedbacks:
+        username = feedback.user.username
+        challenge_slug = feedback.grade_schema.slug
+        challenges_serialized.setdefault(username, {})[challenge_slug] = {
+            "auto_grade": feedback.auto_grade,
+            "manual_grade": feedback.manual_grade,
+            "feedback": feedback.feedback,
+        }
 
     return {
         "quizzes": quizzes_serialized,
-        # "code_challenges": challenges_serialized,
+        "code_exercises": challenges_serialized,
         "schema": {
             "semester": str(semester),
             "quiz_weight": course_grade.quiz_weight,
@@ -123,20 +124,14 @@ def get_semester_grades(semester, user=None):
                     "has_manual_assessment": grade.quiz.has_manual_assessment,
                 } for grade in exam_grades
             ],
-            # "code_exercises": [
-            #     {
-            #         "name": grade.name,
-            #         "manual_grade_weight": grade.manual_grade_weight,
-            #         "weight": grade.weight,
-            #         "feedback": grade.feedback,
-            #         "subchallenges": [
-            #             {
-            #                 "challenge_slug": subchallenge.challenge.slug,
-            #                 "weight": subchallenge.weight,
-            #             } for subchallenge in grade.subchallenges.all()
-            #         ]
-            #     } for grade in code_exercise_grades
-            # ],
+            "code_exercises": [
+                {
+                    "name": grade.name,
+                    "slug": grade.slug,
+                    "manual_grade_weight": grade.manual_grade_weight,
+                    "weight": grade.weight,
+                } for grade in code_exercise_grades
+            ],
         }
     }
 
