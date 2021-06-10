@@ -1,10 +1,11 @@
 from django.http import Http404
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from core.models import Semester, PyGymUser
 from grade.models import CodeExerciseGrade, CourseGrade, SubChallengeAutoFeedback, SubChallengeGrade, CodeExerciseFeedback
-from quiz.models import QuizChallengeFeedback
+from quiz.models import QuizChallengeFeedback, UserQuiz
 from code_challenge.models import CodeChallengeSubmission
 from quiz.serializers import QuizChallengeFeedbackSerializer
 from grade.serializers import CodeExerciseGradeSerializer, CodeExerciseFeedbackSerializer
@@ -169,6 +170,58 @@ def get_grade_schema(request):
 def get_user_grade(request, username):
     semester = current_semester()
     return Response(load_user_grades(semester, username))
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_userquiz_updated(request, username, quiz_slug):
+    user = PyGymUser.objects.get(username=username)
+    user_quiz = UserQuiz.objects.get(quiz__slug=quiz_slug, user=user)
+
+    base_duration = user_quiz.duration
+    additional_time = max(
+        user.additional_quiz_time_percent * base_duration,
+        user.additional_quiz_time_absolute
+    )
+    deadline = user_quiz.start_time + timezone.timedelta(minutes=base_duration + additional_time)
+
+    auto_grade = 10 / user_quiz.challenges.count()
+    if user_quiz.quiz.has_manual_assessment:
+        auto_grade *= 0.4
+
+    count = 0
+    for challenge in user_quiz.challenges.all():
+        try:
+            latest_submission = CodeChallengeSubmission.objects.filter(author=user, challenge=challenge, creation_date__lte=deadline).latest('creation_date')
+        except CodeChallengeSubmission.DoesNotExist:
+            continue
+
+        try:
+            feedback = QuizChallengeFeedback.objects.get(quiz=user_quiz.quiz, user=user, challenge=challenge)
+        except QuizChallengeFeedback.DoesNotExist:
+            feedback = None
+
+        if latest_submission.success:
+            new_auto_grade = auto_grade
+        else:
+            new_auto_grade = 0
+
+        if not feedback:
+            QuizChallengeFeedback.objects.create(
+                quiz=user_quiz.quiz,
+                user=user,
+                challenge=challenge,
+                submission=latest_submission,
+                auto_grade=new_auto_grade,
+            )
+            count += 1
+        elif feedback.submission != latest_submission:
+            feedback.submission = latest_submission
+            feedback.auto_grade = new_auto_grade
+            feedback.save()
+            count += 1
+    return Response(count)
+
 
 
 @api_view(['GET'])
