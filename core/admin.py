@@ -51,11 +51,26 @@ class UserTagAdmin(admin.ModelAdmin):
         self.add_tag(form.cleaned_data.get('blackboard_file'), obj)
 
 
+def resetar_usuarios(modeladmin, request, queryset):
+    for old_user in queryset:
+        new_user = PyGymUser()
+        new_user.username = old_user.username
+        new_user.first_name = old_user.first_name
+        new_user.last_name = old_user.last_name
+        new_user.email = old_user.email
+        new_user.password = old_user.password
+        new_user.additional_quiz_time_percent = old_user.additional_quiz_time_percent
+        new_user.additional_quiz_time_absolute = old_user.additional_quiz_time_absolute
+        old_user.username = old_user.username + '_old'
+        old_user.save()
+        new_user.save()
+
 
 class CustomUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('tags',)
     list_filter = UserAdmin.list_filter + ('tags',)
     fieldsets = UserAdmin.fieldsets + (('Tags', { 'fields': ('tags',) }),)
+    actions = [resetar_usuarios]
 
     def tags(self):
         return ','.join(tag for tag in self.tags.all())
