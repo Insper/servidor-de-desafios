@@ -69,7 +69,8 @@ def resetar_usuarios(modeladmin, request, queryset):
 class CustomUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('tags',)
     list_filter = UserAdmin.list_filter + ('tags',)
-    fieldsets = UserAdmin.fieldsets + (('Tags', { 'fields': ('tags',) }),)
+    fieldsets = UserAdmin.fieldsets + (('Tags', { 'fields': ('tags',) }),('Quiz time', { 'fields': ('additional_quiz_time_percent'
+, 'additional_quiz_time_absolute')}))
     actions = [resetar_usuarios]
 
     def tags(self):
