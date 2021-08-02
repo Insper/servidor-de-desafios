@@ -3,7 +3,7 @@ from .models import Quiz, UserQuiz, QuizChallengeFeedback
 
 
 class QuizChallengeFeedbackAdmin(admin.ModelAdmin):
-    readonly_fields = ["quiz", "user", "challenge", "submission"]
+    readonly_fields = ["quiz", "challenge", "submission"]
 
 
 admin.site.register(Quiz)
