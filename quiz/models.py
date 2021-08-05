@@ -16,6 +16,7 @@ class QuestionTypes(models.TextChoices):
 
 class Quiz(models.Model):
     title = models.CharField(max_length=1024)
+    description = models.TextField(blank=True, null=True)
     question_type = models.CharField(
         max_length=2,
         choices=QuestionTypes.choices,
@@ -43,6 +44,10 @@ class UserQuiz(models.Model):
     @property
     def title(self):
         return self.quiz.title
+
+    @property
+    def description(self):
+        return self.quiz.description
 
     @property
     def remaining_seconds(self):

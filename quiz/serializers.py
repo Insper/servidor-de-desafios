@@ -11,6 +11,7 @@ class QuizSerializer(ModelSerializer):
         model = Quiz
         fields = [
             'title',
+            'description',
             'question_type',
             'slug',
             'duration',
@@ -26,7 +27,7 @@ class UserQuizSerializer(ModelSerializer):
 
     class Meta:
         model = UserQuiz
-        fields = ['title', 'user', 'start_time', 'submission_time', 'remaining_seconds', 'duration', 'submitted', 'challenges', 'has_manual_assessment', 'slug']
+        fields = ['title', 'description', 'user', 'start_time', 'submission_time', 'remaining_seconds', 'duration', 'submitted', 'challenges', 'has_manual_assessment', 'slug']
 
 
 class QuizChallengeFeedbackSerializer(ModelSerializer):
