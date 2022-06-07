@@ -1,15 +1,15 @@
 branch-defaults:
   master:
-    environment: softdes-backend-env
+    environment: pygym-backend
     group_suffix: null
   server-2.0:
     environment: null
     group_suffix: null
 global:
-  application_name: pygym-backend
+  application_name: softdes-backend-env-v2
   branch: null
   default_ec2_keyname: aws-eb
-  default_platform: Python 3.6
+  default_platform: Python 3.8
   default_region: us-east-1
   include_git_submodules: true
   instance_profile: null
