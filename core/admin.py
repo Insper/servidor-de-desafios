@@ -1,9 +1,12 @@
 from io import TextIOWrapper
 import pandas as pd
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.forms import ModelForm, FileField
 from django.contrib.auth.admin import UserAdmin
-from .models import PyGymUser, Concept, ChallengeRepo, UserTag, Semester
+from django.utils.translation import ngettext
+
+from code_challenge.repo import update_from_git
+from .models import FrontendUpdateUrl, PyGymUser, Concept, ChallengeRepo, UserTag, Semester
 
 
 class UserInline(admin.TabularInline):
@@ -77,8 +80,26 @@ class CustomUserAdmin(UserAdmin):
         return ','.join(tag for tag in self.tags.all())
 
 
+
+
+class ChallengeRepoAdmin(admin.ModelAdmin):
+    actions = ['update_data']
+
+    def update_data(self, request, queryset):
+        for repo in queryset:
+            update_from_git(repo)
+        n_repos = len(queryset)
+        self.message_user(request, ngettext(
+            f'{n_repos} repo was successfully updated.',
+            f'{n_repos} repos were successfully updated.',
+            n_repos,
+        ), messages.SUCCESS)
+    update_data.short_description = 'Update data from selected repositories'
+
+
 admin.site.register(PyGymUser, CustomUserAdmin)
 admin.site.register(Concept)
-admin.site.register(ChallengeRepo)
+admin.site.register(ChallengeRepo, ChallengeRepoAdmin)
+admin.site.register(FrontendUpdateUrl)
 admin.site.register(UserTag, UserTagAdmin)
 admin.site.register(Semester)

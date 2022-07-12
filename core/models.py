@@ -67,3 +67,15 @@ class ChallengeRepo(models.Model):
 
     def __str__(self):
         return f'{self.slug} ({self.remote})'
+
+
+class FrontendUpdateUrl(models.Model):
+    """URLs for deploy hooks: https://vercel.com/docs/concepts/git/deploy-hooks"""
+    name = models.CharField(max_length=1024)
+    url = models.URLField()
+
+    def __str__(self):
+        name = self.name
+        if name:
+            name += ': '
+        return f'{name}{self.url}'
